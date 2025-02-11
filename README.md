@@ -17,7 +17,7 @@ Welcome to the **PSS Language Server** project, a dedicated backend service for 
 
    ```bash
    git clone https://github.com/thisisthedarshan/pss-langserver.git
-   cd pss-lsp
+   cd pss-langserver
    ```
 
 2. Install dependencies:
