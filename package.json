@@ -1,0 +1,31 @@
+{
+  "name": "pss-langserver",
+  "version": "1.0.0",
+  "author": "Darshan",
+  "license": "GPL-3.0-only",
+  "displayName": "PSS Language Server",
+  "description": "A Language server for the Portable Stimulus Standard",
+  "main": "server",
+  "icon": "media/icon.jpeg",
+  "type": "commonjs",
+  "engines": {
+    "node": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thisisthedarshan/pss-langserver.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thisisthedarshan/pss-langserver/issues"
+  },
+  "homepage": "https://github.com/thisisthedarshan/pss-langserver#readme",
+  "keywords": [
+    "portable stimulus",
+    "pss",
+    "accellera pss",
+    "pss 3.0"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

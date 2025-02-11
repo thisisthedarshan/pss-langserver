@@ -1,0 +1,6 @@
+# Ignore some secrets - just in case :)
+.secret
+.secrets/
+
+# Ignore vscode generated folder
+.vscode/
