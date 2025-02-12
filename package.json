@@ -1,6 +1,6 @@
 {
   "name": "pss-langserver",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "author": "Darshan",
   "license": "GPL-3.0-only",
   "displayName": "PSS Language Server",
