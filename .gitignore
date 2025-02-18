@@ -4,3 +4,6 @@
 
 # Ignore vscode generated folder
 .vscode/
+
+# Ignore node modules
+node_modules/
