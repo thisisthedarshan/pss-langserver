@@ -11,3 +11,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The base config for the project - with icon
 - Changelog, gitignore, README, npmrc for the project
+- Build scripts and configurations
+- GitHub workflow to publish npm package
