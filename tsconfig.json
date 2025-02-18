@@ -2,18 +2,18 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "outDir": "./dist",        
-    "rootDir": "./src",        
-    "strict": true,             // Enable strict type checking
-    "esModuleInterop": true,    // For compatibility with CommonJS
-    "skipLibCheck": true,       // Skip type checking of declaration files
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true, // Enable strict type checking
+    "esModuleInterop": true, // For compatibility with CommonJS
+    "skipLibCheck": true, // Skip type checking of declaration files
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true, // Generate source maps for debugging
-    "types": [
-      "node",
-      "vscode"
-    ], // Add node and vscode types
   },
-  "include": ["src"], 
-  "exclude": ["node_modules"]  // Exclude node_modules
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ] // Exclude node_modules
 }
