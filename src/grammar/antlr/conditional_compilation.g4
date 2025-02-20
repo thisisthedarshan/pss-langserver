@@ -13,7 +13,7 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar conditional_compilation;
-import pss_lexer;
+import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
 
 package_body_compile_if : TOKEN_COMPILE TOKEN_IF TOKEN_FLBRACE constant_expression TOKEN_FRBRACE
 package_body_compile_if_item (TOKEN_ELSE package_body_compile_if_item)?;

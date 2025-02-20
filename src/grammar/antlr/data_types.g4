@@ -13,7 +13,7 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar data_types;
-import pss_lexer;
+import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types
 
 data_type :
 scalar_data_type

@@ -15,7 +15,7 @@
 
 parser grammar functions;
 
-import pss_lexer;
+import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
 
 procedural_function : platform_qualifier? TOKEN_PURE? TOKEN_STATIC? function
 function_prototype  TOKEN_CLBRACE  procedural_stmt*  TOKEN_CRBRACE;
