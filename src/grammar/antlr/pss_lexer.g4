@@ -57,7 +57,7 @@ TOKEN_DASTERISK: '**';
 TOKEN_PLUSEQ: '+=';
 TOKEN_MINUSEQ: '-=';
 TOKEN_LSHIFTEQ: '<<=';
-TOKEN_RSHIFTQE: '>>='
+TOKEN_RSHIFTQE: '>>=';
 TOKEN_OREQ: '|=';
 TOKEN_ANDEQ: '&=';
 
@@ -89,28 +89,28 @@ TOKEN_INPUT: 'input';
 TOKEN_OUTPUT: 'output';
 TOKEN_INOUT: 'inout';
 TOKEN_LOCK: 'lock';
-TOKEN_SHARE: 'share'; 
+TOKEN_SHARE: 'share';
 TOKEN_CONSTRAINT: 'constraint';
 TOKEN_PARALLEL: 'parallel';
 TOKEN_SEQUENCE: 'sequence';
 TOKEN_STRUCT: 'struct';
-TOKEN_BUFFER:'buffer';
-TOKEN_STREAM:'stream';
-TOKEN_STATE:'state';
-TOKEN_RESOURCE:'resource';
+TOKEN_BUFFER: 'buffer';
+TOKEN_STREAM: 'stream';
+TOKEN_STATE: 'state';
+TOKEN_RESOURCE: 'resource';
 TOKEN_EXEC: 'exec';
-TOKEN_PRESOLVE:'pre_solve';
-TOKEN_POSTSOLVE:'post_solve';
-TOKEN_PREBODY:'pre_body';
-TOKEN_BODY:'body';
-TOKEN_HEADER:'header';
-TOKEN_DECLARATION:'declaration';
-TOKEN_RUNSTART:'run_start';
-TOKEN_RUNEND:'run_end';
-TOKEN_INITDOWN:'init_down';
-TOKEN_INITUP:'init_up';
-TOKEN_INIT:'init';
-TOKEN_SUPER:'super';
+TOKEN_PRESOLVE: 'pre_solve';
+TOKEN_POSTSOLVE: 'post_solve';
+TOKEN_PREBODY: 'pre_body';
+TOKEN_BODY: 'body';
+TOKEN_HEADER: 'header';
+TOKEN_DECLARATION: 'declaration';
+TOKEN_RUNSTART: 'run_start';
+TOKEN_RUNEND: 'run_end';
+TOKEN_INITDOWN: 'init_down';
+TOKEN_INITUP: 'init_up';
+TOKEN_INIT: 'init';
+TOKEN_SUPER: 'super';
 TOKEN_PURE: 'pure';
 TOKEN_TARGET: 'target';
 TOKEN_SOLVE: 'solve';
@@ -142,7 +142,7 @@ TOKEN_JOINNONE: 'join_none';
 TOKEN_JOINFIRST: 'join_first';
 TOKEN_FOREACH: 'foreach';
 TOKEN_SELECT: 'select';
-TOKEN_REPLICATE:'replicate';
+TOKEN_REPLICATE: 'replicate';
 TOKEN_ATOMIC: 'atomic';
 TOKEN_SYMBOL: 'symbol';
 TOKEN_OVERRIDE: 'override';
@@ -165,10 +165,10 @@ TOKEN_STRING: 'string';
 TOKEN_BOOL: 'bool';
 TOKEN_FLOAT32: 'float32';
 TOKEN_FLOAT64: 'float64';
-TOKEN_ARRAY:'array';
-TOKEN_LIST:'list';
-TOKEN_MAP:'map';
-TOKEN_SET:'set';
+TOKEN_ARRAY: 'array';
+TOKEN_LIST: 'list';
+TOKEN_MAP: 'map';
+TOKEN_SET: 'set';
 TOKEN_TYPEDEF: 'typedef';
 TOKEN_DYNAMIC: 'dynamic';
 TOKEN_DISABLE: 'disable';
@@ -179,51 +179,59 @@ TOKEN_COVERGROUP: 'covergroup';
 TOKEN_OPTION: 'option';
 TOKEN_IFF: 'iff';
 TOKEN_COVERPOINT: 'coverpoint';
-TOKEN_BINS :'bins';
-TOKEN_ILLEGALBINS :'illegal_bins';
-TOKEN_IGNOREBINS :'ignore_bins';
+TOKEN_BINS: 'bins';
+TOKEN_ILLEGALBINS: 'illegal_bins';
+TOKEN_IGNOREBINS: 'ignore_bins';
 TOKEN_CROSS: 'cross';
 TOKEN_COMPILE: 'compile';
 TOKEN_HAS: 'has';
 TOKEN_ASSERT: 'assert';
 TOKEN_TRUE: 'true';
-TOKEN_FALSE:'false';
+TOKEN_FALSE: 'false';
 TOKEN_NULL: 'null';
 
 /* Digits */
-fragment BIN_DIGIT : '0' | '1';
-fragment OCT_DIGIT : [0-7];
-fragment DEC_DIGIT : [0-9];
-fragment HEX_DIGIT : [0-9a-fA-F];
-fragment EXP  : 'e' | 'E';
-fragment SIGN : '+' | '-';
+fragment BIN_DIGIT: '0' | '1';
+fragment OCT_DIGIT: [0-7];
+fragment DEC_DIGIT: [0-9];
+fragment HEX_DIGIT: [0-9a-fA-F];
+fragment EXP: 'e' | 'E';
+fragment SIGN: '+' | '-';
 
 /* Number literals */
-TOKEN_BIN_NUMBER : '0' ('b' | 'B') BIN_DIGIT (BIN_DIGIT | '_')*;
-TOKEN_OCT_NUMBER : '0' (OCT_DIGIT | '_')*;
-TOKEN_DEC_NUMBER : [1-9] (DEC_DIGIT | '_')*;
-TOKEN_HEX_NUMBER : '0' ('x' | 'X') HEX_DIGIT (HEX_DIGIT | '_')*;
+TOKEN_BIN_NUMBER: '0' ('b' | 'B') BIN_DIGIT (BIN_DIGIT | '_')*;
+TOKEN_OCT_NUMBER: '0' (OCT_DIGIT | '_')*;
+TOKEN_DEC_NUMBER: [1-9] (DEC_DIGIT | '_')*;
+TOKEN_HEX_NUMBER: '0' ('x' | 'X') HEX_DIGIT (HEX_DIGIT | '_')*;
 
-TOKEN_BASED_BIN_LITERAL : '\'' ('s' | 'S')? ('b' | 'B') TOKEN_BIN_DIGIT (TOKEN_BIN_DIGIT | '_')*;
-TOKEN_BASED_OCT_LITERAL : '\'' ('s' | 'S')? ('o' | 'O') TOKEN_OCT_DIGIT (TOKEN_OCT_DIGIT | '_')*;
-TOKEN_BASED_DEC_LITERAL : '\'' ('s' | 'S')? ('d' | 'D') TOKEN_DEC_DIGIT (TOKEN_DEC_DIGIT | '_')*;
-TOKEN_BASED_HEX_LITERAL : '\'' ('s' | 'S')? ('h' | 'H') TOKEN_HEX_DIGIT (TOKEN_HEX_DIGIT | '_')*;
+TOKEN_BASED_BIN_LITERAL:
+	'\'' ('s' | 'S')? ('b' | 'B') BIN_DIGIT (BIN_DIGIT | '_')*;
+TOKEN_BASED_OCT_LITERAL:
+	'\'' ('s' | 'S')? ('o' | 'O') OCT_DIGIT (OCT_DIGIT | '_')*;
+TOKEN_BASED_DEC_LITERAL:
+	'\'' ('s' | 'S')? ('d' | 'D') DEC_DIGIT (DEC_DIGIT | '_')*;
+TOKEN_BASED_HEX_LITERAL:
+	'\'' ('s' | 'S')? ('h' | 'H') HEX_DIGIT (HEX_DIGIT | '_')*;
 
 /* Comments */
-TOKEN_SL_COMMENT : '//' ~[\r\n]* '\n' -> channel(HIDDEN);
-TOKEN_ML_COMMENT : '/*' .*? '*/' -> channel(HIDDEN);
+TOKEN_SL_COMMENT: '//' ~[\r\n]* '\n' -> channel(HIDDEN);
+TOKEN_ML_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
 /* Double and Triple-quoted strings */
-TOKEN_QUOTED_STRING : '"' ( TOKEN_UNESCAPED_CHARACTER | TOKEN_ESCAPED_CHARACTER )* '"';
-TOKEN_TRIPLE_QUOTED_STRING : '"""' .*? '"""';
+TOKEN_QUOTED_STRING:
+	'"' (UNESCAPED_CHARACTER | ESCAPED_CHARACTER)* '"';
+TOKEN_TRIPLE_QUOTED_STRING: '"""' .*? '"""';
 
 // String-related characters
-fragment UNESCAPED_CHARACTER : ~["\\]; // Any printable character except quotes and backslash
-fragment ESCAPED_CHARACTER : '\\' ['"\\?abfnrtv] | '\\' [0-7] [0-7] [0-7]; // Escapes
+fragment UNESCAPED_CHARACTER:
+	~["\\]; // Any printable character except quotes and backslash
+fragment ESCAPED_CHARACTER:
+	'\\' ['"\\?abfnrtv]
+	| '\\' [0-7] [0-7] [0-7]; // Escapes
 
-TOKEN_FILENAME_STRING : TOKEN_QUOTED_STRING;
+TOKEN_FILENAME_STRING: TOKEN_QUOTED_STRING;
 
 /* identifier */
-TOKEN_ID : [a-zA-Z_] [a-zA-Z_0-9]*;
-ESCAPED_ID : '\\' ~[ \t\r\n]+ [ \t\r\n]+;
-WS : [ \t\r\n] -> skip; // Ignore whitespace
+TOKEN_ID: [a-zA-Z_] [a-zA-Z_0-9]*;
+ESCAPED_ID: '\\' ~[ \t\r\n]+ [ \t\r\n]+;
+WS: [ \t\r\n] -> skip; // Ignore whitespace

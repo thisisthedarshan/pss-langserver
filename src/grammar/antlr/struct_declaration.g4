@@ -13,7 +13,7 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar struct_declaration;
-import pss_lexer, package_declaration, component_declaration, package_body;
+import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,template_types;
 
 struct_declaration: struct_kind struct_identifier template_param_decl_list? struct_super_spec?
 	TOKEN_LCBRACE struct_body_item* TOKEN_RCBRACE;

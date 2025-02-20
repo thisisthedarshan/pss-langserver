@@ -14,7 +14,7 @@
  */
 
 parser grammar package_declaration;
-import pss_lexer, component_declaration, action_declarations, package_body;
+import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,procedural_statements,pss_lexer,struct_declaration,template_types;
 
 package_declaration:
 	TOKEN_IMPORT package_id_path TOKEN_CLBRACE (

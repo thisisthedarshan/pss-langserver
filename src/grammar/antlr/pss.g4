@@ -14,7 +14,7 @@
  */
 
 parser grammar pss;
-import package_body, package_declaration, component_declaration;
+import package_declaration, component_declaration;
 
 compilation_unit: pss* EOF;
 

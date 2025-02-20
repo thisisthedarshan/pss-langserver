@@ -14,7 +14,7 @@
  */
 
 parser grammar action_declarations;
-import pss_lexer, package_declaration, component_declaration, package_body;
+import pss_lexer, activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
 
 action_declaration:
 	TOKEN_ACTION action_identifier template_param_decl_list? action_super_spec? TOKEN_CLBRACE (

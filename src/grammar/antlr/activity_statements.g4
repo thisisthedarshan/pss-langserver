@@ -14,7 +14,7 @@
  */
 
 parser grammar activity_statements;
-import pss_lexer;
+import pss_lexer, action_declarations,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
 
 activity_stmt :
 (label_identifier TOKEN_COLON)? labeled_activity_stmt
