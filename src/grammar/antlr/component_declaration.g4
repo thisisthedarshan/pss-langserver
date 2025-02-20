@@ -14,3 +14,57 @@
  */
 
 grammar component_declaration;
+import pss_lexer;
+
+component_declaration ::=
+ TOKEN_PURE? component component_identifier template_param_decl_list?
+component_super_spec? TOKEN_CLBRACE (component_body_item)* TOKEN_CRBRACE;
+
+component_super_spec : TOKEN_COLON type_identifier;
+
+component_body_item :
+override_declaration
+| component_data_declaration
+| component_pool_declaration
+| action_declaration
+| abstract_action_declaration
+| object_bind_stmt
+| exec_block
+| struct_declaration
+| enum_declaration
+| covergroup_declaration
+| function_decl
+| import_class_decl
+| procedural_function
+| import_function
+| target_template_function
+| export_action
+| typedef_declaration
+| import_stmt
+| extend_stmt
+| compile_assert_stmt
+| attr_group
+| component_body_compile_if
+| monitor_declaration
+| cover_stmt
+| stmt_terminator;
+
+component_data_declaration :
+access_modifier? (TOKEN_STATIC TOKEN_CONST)? data_declaration;
+
+component_pool_declaration :
+TOKEN_POOL (TOKEN_SLBRACE expression TOKEN_SRBRACE)? type_identifier identifier TOKEN_SEMICOLON;
+
+object_bind_stmt : TOKEN_BIND hierarchical_id object_bind_item_or_list TOKEN_SEMICOLON;
+
+object_bind_item_or_list :
+object_bind_item_path
+| (TOKEN_CLBRACE object_bind_item_path (TOKEN_COMMA object_bind_item_path)* TOKEN_CRBRACE);
+
+object_bind_item_path : (component_path_elem TOKEN_DOT)* object_bind_item;
+
+component_path_elem : component_identifier (TOKEN_SLBRACE domain_open_range_list TOKEN_SRBRACE)?
+
+object_bind_item :
+(action_type_identifier TOKEN_DOT identifier ( TOKEN_SLBRACE domain_open_range_list TOKEN_SRBRACE )?)
+| TOKEN_ASTERISK;
