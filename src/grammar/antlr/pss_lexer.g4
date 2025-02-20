@@ -41,6 +41,7 @@ TOKEN_MOD: '%';
 TOKEN_ADD: '+';
 TOKEN_QUESTION: '?';
 TOKEN_UNDERSCORE: '_';
+TOKEN_ZERO: '0';
 
 /* Comparison and Shift */
 TOKEN_EQUALEQUAL: '==';
@@ -189,6 +190,7 @@ TOKEN_ASSERT: 'assert';
 TOKEN_TRUE: 'true';
 TOKEN_FALSE: 'false';
 TOKEN_NULL: 'null';
+TOKEN_FILE: 'file';
 
 /* Digits */
 fragment BIN_DIGIT: '0' | '1';
@@ -197,6 +199,9 @@ fragment DEC_DIGIT: [0-9];
 fragment HEX_DIGIT: [0-9a-fA-F];
 fragment EXP: 'e' | 'E';
 fragment SIGN: '+' | '-';
+
+TOKEN_EXP: EXP;
+TOKEN_SIGN: SIGN;
 
 /* Number literals */
 TOKEN_BIN_NUMBER: '0' ('b' | 'B') BIN_DIGIT (BIN_DIGIT | '_')*;
@@ -232,6 +237,6 @@ fragment ESCAPED_CHARACTER:
 TOKEN_FILENAME_STRING: TOKEN_QUOTED_STRING;
 
 /* identifier */
-TOKEN_ID: [a-zA-Z_] [a-zA-Z_0-9]*;
+ID: [a-zA-Z_] [a-zA-Z_0-9]*;
 ESCAPED_ID: '\\' ~[ \t\r\n]+ [ \t\r\n]+;
 WS: [ \t\r\n] -> skip; // Ignore whitespace

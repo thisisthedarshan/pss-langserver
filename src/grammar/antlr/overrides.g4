@@ -13,7 +13,9 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar overrides;
-import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,package_declaration,procedural_statements,struct_declaration,template_types;
 
 override_declaration : TOKEN_OVERRIDE TOKEN_CLBRACE override_stmt* TOKEN_CRBRACE;
 
@@ -21,7 +23,7 @@ override_stmt :
 type_override
 | instance_override
 | override_compile_if
-| stmt_terminator
+| stmt_terminator;
 
 type_override : TOKEN_TYPE type_identifier TOKEN_WITH type_identifier TOKEN_SEMICOLON;
 

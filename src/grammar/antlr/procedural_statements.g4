@@ -14,7 +14,9 @@
  */
 
 parser grammar procedural_statements;
-import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,pss_lexer,struct_declaration,template_types;
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,struct_declaration,template_types;
 
 procedural_stmt:
 	procedural_sequence_block_stmt
@@ -48,7 +50,7 @@ procedural_assignment_stmt:
 	ref_path assign_op expression TOKEN_SEMICOLON;
 
 procedural_void_function_call_stmt: (
-		TOKEN_FLBRACE void TOKEN_FRBRACE
+		TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE
 	)? function_call TOKEN_SEMICOLON;
 
 procedural_return_stmt:
@@ -61,7 +63,7 @@ procedural_repeat_stmt:
 	| TOKEN_WHILE TOKEN_FLBRACE expression TOKEN_FRBRACE procedural_stmt;
 
 procedural_foreach_stmt:
-	foreach TOKEN_FLBRACE (iterator_identifier TOKEN_COLON)? expression (
+	TOKEN_FOREACH TOKEN_FLBRACE (iterator_identifier TOKEN_COLON)? expression (
 		TOKEN_SLBRACE index_identifier TOKEN_SRBRACE
 	)? TOKEN_FRBRACE procedural_stmt;
 

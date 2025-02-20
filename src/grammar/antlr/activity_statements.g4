@@ -14,7 +14,12 @@
  */
 
 parser grammar activity_statements;
-import pss_lexer, action_declarations,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
+
+activity_declaration:
+TOKEN_ACTIVITY TOKEN_CLBRACE activity_stmt* TOKEN_CRBRACE;
 
 activity_stmt :
 (label_identifier TOKEN_COLON)? labeled_activity_stmt
@@ -80,20 +85,19 @@ select_branch : ((TOKEN_FLBRACE expression TOKEN_FRBRACE (TOKEN_FLBRACE expressi
 activity_if_else_stmt : TOKEN_IF TOKEN_FLBRACE expression TOKEN_FRBRACE activity_stmt (TOKEN_ELSE activity_stmt)?;
 
 activity_match_stmt :
-match TOKEN_FLBRACE match_expression TOKEN_FRBRACE TOKEN_CLBRACE match_choice match_choice* TOKEN_CRBRACE;
+TOKEN_MATCH TOKEN_FLBRACE match_expression TOKEN_FRBRACE TOKEN_CLBRACE match_choice match_choice* TOKEN_CRBRACE;
 
 match_expression : expression;
 
 match_choice :
-(TOKEN_SLBRACE open_range_list TOKEN_SRBRACE TOKEN_COLON activity_stmt)
-| (TOKEN_DEFAULT : activity_stmt);
+((TOKEN_SLBRACE open_range_list TOKEN_SRBRACE TOKEN_COLON activity_stmt) | (TOKEN_DEFAULT TOKEN_COLON activity_stmt));
 
 activity_replicate_stmt : TOKEN_REPLICATE TOKEN_FLBRACE (index_identifier TOKEN_COLON)? expression TOKEN_FRBRACE
  (label_identifier TOKEN_SLBRACE TOKEN_SRBRACE TOKEN_COLON)? labeled_activity_stmt;
 
 activity_super_stmt : TOKEN_SUPER TOKEN_SEMICOLON ;
 
-activity_atomic_block_stmt : TOKEN_ATOMIC TOKEN_CLBRACE activity_stmt* TOKEN_CRBRACE
+activity_atomic_block_stmt : TOKEN_ATOMIC TOKEN_CLBRACE activity_stmt* TOKEN_CRBRACE;
 
 activity_bind_stmt : TOKEN_BIND hierarchical_id activity_bind_item_or_list TOKEN_SEMICOLON;
 

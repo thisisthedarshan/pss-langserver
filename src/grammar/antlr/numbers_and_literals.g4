@@ -13,37 +13,39 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar numbers_and_literals;
-import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 
 number :
 integer_number
 | floating_point_number;
 
 integer_number :
-bin_number
-| oct_number
-| dec_number
-| hex_number
+TOKEN_BIN_NUMBER
+| TOKEN_OCT_NUMBER
+| TOKEN_DEC_NUMBER
+| TOKEN_HEX_NUMBER
 | based_bin_number
 | based_oct_number
 | based_dec_number
 | based_hex_number;
 
-based_bin_number : dec_number? TOKEN_BASED_BIN_LITERAL;
-based_oct_number : dec_number? TOKEN_BASED_OCT_LITERAL;
-based_dec_number : dec_number? TOKEN_BASED_DEC_LITERAL;
-based_hex_number : dec_number? TOKEN_BASED_HEX_LITERAL;
+based_bin_number : TOKEN_DEC_NUMBER? TOKEN_BASED_BIN_LITERAL;
+based_oct_number : TOKEN_DEC_NUMBER? TOKEN_BASED_OCT_LITERAL;
+based_dec_number : TOKEN_DEC_NUMBER? TOKEN_BASED_DEC_LITERAL;
+based_hex_number : TOKEN_DEC_NUMBER? TOKEN_BASED_HEX_LITERAL;
 
 floating_point_number :
 floating_point_dec_number
 | floating_point_sci_number;
 
-unsigned_number : dec_digit (dec_digit | TOKEN_UNDERSCORE)*;
+unsigned_number : TOKEN_DEC_NUMBER;
 
-floating_point_dec_number : unsigned_number TOKEN_DOT unsigned_number
+floating_point_dec_number : unsigned_number TOKEN_DOT unsigned_number;
 
 floating_point_sci_number :
-unsigned_number (TOKEN_DOT unsigned_number)? EXP sign? unsigned_number;
+unsigned_number (TOKEN_DOT unsigned_number)? TOKEN_EXP TOKEN_SIGN? unsigned_number;
 
 aggregate_literal :
 empty_aggregate_literal
@@ -59,7 +61,7 @@ map_literal : TOKEN_CLBRACE map_literal_item  (TOKEN_COMMA map_literal_item)* TO
 
 map_literal_item : expression TOKEN_COLON expression;
 
-struct_literal : TOKEN_CLBRACE struct_literal_item (TOKEN_COMMA struct_literal_item)* TOKEN_CRBRACE
+struct_literal : TOKEN_CLBRACE struct_literal_item (TOKEN_COMMA struct_literal_item)* TOKEN_CRBRACE;
 
 struct_literal_item : TOKEN_DOT identifier TOKEN_EQUALS expression;
 

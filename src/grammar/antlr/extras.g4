@@ -13,7 +13,9 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar extras;
-import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 
 string_literal :
 TOKEN_QUOTED_STRING
@@ -21,7 +23,18 @@ TOKEN_QUOTED_STRING
 
 comment : TOKEN_SL_COMMENT | TOKEN_ML_COMMENT;
 
-unescaped_character : any_printable_ASCII_character
-escaped_character : \('|"|?|\|a|b|f|n|r|t|v|[0-7][0-7][0-7])
+filename_string : TOKEN_QUOTED_STRING;
 
-filename_string : TOKEN_QUOTED_STRING
+
+/* Data Declarations - missing from the LRM */
+data_declaration:
+data_type data_instantiation (TOKEN_COMMA data_instantiation)* TOKEN_SEMICOLON;
+
+data_instantiation:
+identifier array_dim? (TOKEN_EQUALS constant_expression)?;
+
+array_dim:
+TOKEN_SLBRACE constant_expression TOKEN_SRBRACE;
+
+attr_field:
+access_modifier? TOKEN_RAND (TOKEN_STATIC TOKEN_CONST)? data_declaration;

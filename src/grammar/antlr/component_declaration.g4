@@ -14,10 +14,12 @@
  */
 
 grammar component_declaration;
-import pss_lexer,action_declarations,activity_statements,behavioral_coverage,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
+options {tokenVocab=pss_lexer;}
 
-component_declaration ::=
- TOKEN_PURE? component component_identifier template_param_decl_list?
+import action_declarations,activity_statements,behavioral_coverage,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
+
+component_declaration:
+ TOKEN_PURE? TOKEN_COMPONENT component_identifier template_param_decl_list?
 component_super_spec? TOKEN_CLBRACE (component_body_item)* TOKEN_CRBRACE;
 
 component_super_spec : TOKEN_COLON type_identifier;
@@ -63,7 +65,7 @@ object_bind_item_path
 
 object_bind_item_path : (component_path_elem TOKEN_DOT)* object_bind_item;
 
-component_path_elem : component_identifier (TOKEN_SLBRACE domain_open_range_list TOKEN_SRBRACE)?
+component_path_elem : component_identifier (TOKEN_SLBRACE domain_open_range_list TOKEN_SRBRACE)?;
 
 object_bind_item :
 (action_type_identifier TOKEN_DOT identifier ( TOKEN_SLBRACE domain_open_range_list TOKEN_SRBRACE )?)

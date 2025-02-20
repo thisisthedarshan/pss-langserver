@@ -13,7 +13,9 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar coverage;
-import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 
 covergroup_declaration : TOKEN_COVERGROUP covergroup_identifier
 TOKEN_FLBRACE covergroup_port (TOKEN_COMMA covergroup_port)* TOKEN_FRBRACE TOKEN_CLBRACE covergroup_body_item* TOKEN_CRBRACE;
@@ -47,8 +49,8 @@ covergroup_portmap_list :
 covergroup_portmap : TOKEN_DOT identifier TOKEN_FLBRACE hierarchical_id TOKEN_FRBRACE;
 
 covergroup_options_or_empty :
-TOKEN_WITH TOKEN_CLBRACE covergroup_option* TOKEN_CRBRACE;
-| TOKEN_SEMICOLON;
+(TOKEN_WITH TOKEN_CLBRACE covergroup_option* TOKEN_CRBRACE)
+| TOKEN_SEMICOLON ;
 
 covergroup_coverpoint : (data_type? coverpoint_identifier TOKEN_COLON)? TOKEN_COVERPOINT expression (TOKEN_IFF TOKEN_FLBRACE expression TOKEN_FRBRACE)? bins_or_empty;
 
@@ -66,7 +68,7 @@ covergroup_coverpoint_binspec : bins_keyword identifier
 coverpoint_bins :
 (TOKEN_SLBRACE covergroup_range_list TOKEN_SRBRACE ( TOKEN_WITH TOKEN_FLBRACE covergroup_expression TOKEN_FRBRACE)? TOKEN_SEMICOLON)
 | (coverpoint_identifier TOKEN_WITH TOKEN_FLBRACE covergroup_expression TOKEN_FRBRACE TOKEN_SEMICOLON)
-| (default TOKEN_SEMICOLON);
+| (TOKEN_DEFAULT TOKEN_SEMICOLON);
 
 covergroup_range_list : covergroup_value_range (TOKEN_COMMA covergroup_value_range)*;
 

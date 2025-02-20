@@ -13,7 +13,9 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar identifiers;
-import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 
 identifier :
 ID
@@ -59,7 +61,7 @@ struct_identifier : identifier;
 
 symbol_identifier : identifier;
 
-type_identifier : (TOKEN_SCOPE)? type_identifer_elem (TOKEN_SCOPE type_identifer_elem)*;
+type_identifier : (TOKEN_SCOPE)? type_identifier_elem (TOKEN_SCOPE type_identifier_elem)*;
 
 type_identifier_elem : identifier template_param_value_list?;
 
