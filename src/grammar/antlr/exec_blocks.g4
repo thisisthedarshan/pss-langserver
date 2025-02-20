@@ -13,7 +13,9 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar exec_blocks;
-import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 
 exec_block_stmt :
 exec_block
@@ -38,8 +40,8 @@ TOKEN_PRESOLVE
 
 exec_stmt : procedural_stmt | exec_super_stmt;
 
-exec_super_stmt ::= TOKEN_SUPER TOKEN_SEMICOLON;
+exec_super_stmt : TOKEN_SUPER TOKEN_SEMICOLON;
 
-target_code_exec_block ::= TOKEN_EXEC exec_kind language_identifier TOKEN_EQUALS string_literal TOKEN_SEMICOLON;
+target_code_exec_block : TOKEN_EXEC exec_kind language_identifier TOKEN_EQUALS string_literal TOKEN_SEMICOLON;
 
-target_file_exec_block ::= TOKEN_EXEC file filename_string TOKEN_EQUALS string_literal TOKEN_SEMICOLON;
+target_file_exec_block : TOKEN_EXEC TOKEN_FILE filename_string TOKEN_EQUALS string_literal TOKEN_SEMICOLON;

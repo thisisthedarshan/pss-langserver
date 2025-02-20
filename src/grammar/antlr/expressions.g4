@@ -13,12 +13,14 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar expressions;
-import pss_lexer,action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 
 constant_expression : expression;
 
 expression :
-primary
+(comment? expression comment?)
 | (unary_operator primary)
 | (expression TOKEN_DASTERISK expression)
 | (expression mul_div expression)
@@ -34,7 +36,7 @@ primary
 | (expression TOKEN_OROR expression)
 | (expression binary_operator expression)
 | (conditional_expression)
-| (in_expression);
+| primary;
 
 primary:
 number
@@ -80,9 +82,6 @@ TOKEN_LT
 
 equality_compare:
 TOKEN_EQUALEQUAL | TOKEN_NOTEQUAL;
-
-
-
 
 open_range_list:
 open_range_value (TOKEN_COMMA open_range_value)*;

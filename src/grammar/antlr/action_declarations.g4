@@ -14,12 +14,13 @@
  */
 
 parser grammar action_declarations;
-import pss_lexer, activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
+options {tokenVocab=pss_lexer;}
+
+import activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 
 action_declaration:
-	TOKEN_ACTION action_identifier template_param_decl_list? action_super_spec? TOKEN_CLBRACE (
-		action_body_item*
-	)? TOKEN_CRBRACE;
+	TOKEN_ACTION action_identifier template_param_decl_list? action_super_spec? TOKEN_CLBRACE 
+		action_body_item* TOKEN_CRBRACE;
 
 abstract_action_declaration: TOKEN_ABSTRACT action_declaration;
 

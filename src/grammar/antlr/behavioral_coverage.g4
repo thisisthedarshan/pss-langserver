@@ -14,11 +14,13 @@
  */
 
 parser grammar behavioral_coverage;
-import pss_lexer,action_declarations,activity_statements,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,pss_lexer,struct_declaration,template_types;
+options {tokenVocab=pss_lexer;}
+
+import action_declarations,activity_statements,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 
 cover_stmt:
-(label_identifier? TOKEN_COVER type_identifier TOKEN_SEMICOLON)
-| ([ label_identifier ] TOKEN_COVER  TOKEN_CLBRACE monitor_body_item* TOKEN_CRBRACE);
+((label_identifier TOKEN_COLON)? TOKEN_COVER type_identifier TOKEN_SEMICOLON)
+| ((label_identifier TOKEN_COLON)? TOKEN_COVER  TOKEN_CLBRACE monitor_body_item* TOKEN_CRBRACE);
 
 monitor_declaration : TOKEN_MONITOR monitor_identifier
 template_param_decl_list? monitor_super_spec? TOKEN_CLBRACE monitor_body_item* TOKEN_CRBRACE;
@@ -94,7 +96,7 @@ monitor_activity_constraint_stmt : TOKEN_CONSTRAINT monitor_constraint_set;
 
 monitor_constraint_declaration :
 (TOKEN_CONSTRAINT monitor_constraint_set)
-| (TOKEN_CONSTRAINT identifier monitor_constraint_block)
+| (TOKEN_CONSTRAINT identifier monitor_constraint_block);
 
 monitor_constraint_set :
 monitor_constraint_body_item
