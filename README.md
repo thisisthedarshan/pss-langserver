@@ -11,6 +11,10 @@ Welcome to the **PSS Language Server** project, a dedicated backend service for 
 - **Hover Documentation:** Detailed tooltips for PSS constructs.
 - **Embedded Code Support:** Parsing and diagnostics for embedded C and SystemVerilog code.
 
+## Installation
+
+Just run `npm i pss-langserver`
+
 ## 🔧 Development Setup
 
 1. Clone the repository:
