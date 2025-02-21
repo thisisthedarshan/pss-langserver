@@ -20,21 +20,20 @@ import action_declarations,activity_statements,behavioral_coverage,component_dec
 constant_expression : expression;
 
 expression :
-(comment? expression comment?)
 | (unary_operator primary)
-| (expression TOKEN_DASTERISK expression)
-| (expression mul_div expression)
-| (expression add_sub expression)
-| (expression shifting expression)
-| (expression in_statements expression)
-| (expression logical_compare expression)
-| (expression equality_compare expression)
-| (expression TOKEN_AND expression)
-| (expression TOKEN_CARET expression)
-| (expression TOKEN_OR expression)
-| (expression TOKEN_ANDAND expression)
-| (expression TOKEN_OROR expression)
-| (expression binary_operator expression)
+| (power_op expression)
+| (mul_div expression)
+| (add_sub expression)
+| (shifting expression)
+| (in_statements expression)
+| (logical_compare expression)
+| (equality_compare expression)
+| (bitwise_and expression)
+| (bitwise_xor expression)
+| (bitwise_or expression)
+| (logical_and expression)
+| (logical_or expression)
+| (binary_operator expression)
 | (conditional_expression)
 | primary;
 
@@ -45,10 +44,13 @@ number
 |string_literal
 |null_ref
 |parenthesis_expressions
+|cast_expression
 |ref_path
 |compile_has_expr;
 
 unary_operator : TOKEN_MINUS | TOKEN_EXCLAMATION | TOKEN_TILDA | TOKEN_AND | TOKEN_OR | TOKEN_CARET;
+
+power_op: TOKEN_DASTERISK;
 
 binary_operator :
 TOKEN_ASTERISK | TOKEN_DIVIDE | TOKEN_MOD | TOKEN_ADD | TOKEN_MINUS | TOKEN_LSHIFT | TOKEN_RSHIFT | TOKEN_EQUALEQUAL | TOKEN_NOTEQUAL | TOKEN_LT | TOKEN_LTEQ | TOKEN_GT | TOKEN_GTEQ | TOKEN_OROR | TOKEN_ANDAND | TOKEN_OR | TOKEN_CARET | TOKEN_AND | TOKEN_DASTERISK;
@@ -83,15 +85,16 @@ TOKEN_LT
 equality_compare:
 TOKEN_EQUALEQUAL | TOKEN_NOTEQUAL;
 
-open_range_list:
-open_range_value (TOKEN_COMMA open_range_value)*;
+bitwise_and: TOKEN_AND;
+bitwise_xor : TOKEN_CARET;
+bitwise_or : TOKEN_OR;
+logical_and : TOKEN_ANDAND;
+logical_or : TOKEN_OROR;
 
 open_range_value:
 expression (TOKEN_ELLIPSIS expression)?;
 
-conditional_expression : cond_predicate TOKEN_QUESTION expression TOKEN_COLON expression;
-
-cond_predicate : expression;
+conditional_expression : TOKEN_QUESTION expression TOKEN_COLON expression;
 
 in_expression :
 (expression TOKEN_IN TOKEN_SLBRACE open_range_list TOKEN_SRBRACE )
@@ -99,22 +102,9 @@ in_expression :
 
 open_range_list : open_range_value (TOKEN_COMMA open_range_value)*;
 
-open_range_value : expression (TOKEN_DDOT expression)?;
+/* open_range_value : expression (TOKEN_DDOT expression)?; */
 
 collection_expression : expression;
-
-primary :
-number
-| aggregate_literal
-| bool_literal
-| string_literal
-| null_ref
-| paren_expr
-| cast_expression
-| ref_path
-| compile_has_expr;
-
-paren_expr : TOKEN_FLBRACE expression TOKEN_FRBRACE;
 
 cast_expression : TOKEN_FLBRACE casting_type TOKEN_FRBRACE expression;
 
