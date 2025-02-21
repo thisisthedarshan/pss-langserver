@@ -13,5 +13,5 @@ export function getAutoCompleteItemsFromFile(fileContents: string): string[] {
   let myVisitor = new visitor();
   tree.accept(myVisitor);
   //console.log(tree);
-  return myVisitor.getIdentifiers();
+  return [...new Set(myVisitor.getIdentifiers())];
 }
