@@ -18,6 +18,8 @@
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { Range, Position } from "vscode-languageserver/node";
 import { getAutoCompleteItemsFromFile } from "./parser/ast";
+const fs = require('fs-extra')
+const path = require('path')
 
 export function fullRange(document: TextDocument): Range {
   const lastLine = document.lineCount - 1;
@@ -45,4 +47,18 @@ export function updateStringArray(array1: string[], array2: string[]): string[] 
   });
 
   return array1;
+}
+
+export async function scanDirectory(dirPath: string, files: string[]): Promise<void> {
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dirPath, entry.name);
+
+    if (entry.isDirectory()) {
+      await scanDirectory(fullPath, files);
+    } else if (entry.isFile() && entry.name.endsWith('.pss')) {
+      files.push(fullPath);
+    }
+  }
 }
