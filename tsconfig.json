@@ -8,7 +8,7 @@
     "esModuleInterop": true, // For compatibility with CommonJS
     "skipLibCheck": true, // Skip type checking of declaration files
     "forceConsistentCasingInFileNames": true,
-    "sourceMap": true, // Generate source maps for debugging
+    "sourceMap": false, // Generate source maps for debugging
   },
   "include": [
     "src"
