@@ -14,3 +14,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Build scripts and configurations
 - GitHub workflow to publish npm package
 - Basic language server features - including completions (parsed from tree) and formatting
+- Language Server now replies with built-in keywords too.
