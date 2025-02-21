@@ -37,8 +37,9 @@ import {
   TextDocument
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
-import { fullRange, updateAST, updateStringArray } from './helper_functions';
-import { getAutoCompleteItemsFromFile } from './parser/ast';
+import { fullRange, scanDirectory, updateAST, updateStringArray } from './helper_functions';
+import { keywords } from './definitions/keywords';
+import fs from 'fs-extra'
 
 /* Support all connection types - ipc, stdio, tcp */
 const connection = createConnection(ProposedFeatures.all);
@@ -56,6 +57,21 @@ let hasDiagnosticRelatedInformationCapability = false;
 /* Setup initialization */
 connection.onInitialize((params: InitializeParams) => {
   const capabilities = params.capabilities;
+  const workspaceFolders = params.workspaceFolders || [];
+  const pssFiles: string[] = [];
+
+  for (const folder of workspaceFolders) {
+    scanDirectory(folder.uri.replace('file://', ''), pssFiles);
+  }
+
+  // Process found files
+  for (const file of pssFiles) {
+    const content: string = fs.readFileSync(file, 'utf8');
+    // Process file content here
+    updateAST(content).then(vars => {
+      completionItems = updateStringArray(completionItems, vars);
+    });
+  }
 
   /* Does the client support the `workspace/configuration` request? */
   /* If not, we fall back using global settings. */
@@ -99,6 +115,12 @@ connection.onInitialize((params: InitializeParams) => {
 
 /* Completed initialization */
 connection.onInitialized(() => {
+  /* Build the autocompletions with built-in code */
+  var builtins: string[] = [];
+  keywords.list.forEach(keyword => {
+    builtins.push(keyword);
+  });
+
   if (hasConfigurationCapability) {
     // Register for all configuration changes.
     connection.client.register(DidChangeConfigurationNotification.type, undefined);

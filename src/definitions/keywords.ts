@@ -20,7 +20,7 @@ export const keywords = {
     "log", "pow", "addr_value_abs", "read16", "read32", "read64", "write16", "write32", "write64", "read_bytes",
     "write_bytes", "read_struct", "write_struct", "read", "write", "read_val", "write_val", "write_masked",
     "write_val_masked", "write_field", "write_fields", "get_offset_of_instance_array", "get_offset_of_path", "set_handle",
-    "std_pkg", "executor_pkg", "executor_pkg"
+    "std_pkg", "executor_pkg", "executor_pkg", "comp"
   ],
   descriptions: [
     "Type definition for chandle, used for address related tasks.",
