@@ -10,3 +10,6 @@ node_modules/
 
 # Ignore .antlr folder
 .antlr/
+
+# Ignore the built folder
+dist/
