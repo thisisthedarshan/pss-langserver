@@ -73,6 +73,12 @@ connection.onInitialize((params: InitializeParams) => {
     });
   }
 
+  /* Build the autocompletions with built-in code */
+  var builtins: string[] = [];
+  keywords.list.forEach(keyword => {
+    builtins.push(keyword);
+  });
+
   /* Does the client support the `workspace/configuration` request? */
   /* If not, we fall back using global settings. */
   hasConfigurationCapability = !!(
@@ -115,12 +121,6 @@ connection.onInitialize((params: InitializeParams) => {
 
 /* Completed initialization */
 connection.onInitialized(() => {
-  /* Build the autocompletions with built-in code */
-  var builtins: string[] = [];
-  keywords.list.forEach(keyword => {
-    builtins.push(keyword);
-  });
-
   if (hasConfigurationCapability) {
     // Register for all configuration changes.
     connection.client.register(DidChangeConfigurationNotification.type, undefined);
