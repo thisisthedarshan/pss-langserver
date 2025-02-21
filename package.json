@@ -8,6 +8,9 @@
   "main": "dist/pss-langserver",
   "icon": "media/icon.jpeg",
   "type": "commonjs",
+  "bin": {
+    "pss-langserver": "./dist/pss-langserver.js"
+  },
   "engines": {
     "node": "*"
   },
