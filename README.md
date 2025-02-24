@@ -1,5 +1,9 @@
 # Language server for PSS
 
+[![NPM Version](https://img.shields.io/npm/v/pss-langserver)](https://www.npmjs.com/package/pss-langserver)
+![NPM Downloads](https://img.shields.io/npm/d18m/pss-langserver?label=NPM%20Downloads)
+[![NPM License](https://img.shields.io/npm/l/pss-langserver)](LICENSE)
+
 Welcome to the **PSS Language Server** project, a dedicated backend service for providing robust language support for **Accellera's Portable Stimulus Standard (PSS)** across any IDE that supports the LSP protocol.
 
 ## 🚀 Features (Planned and In Progress)
