@@ -37,7 +37,7 @@ export function formatDocument(text: string, tabspace: integer, author: string):
   for (let line of lines) {
     // Keep empty newlines as it is
     if (line.trim() === '') {
-      formattedLines.push('\n'); // Keep the empty line as-is
+      formattedLines.push(''); // Keep the empty line as-is
       continue;
     }
 
