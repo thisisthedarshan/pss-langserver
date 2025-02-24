@@ -42,7 +42,7 @@
     "build": "make grammar && tsc",
     "clean": "rm -fr ./dist/*",
     "dev": "tsc --watch",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "make source",
     "start": "node dist/pss-langserver.js"
   }
 }
