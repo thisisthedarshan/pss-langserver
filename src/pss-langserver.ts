@@ -48,7 +48,7 @@ const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
 
 var completionItems: string[] = []; /* Holds all autocompletion items */
-var isFirst = false;
+var isFirst = true;
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
@@ -72,6 +72,11 @@ connection.onInitialize((params: InitializeParams) => {
       completionItems = updateStringArray(completionItems, vars);
     });
   }
+
+  /* Build the autocompletions with built-in code */
+  keywords.list.forEach(keyword => {
+    completionItems.push(keyword);
+  });
 
   /* Does the client support the `workspace/configuration` request? */
   /* If not, we fall back using global settings. */
@@ -196,15 +201,6 @@ connection.onDidChangeWatchedFiles(_change => {
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
     var completions: CompletionItem[] = [];
-
-    if (!isFirst) {
-      /* Build the autocompletions with built-in code */
-      var builtins: string[] = [];
-      keywords.list.forEach(keyword => {
-        builtins.push(keyword);
-      });
-      isFirst = true;
-    }
 
     completionItems.forEach(item => {
       completions.push(
