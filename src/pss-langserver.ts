@@ -32,7 +32,11 @@ import {
   type DocumentDiagnosticReport,
   TextEdit,
   Connection,
-  DidChangeConfigurationParams
+  DidChangeConfigurationParams,
+  ParameterInformation,
+  SignatureInformation,
+  SignatureHelpParams,
+  SignatureHelp
 } from 'vscode-languageserver/node';
 
 import {
@@ -246,6 +250,47 @@ connection.onCompletionResolve(
     return item;
   }
 );
+
+
+/* Provide function Signatures */
+connection.onSignatureHelp(
+  (params: SignatureHelpParams): SignatureHelp | null => {
+    // Get the current line up to the cursor
+    const document = documents.get(params.textDocument.uri);
+    if (!document) return null;
+
+    const position = params.position;
+    const line = document.getText({
+      start: { line: position.line, character: 0 },
+      end: position
+    });
+
+    // Find which function is being called
+    const match = line.match(/(\w+)\($/);
+    if (!match) return null;
+
+    const funcName = match[1];
+    const funcInfo = builtInSignatures[funcName as keyof typeof builtInSignatures];
+    if (!funcInfo) return null;
+
+    const parameters = funcInfo.parameters.map((p: { label: string | [number, number]; documentation: string | undefined; }) =>
+      ParameterInformation.create(p.label, p.documentation)
+    );
+
+    const signature = SignatureInformation.create(
+      funcInfo.signature,
+      funcInfo.documentation,
+      ...parameters
+    );
+
+    return {
+      signatures: [signature],
+      activeSignature: 0,
+      activeParameter: 0
+    };
+  }
+);
+
 
 /* Provide formatting */
 connection.onDocumentFormatting((params, tokens) => {
