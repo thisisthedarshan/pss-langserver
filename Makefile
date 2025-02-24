@@ -69,7 +69,9 @@ grammar:
 
 # Builds source into dist directory
 source:
+	mkdir -p dist
 	npm run build
+	echo "#!/usr/bin/env node" | cat - "./dist/pss-langserver.js" > temp && mv temp "./dist/pss-langserver.js"
 
 inject-license:
 	@for file in $(GRAMMAR_SRCS)/*.ts; do \

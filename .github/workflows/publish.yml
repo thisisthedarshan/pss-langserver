@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies and build 🔧
         run: npm ci
 
+      - name: Build distro
+        run: make source
+
       - name: Publish package on NPM 📦
         run: npm publish
         env:
