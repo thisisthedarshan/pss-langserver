@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Formatter logic is fixed to remove adding of additional newlines
+- Logic for scanning of the files to get all .pss files in current workspace is fixed to also work with file-paths having spaces
 
 ## [0.1.3] - 2025-02-24
 
