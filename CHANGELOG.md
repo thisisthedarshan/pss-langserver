@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated the logic to load builtin-keywords onto completions
-- Fixed  
+- Fixed formatter logic
 
 ## [0.1.0] - 2025-02-21
 

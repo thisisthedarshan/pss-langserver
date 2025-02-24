@@ -1,8 +1,21 @@
-// Copyright (c) 2024-25 Darshan(@thisisthedarshan)
+/*
+ * Copyright (C) 2025 Darshan(@thisisthedarshan)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 import { integer } from "vscode-languageserver";
-
-// Licensed under the MIT License. See LICENSE file for details.
 export function formatDocument(text: string, tabspace: integer, author: string): string {
   // Start by formatting curly braces
   let doc = formatCurlyBraces(text);
@@ -17,7 +30,7 @@ export function formatDocument(text: string, tabspace: integer, author: string):
   let lines = doc.split('\n');
   const formattedLines: string[] = [];
 
-  let indentLevel = tabspace; /* User defined tabspace */
+  let indentLevel = 0; /* Start with indentLevel of 0 */
   let isInBlockComment = false;
 
 
@@ -36,7 +49,7 @@ export function formatDocument(text: string, tabspace: integer, author: string):
 
     // Handle closing braces
     if (line.startsWith('}') && !isInBlockComment && !(/\/\//.test(line))) {
-      indentLevel = Math.max(indentLevel - 1, 0);
+      indentLevel = Math.max(indentLevel - tabspace, 0);
     }
 
     // Check if comment block is encountered
@@ -58,12 +71,12 @@ export function formatDocument(text: string, tabspace: integer, author: string):
     }
 
     // Add indentation
-    const indentedLine = `${'    '.repeat(indentLevel)}${line}`;
+    const indentedLine = `${' '.repeat(indentLevel)}${line}`;
     formattedLines.push(indentedLine);
 
     // Handle opening braces
     if (line.endsWith('{') && !isInBlockComment && !(/\/\/|\/\*/.test(line))) {
-      indentLevel++;
+      indentLevel += tabspace;
     }
 
   }
