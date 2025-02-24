@@ -50,15 +50,23 @@ export function updateStringArray(array1: string[], array2: string[]): string[] 
 }
 
 export async function scanDirectory(dirPath: string, files: string[]): Promise<void> {
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+  // Decode the URI-encoded path
+  const decodedPath = decodeURIComponent(dirPath);
 
-  for (const entry of entries) {
-    const fullPath = path.join(dirPath, entry.name);
+  try {
+    const entries = fs.readdirSync(decodedPath, { withFileTypes: true });
 
-    if (entry.isDirectory()) {
-      await scanDirectory(fullPath, files);
-    } else if (entry.isFile() && entry.name.endsWith('.pss')) {
-      files.push(fullPath);
+    for (const entry of entries) {
+      const fullPath = path.join(decodedPath, entry.name);
+
+      if (entry.isDirectory()) {
+        await scanDirectory(fullPath, files);
+      } else if (entry.isFile() && entry.name.endsWith('.pss')) {
+        files.push(fullPath);
+      }
     }
+  } catch (error) {
+    console.error(`Error scanning directory: ${decodedPath}`, error);
+    throw error;
   }
 }
