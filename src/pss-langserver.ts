@@ -78,7 +78,9 @@ connection.onInitialize((params: InitializeParams) => {
 
   /* Build the autocompletions with built-in code */
   keywords.list.forEach(keyword => {
-    completionItems.push(keyword);
+    if (!(keyword in builtInSignatures)) {
+      completionItems.push(keyword);
+    }
   });
 
   /* Does the client support the `workspace/configuration` request? */
