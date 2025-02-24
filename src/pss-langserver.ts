@@ -30,7 +30,9 @@ import {
   InitializeResult,
   DocumentDiagnosticReportKind,
   type DocumentDiagnosticReport,
-  TextEdit
+  TextEdit,
+  Connection,
+  DidChangeConfigurationParams
 } from 'vscode-languageserver/node';
 
 import {
@@ -147,33 +149,34 @@ let globalSettings: PSS_Config = defaultSettings;
 const documentSettings = new Map<string, Thenable<PSS_Config>>();
 
 /* When connection/config change */
-connection.onDidChangeConfiguration(change => {
-  if (hasConfigurationCapability) {
-    // Reset all cached document settings
-    documentSettings.clear();
-  } else {
-    globalSettings = (
-      (change.settings.PSS || defaultSettings)
-    );
+connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
+  documentSettings.clear();
+  if (!hasConfigurationCapability) {
+    globalSettings = change.settings.MYLANG || defaultSettings;
   }
   /* For future use - with diagnostics */
   /* connection.languages.diagnostics.refresh(); */
 });
 
-function getSettings(resource: string): Thenable<PSS_Config> {
+function getSettings(connection: Connection, resource: string): Thenable<PSS_Config> {
   if (!hasConfigurationCapability) {
     return Promise.resolve(globalSettings);
   }
+
   let result = documentSettings.get(resource);
   if (!result) {
-    result = connection.workspace.getConfiguration({
-      scopeUri: resource,
-      section: 'PSS'
-    }).then(config => {
-      const settings = { ...defaultSettings, ...config };
-      documentSettings.set(resource, Promise.resolve(settings));
-      return settings;
+    result = Promise.all([
+      connection.workspace.getConfiguration({ scopeUri: resource, section: 'MYLANG.tabspaces' }),
+      connection.workspace.getConfiguration({ scopeUri: resource, section: 'MYLANG.fileAuthor' })
+    ]).then(([tabspaces, fileAuthor]) => {
+      // Validate tabspaces
+      const validatedTabspaces = Math.min(Math.max(tabspaces ?? defaultSettings.tabspaces, 1), 9);
+      return {
+        tabspaces: validatedTabspaces,
+        fileAuthor: fileAuthor ?? defaultSettings.fileAuthor
+      };
     });
+
     documentSettings.set(resource, result);
   }
   return result;
@@ -235,7 +238,7 @@ connection.onDocumentFormatting((params, tokens) => {
   const documentContents = sourceDocument.getText();
 
   /* Get settings for author name and tabspaces and return formatted text */
-  return getSettings(sourceDocument.uri).then((settings) => {
+  return getSettings(connection, sourceDocument.uri).then((settings) => {
     const formattedText = formatDocument(documentContents, settings.tabspaces, settings.fileAuthor);
     return [TextEdit.replace(fullRange(sourceDocument), formattedText)];
   });

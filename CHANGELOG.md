@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1] - 2025-02-24
 
+### Added
+
+- Added formatting support to config
+
 ### Changed
 
 - Updated the logic to load builtin-keywords onto completions
-- Added formatting support to config
+- Fixed  
 
 ## [0.1.0] - 2025-02-21
 
