@@ -51,7 +51,7 @@ var completionItems: string[] = []; /* Holds all autocompletion items */
 var isFirst = true;
 
 let hasConfigurationCapability = false;
-let hasWorkspaceFolderCapability = false;
+let hasWorkspaceFolderCapability = true;
 let hasDiagnosticRelatedInformationCapability = false;
 
 /* Setup initialization */
@@ -105,9 +105,11 @@ connection.onInitialize((params: InitializeParams) => {
       diagnosticProvider: {
         interFileDependencies: true,
         workspaceDiagnostics: false
-      }
+      },
+      documentFormattingProvider: true
     }
   };
+  /* Supports workspace */
   if (hasWorkspaceFolderCapability) {
     result.capabilities.workspace = {
       workspaceFolders: {
