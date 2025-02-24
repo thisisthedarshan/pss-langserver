@@ -111,10 +111,11 @@ connection.onInitialize((params: InitializeParams) => {
       },
       /* Our language has inter-file dependencies */
       /* For now, we will not support diagnostics */
-      diagnosticProvider: {
+      diagnosticProvider: undefined,
+      /*{
         interFileDependencies: true,
         workspaceDiagnostics: false
-      },
+      },*/
       documentFormattingProvider: true,
       signatureHelpProvider: {
         triggerCharacters: ['(', ',']
