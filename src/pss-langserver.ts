@@ -115,7 +115,10 @@ connection.onInitialize((params: InitializeParams) => {
         interFileDependencies: true,
         workspaceDiagnostics: false
       },
-      documentFormattingProvider: true
+      documentFormattingProvider: true,
+      signatureHelpProvider: {
+        triggerCharacters: ['(', ',']
+      },
     }
   };
   /* Supports workspace */
