@@ -258,7 +258,6 @@ connection.onCompletionResolve(
 /* Provide function Signatures */
 connection.onSignatureHelp(
   (params: SignatureHelpParams): SignatureHelp | null => {
-    // Get the current line up to the cursor
     const document = documents.get(params.textDocument.uri);
     if (!document) return null;
 
@@ -268,15 +267,18 @@ connection.onSignatureHelp(
       end: position
     });
 
-    // Find which function is being called
-    const match = line.match(/(\w+)\($/);
+    // Updated regex to match function name with parameters
+    const match = line.match(/(\w+)\((.*)/);
     if (!match) return null;
 
     const funcName = match[1];
     const funcInfo = builtInSignatures[funcName as keyof typeof builtInSignatures];
     if (!funcInfo) return null;
 
-    const parameters = funcInfo.parameters.map((p: { label: string | [number, number]; documentation: string | undefined; }) =>
+    // Count commas to determine active parameter
+    const activeParameter = (match[2].match(/,/g) || []).length;
+
+    const parameters = funcInfo.parameters.map(p =>
       ParameterInformation.create(p.label, p.documentation)
     );
 
@@ -289,7 +291,7 @@ connection.onSignatureHelp(
     return {
       signatures: [signature],
       activeSignature: 0,
-      activeParameter: 0
+      activeParameter
     };
   }
 );
