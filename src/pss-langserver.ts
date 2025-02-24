@@ -42,6 +42,7 @@ import { formatDocument } from './providers/formattingProvider';
 import { fullRange, scanDirectory, updateAST, updateStringArray } from './helper_functions';
 import { keywords } from './definitions/keywords';
 import fs from 'fs-extra'
+import { builtInSignatures } from './definitions/builtinFunctions';
 
 /* Support all connection types - ipc, stdio, tcp */
 const connection = createConnection(ProposedFeatures.all);
@@ -154,9 +155,11 @@ connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
   if (!hasConfigurationCapability) {
     globalSettings = change.settings.MYLANG || defaultSettings;
   }
-  /* For future use - with diagnostics */
-  /* connection.languages.diagnostics.refresh(); */
+  connection.languages.diagnostics.refresh();
 });
+
+/* For future use - with diagnostics */
+connection.sendDiagnostics({ uri: "", diagnostics: [] });
 
 function getSettings(connection: Connection, resource: string): Thenable<PSS_Config> {
   if (!hasConfigurationCapability) {
@@ -215,6 +218,21 @@ connection.onCompletion(
         }
       )
     });
+
+    /* Add function signatures */
+    Object.entries(builtInSignatures).forEach(([name, func]) => {
+      completions.push({
+        label: name,
+        kind: CompletionItemKind.Function,
+        detail: func.signature,
+        documentation: {
+          kind: 'markdown',
+          value: `${func.documentation}\n\n**Parameters:**\n${func.parameters.map(p => `- \`${p.label}\`: ${p.documentation}`).join('\n')
+            }`
+        }
+      });
+    });
+
     return completions;
   }
 );
