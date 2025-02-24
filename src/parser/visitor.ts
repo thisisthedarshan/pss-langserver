@@ -1,6 +1,6 @@
 import { ParserRuleContext } from "antlr4";
 import pssVisitor from "../grammar/pssVisitor";
-import { IdentifierContext } from "../grammar/pss";
+import { Enum_itemContext, IdentifierContext } from "../grammar/pss";
 
 export class visitor extends pssVisitor<void> {
   private identifiers: string[] = [];
@@ -10,5 +10,9 @@ export class visitor extends pssVisitor<void> {
     this.visitIdentifier = (ctx: IdentifierContext): void => {
       this.identifiers.push(ctx.getText());
     };
+
+    this.visitEnum_item = (ctx: Enum_itemContext): void => {
+      this.identifiers.push(ctx.getText());
+    }
   }
 }
