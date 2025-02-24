@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added formatting support to config
+- Added enum items to autocompletion suggestions
 
 ### Changed
 
