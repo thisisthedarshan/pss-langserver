@@ -166,8 +166,8 @@ function getSettings(connection: Connection, resource: string): Thenable<PSS_Con
   let result = documentSettings.get(resource);
   if (!result) {
     result = Promise.all([
-      connection.workspace.getConfiguration({ scopeUri: resource, section: 'MYLANG.tabspaces' }),
-      connection.workspace.getConfiguration({ scopeUri: resource, section: 'MYLANG.fileAuthor' })
+      connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.tabspaces' }),
+      connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.fileAuthor' })
     ]).then(([tabspaces, fileAuthor]) => {
       // Validate tabspaces
       const validatedTabspaces = Math.min(Math.max(tabspaces ?? defaultSettings.tabspaces, 1), 9);
