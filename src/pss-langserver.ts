@@ -163,7 +163,7 @@ const documentSettings = new Map<string, Thenable<PSS_Config>>();
 connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
   documentSettings.clear();
   if (!hasConfigurationCapability) {
-    globalSettings = change.settings.MYLANG || defaultSettings;
+    globalSettings = change.settings.PSS || defaultSettings;
   }
   connection.languages.diagnostics.refresh();
 });
