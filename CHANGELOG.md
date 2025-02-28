@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- Grammar to detect document blocks.
+
 ### Changed
 
 - A minor bug fix where config refresh failed due to wrong check.
