@@ -16,17 +16,21 @@
  */
 
 import { integer } from "vscode-languageserver";
-export function formatDocument(text: string, tabspace: integer, author: string): string {
-  // Start by formatting curly braces
-  let doc = formatCurlyBraces(text);
-  // Then add spaces after commas
-  doc = formatCommas(doc);
-  // Format multi-line comments:
-  doc = formatMultilineComments(doc);
-  // Then format semicolons
-  doc = addNewlinesAfterSemicolons(doc);
+import alignTextElements from "./formattingHelper";
 
-  // The make it process line by line
+export function formatDocument(text: string, tabspace: integer, author: string): string {
+  /* First format curly braces */
+  let doc = formatCurlyBraces(text);
+  /* Then add spaces after commas */
+  doc = formatCommas(doc);
+  /* Format multi-line comments: */
+  doc = formatMultilineComments(doc);
+  /* Then format semicolons */
+  doc = addNewlinesAfterSemicolons(doc);
+  /* Then start by formatting patterns - beautification */
+  doc = alignTextElements(doc);
+
+  /* The make it process line by line */
   let lines = doc.split('\n');
   const formattedLines: string[] = [];
 
@@ -35,7 +39,7 @@ export function formatDocument(text: string, tabspace: integer, author: string):
 
 
   for (let line of lines) {
-    // Keep empty newlines as it is
+    /* Keep empty newlines as it is */
     if (line.trim() === '') {
       formattedLines.push(''); // Keep the empty line as-is
       continue;
@@ -43,16 +47,16 @@ export function formatDocument(text: string, tabspace: integer, author: string):
 
     line = line.trim();
 
-    // Format specific syntax
+    /* Format specific syntax */
     line = formatOperators(line);
     line = formatSingleLineComments(line);
 
-    // Handle closing braces
+    /* Handle closing braces */
     if (line.startsWith('}') && !isInBlockComment && !(/\/\//.test(line))) {
       indentLevel = Math.max(indentLevel - tabspace, 0);
     }
 
-    // Check if comment block is encountered
+    /* Check if comment block is encountered */
     if (line.startsWith("/*")) {
       isInBlockComment = true;
     }
@@ -63,18 +67,18 @@ export function formatDocument(text: string, tabspace: integer, author: string):
       }
     }
 
-    // Check if still in comment
+    /* Check if still in comment */
     if (isInBlockComment) {
       if (line.startsWith("*")) {
         line = ` ${line}`; // Add an extra space
       }
     }
 
-    // Add indentation
+    /* Add indentation */
     const indentedLine = `${' '.repeat(indentLevel)}${line}`;
     formattedLines.push(indentedLine);
 
-    // Handle opening braces
+    /* Handle opening braces */
     if (line.endsWith('{') && !isInBlockComment && !(/\/\/|\/\*/.test(line))) {
       indentLevel += tabspace;
     }
