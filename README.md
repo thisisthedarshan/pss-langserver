@@ -66,7 +66,7 @@ This installs the `pss-langserver` command, which you can start using the `--std
 1. **Install the Extension:**  
    - Visit the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Darshan.dsp-vsc-pss) and download it directly
    - *Or* visit the [Project Repository](https://github.com/thisisthedarshan/vscode-pss) and follow the [Installation Guide](https://github.com/thisisthedarshan/vscode-pss/blob/main/INSTALL.md)
-   - *Or* Open VS Code and navigate to the Extensions view (<kbd>Ctrl+Shift+X</kbd> on Windows/Linux or <kbd>Cmd+Shift+X<kbd> on macOS). Search for **Darshan.dsp-vsc-pss** click **Install**.  
+   - *Or* Open VS Code and navigate to the Extensions view (<kbd>Ctrl+Shift+X</kbd> on Windows/Linux or <kbd>Cmd+Shift+X</kbd> on macOS). Search for **Darshan.dsp-vsc-pss** click **Install**.  
    - *Or* Launch VS Code Quick Open (<kbd>Ctrl+P</kbd>), paste the following command, and press enter:  ```ext install darshan.dsp-vsc-pss```
   
 2. **Configure Workspace Settings:**  
