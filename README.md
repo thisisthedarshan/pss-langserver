@@ -17,7 +17,7 @@ Welcome to the **PSS Language Server** project, a dedicated backend service for 
 
 ## Installation
 
-Just run `npm i pss-langserver`
+Just run `npm i -g pss-langserver` and start it using `pss-langserver`. To update to latest version (if already installed), run `npm update -g`.
 
 ## 🔧 Development Setup
 
@@ -48,15 +48,211 @@ Just run `npm i pss-langserver`
 
 ## 📑 Usage in IDEs
 
-To use the PSS LSP in any IDE that supports LSP:
+Before integrating with any IDE, please ensure you have installed the language server globally by running:
 
-1. Ensure the IDE is configured to recognize external language servers.
-2. Provide the path to the `pss-lsp` binary installed globally by npm.
-3. Verify that the IDE communicates using standard LSP communication protocols (like `stdio` ).
+```bash
+npm install -g pss-langserver
+```
 
-### Example for VS Code
+This installs the `pss-langserver` command, which you can start using the `--stdio` option (among others).
 
-This extension is used as a dependency for my [VS Code extension for PSS](https://github.com/thisisthedarshan/vscode-pss). If you'd like to check it out, you can find it on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Darshan.dsp-vsc-pss).
+---
+
+### VS Code
+
+1. **Install the Extension:**  
+   - Visit the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Darshan.dsp-vsc-pss) or Open VS Code and navigate to the Extensions view (<kbd>Ctrl+Shift+X</kbd> on Windows/Linux or <kbd>Cmd+Shift+X<kbd> on macOS).  
+   - Search for **Darshan.dsp-vsc-pss** click **Install**.  
+   - Or Launch VS Code Quick Open (<kbd>Ctrl+P</kbd>), paste the following command, and press enter:  ```ext install darshan.dsp-vsc-pss```
+  
+2. **Configure Workspace Settings:**  
+   - Open VS Code settings (via File → Preferences → Settings or by clicking the gear icon).  
+   - Under the extension’s section (titled "PSS Support"), set the following options:  
+     - **PSS.tabspaces:** Number of tab spaces to use (default is 4; allowed values: 1–9).  
+     - **PSS.fileAuthor:** Specify the author name for automated file headers.  
+   - Alternatively, add the following to your workspace or user `settings.json`:
+
+     ```json
+     {
+       "PSS.tabspaces": 4,
+       "PSS.fileAuthor": ""
+     }
+     ```
+
+---
+
+### VIM
+
+1. **Install a Plugin Manager:**  
+   - If you don’t have one already, install [vim-plug](https://github.com/junegunn/vim-plug).
+
+2. **Install an LSP Client Plugin:**  
+   - For example, using [coc.nvim](https://github.com/neoclide/coc.nvim):  
+     - Add this to your `~/.vimrc`:
+
+       ```vim
+       call plug#begin('~/.vim/plugged')
+       Plug 'neoclide/coc.nvim', {'branch': 'release'}
+       call plug#end()
+       ```
+
+     - Restart VIM and run `:PlugInstall`.
+
+3. **Configure the Language Server in coc.nvim:**  
+   - Create or update your `~/.vim/coc-settings.json` with the following:
+
+     ```json
+     {
+       "languageserver": {
+         "pss": {
+           "command": "pss-langserver",
+           "args": ["--stdio"],
+           "filetypes": ["pss"],
+           "rootPatterns": ["*.pss"],
+           "initializationOptions": {
+             "PSS": {
+               "tabspaces": 4,
+               "fileAuthor": ""
+             }
+           }
+         }
+       }
+     }
+     ```
+
+4. **Workspace Configuration:**  
+   - Make sure your VIM workspace (or project folder) includes your `.pss` files. Coc.nvim will automatically activate the language server when you open such a file.
+
+---
+
+### NeoVim
+
+1. **Install a Plugin Manager:**  
+   - If needed, use [vim-plug](https://github.com/junegunn/vim-plug).
+
+2. **Install nvim-lspconfig:**  
+   - Add this to your `init.vim` or `init.lua`:
+
+     ```vim
+     call plug#begin('~/.local/share/nvim/plugged')
+     Plug 'neovim/nvim-lspconfig'
+     call plug#end()
+     ```
+
+   - Run `:PlugInstall` within NeoVim.
+
+3. **Configure the Language Server:**  
+   - In your `init.lua` (or equivalent), add:
+
+     ```lua
+     require('lspconfig').pss_langserver = {
+       default_config = {
+         cmd = {"pss-langserver", "--stdio"},
+         filetypes = {"pss"},
+         root_dir = function(fname)
+         return lspconfig.util.root_pattern("*.pss")(fname)
+            or lspconfig.util.path.dirname(fname)  -- Fallback to the file's directory
+         end,
+         settings = {
+           PSS = {
+             tabspaces = 4,
+             fileAuthor = ""
+           }
+         }
+       }
+     }
+     require('lspconfig').pss_langserver.setup{}
+
+     ```
+
+- Replace `"pss_langserver"` with your desired server name if necessary.
+
+4. **Workspace Setup:**  
+   - Ensure that your project directories containing `.pss` files are opened in NeoVim, so the language server activates automatically.
+
+---
+
+### GVIM
+
+GVIM uses the same configuration as VIM. Follow these steps:
+
+1. **Install a Plugin Manager:**  
+   - Use [vim-plug](https://github.com/junegunn/vim-plug) if not already installed.
+
+2. **Install an LSP Client Plugin:**  
+   - Add coc.nvim as shown in the VIM section to your GVIM configuration.
+
+3. **Configure the Language Server:**  
+   - Update your `coc-settings.json` (usually located in your home directory or GVIM configuration folder) with the same settings as for VIM:
+
+     ```json
+     {
+       "languageserver": {
+         "pss": {
+           "command": "pss-langserver",
+           "args": ["--stdio"],
+           "filetypes": ["pss"],
+           "rootPatterns": ["*.pss"],
+           "initializationOptions": {
+             "PSS": {
+               "tabspaces": 4,
+               "fileAuthor": ""
+             }
+           }
+         }
+       }
+     }
+     ```
+
+4. **Restart GVIM:**  
+   - Restart GVIM to load the new configuration. Files with the `.pss` extension will trigger the language server.
+
+---
+
+### EMACS
+
+1. **Install lsp-mode:**  
+   - Configure MELPA in your Emacs configuration (`init.el` or equivalent):
+
+     ```elisp
+     (require 'package)
+     (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+     (package-initialize)
+     (unless (package-installed-p 'lsp-mode)
+       (package-refresh-contents)
+       (package-install 'lsp-mode))
+     ```
+
+2. **Configure lsp-mode for the PSS Language Server:**  
+   - Add the following configuration snippet to your Emacs configuration:
+
+     ```elisp
+     (require 'lsp-mode)
+     
+     ;; Associate .pss files with a custom major mode if needed
+     (add-to-list 'auto-mode-alist '("\\.pss\\'" . text-mode))
+     
+     (lsp-register-client
+      (make-lsp-client :new-connection (lsp-stdio-connection '("pss-langserver" "--stdio"))
+                       :activation-fn (lsp-activate-on "pss")
+                       :server-id 'pss-ls
+                       :initialized-fn (lambda (workspace)
+                                         (with-lsp-workspace workspace
+                                           (lsp--set-configuration
+                                            `(:PSS (:tabspaces 4
+                                                    :fileAuthor ""))))))
+     ))
+     
+     ;; Optional: Automatically start lsp-mode for .pss files
+     (add-hook 'text-mode-hook #'lsp)
+     ```
+
+   - This registers the language server for files identified with `.pss` and sets the initial configuration for `PSS.tabspaces` and `PSS.fileAuthor`.
+
+3. **Workspace and File Setup:**  
+   - Open any `.pss` file in EMACS, and lsp-mode will automatically activate the PSS language server with the specified settings.
+
+---
 
 ## 📚 Learn More
 
