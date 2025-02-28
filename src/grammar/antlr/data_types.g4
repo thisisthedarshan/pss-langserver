@@ -62,7 +62,7 @@ string_type : TOKEN_STRING (TOKEN_IN TOKEN_SLBRACE string_literal ( TOKEN_COMMA 
 bool_type : TOKEN_BOOL;
 
 enum_declaration :
-TOKEN_ENUM enum_identifier ( TOKEN_COLON data_type ) TOKEN_CLBRACE (enum_item (TOKEN_COMMA enum_item)* )? TOKEN_CRBRACE;
+TOKEN_ENUM enum_identifier ( TOKEN_COLON data_type )? TOKEN_CLBRACE (enum_item (TOKEN_COMMA enum_item)* )? TOKEN_CRBRACE;
 
 enum_item : identifier (TOKEN_EQUALS constant_expression)?;
 

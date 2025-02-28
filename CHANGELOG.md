@@ -11,13 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Grammar to detect document blocks.
 
-### Changed
+### FIXED
 
 - A minor bug fix where config refresh failed due to wrong check.
+- Grammar Syntaxes for data_types.
 
 ## [0.1.4] - 2025-02-24
 
-### Changed
+### FIXED
 
 - Formatter logic is fixed to remove adding of additional newlines
 - Logic for scanning of the files to get all .pss files in current workspace is fixed to also work with file-paths having spaces
