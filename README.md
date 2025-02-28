@@ -17,6 +17,9 @@ Welcome to the **PSS Language Server** project, a dedicated backend service for 
 
 ## Installation
 
+> Ensure NodeJS is installed on your system.
+> If not, just get it [from here](https://nodejs.org/en/download)
+
 Just run `npm i -g pss-langserver` and start it using `pss-langserver`. To update to latest version (if already installed), run `npm update -g`.
 
 ## 🔧 Development Setup
@@ -61,9 +64,10 @@ This installs the `pss-langserver` command, which you can start using the `--std
 ### VS Code
 
 1. **Install the Extension:**  
-   - Visit the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Darshan.dsp-vsc-pss) or Open VS Code and navigate to the Extensions view (<kbd>Ctrl+Shift+X</kbd> on Windows/Linux or <kbd>Cmd+Shift+X<kbd> on macOS).  
-   - Search for **Darshan.dsp-vsc-pss** click **Install**.  
-   - Or Launch VS Code Quick Open (<kbd>Ctrl+P</kbd>), paste the following command, and press enter:  ```ext install darshan.dsp-vsc-pss```
+   - Visit the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Darshan.dsp-vsc-pss) and download it directly
+   - *Or* visit the [Project Repository](https://github.com/thisisthedarshan/vscode-pss) and follow the [Installation Guide](https://github.com/thisisthedarshan/vscode-pss/blob/main/INSTALL.md)
+   - *Or* Open VS Code and navigate to the Extensions view (<kbd>Ctrl+Shift+X</kbd> on Windows/Linux or <kbd>Cmd+Shift+X<kbd> on macOS). Search for **Darshan.dsp-vsc-pss** click **Install**.  
+   - *Or* Launch VS Code Quick Open (<kbd>Ctrl+P</kbd>), paste the following command, and press enter:  ```ext install darshan.dsp-vsc-pss```
   
 2. **Configure Workspace Settings:**  
    - Open VS Code settings (via File → Preferences → Settings or by clicking the gear icon).  
