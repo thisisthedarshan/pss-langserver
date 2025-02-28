@@ -14,18 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { builtInSignatures } from "../definitions/builtinFunctions";
-
-export function isWithinCommentBlock(document: { lineAt: (arg0: any) => { (): any; new(): any; text: string; }; }, lineNumber: any) {
-  for (let i = lineNumber; i >= 0; i--) {
-    const lineText = document.lineAt(i).text.trim();
-
-    if ((lineText.startsWith('/*') || lineText.startsWith("/**")) && !lineText.endsWith('*/')) {
-      return true;  // Found the start of an unclosed block comment
-    }
-    if (lineText.endsWith('*/')) {
-      return false;  // Found the end of the block comment
-    }
-  }
-  return false;
+import { getAutoCompleteItemsFromFile } from "./ast";
+const file: string = `
+extend component pss_top {
+ import my_mem_ops_c::*;
+ action stress_xfer {
+ activity {
+ schedule {
+ do my_mem_ops_c::write_data;
+ do my_mem_ops_c::write_data;
+ }
+ repeat (5) {
+ do my_mem_ops_c::copy_data;
+ }
+ schedule {
+ do my_mem_ops_c::read_check_data;
+ do my_mem_ops_c::read_check_data;
+ }
+ }
+ }
 }
+`;
+getAutoCompleteItemsFromFile(file);
