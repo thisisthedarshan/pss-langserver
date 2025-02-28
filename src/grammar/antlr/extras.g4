@@ -21,10 +21,9 @@ string_literal :
 TOKEN_QUOTED_STRING
 | TOKEN_TRIPLE_QUOTED_STRING;
 
-comment : TOKEN_SL_COMMENT | TOKEN_ML_COMMENT;
+comment : TOKEN_DOC_COMMENT | TOKEN_SL_COMMENT | TOKEN_ML_COMMENT;
 
 filename_string : TOKEN_QUOTED_STRING;
-
 
 /* Data Declarations - missing from the LRM */
 data_declaration:

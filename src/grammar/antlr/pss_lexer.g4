@@ -219,6 +219,7 @@ TOKEN_BASED_HEX_LITERAL:
 	'\'' ('s' | 'S')? ('h' | 'H') HEX_DIGIT (HEX_DIGIT | '_')*;
 
 /* Comments */
+TOKEN_DOC_COMMENT: '/**' .*? '*/' -> channel(HIDDEN);
 TOKEN_SL_COMMENT: '//' ~[\r\n]* '\n' -> channel(HIDDEN);
 TOKEN_ML_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
