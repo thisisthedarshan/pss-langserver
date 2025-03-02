@@ -29,3 +29,8 @@ export function isWithinCommentBlock(document: { lineAt: (arg0: any) => { (): an
   }
   return false;
 }
+
+export enum objType {
+  COMPONENT, ACTION, FUNCTION, ENUM, REGISTER_NAME, REGISTER_GROUP, INTEGER,
+  BOOL, FLOAT, BUFFER, STRUCT, RESOURCE_OBJECT, PACKAGE
+}

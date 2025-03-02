@@ -14,3 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+import pssVisitor from "../grammar/pssVisitor";
+
+class commentsVisitor extends pssVisitor<string> {
+
+    private comment: string = "";
+    getComment(): string { return this.comment; }
+
+}

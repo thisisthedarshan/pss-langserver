@@ -14,21 +14,155 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { ParserRuleContext } from "antlr4";
+import { ParserRuleContext, Token } from "antlr4";
 import pssVisitor from "../grammar/pssVisitor";
-import { Enum_itemContext, IdentifierContext } from "../grammar/pss";
+import { Action_declarationContext, Enum_itemContext, IdentifierContext } from "../grammar/pss";
+import pss_lexer from "../grammar/pss_lexer";
+import { objType } from "./helpers";
+import { integer } from "vscode-languageserver";
+
+/* Tells what line(s) use the object */
+type usedOn = {
+  file: string;
+  lineNumber: integer;
+}
+
+/* Holds info on parameters */
+type params = {
+  paramType: objType;
+  paramDefault: any | undefined;
+}
+
+/* Holds some meta info on the object(s) */
+type metaInfo = {
+  objectType: objType;
+  parent: string | undefined;
+  onLine: integer;
+  used: usedOn[];
+  documentation: string | undefined;
+  templateParams: string | params[] | undefined;
+  inherits: string | undefined;
+}
+
+/* This is the object returned by the visitor */
+type metaData = {
+  keyword: string;
+  info: metaInfo;
+}
 
 export class visitor extends pssVisitor<void> {
+  /* Data types */
   private identifiers: string[] = [];
+  private astMeta: metaData[] = [];
+  private tokenStream: any;
+
+  /* Getter */
   getIdentifiers(): string[] { return this.identifiers; }
-  constructor() {
+
+  constructor(tokenStream: any) {
+
     super();
+    this.tokenStream = tokenStream;
+
+    /* Visit different identifiers */
+
     this.visitIdentifier = (ctx: IdentifierContext): void => {
       this.identifiers.push(ctx.getText());
     };
+
+    /* Visit all declarations and generate data */
+    this.visitAction_declaration = (ctx: Action_declarationContext): void => {
+      var templateParams: any[] = [];
+      var inheritedFrom: string = "";
+      this.astMeta.push({
+        keyword: ctx.action_identifier.toString(),
+        info: {
+          objectType: objType.ACTION,
+          parent: undefined,
+          onLine: ctx.start.line,
+          used: [],
+          documentation: "",
+          templateParams: ctx.template_param_decl_list.toString(),
+          inherits: undefined
+        }
+      });
+    }
+
 
     this.visitEnum_item = (ctx: Enum_itemContext): void => {
       this.identifiers.push(ctx.getText());
     }
   }
+
+
+  private captureComments(ctx: ParserRuleContext): void {
+    /* Get start token index */
+    const tokenIndex = ctx.start.tokenIndex;
+
+    /* Get comments before this rule */
+    const comments = this.getCommentsBeforeToken(tokenIndex);
+
+    if (comments.length > 0) {
+      console.log(`Comments for ${ctx.getText()}:`, comments);
+      /* Process comments as needed */
+    }
+  }
+
+  private getInlineComments(ctx: ParserRuleContext): string[] {
+    const comments: string[] = [];
+
+    /* Check if stop exists before using it */
+    if (!ctx.stop) return comments;
+
+    const tokenIndex = ctx.stop.tokenIndex;
+
+    /* Look at the next token */
+    const nextToken = this.tokenStream.get(tokenIndex + 1);
+
+    /* Check if it's on the hidden channel and is a comment */
+    if (nextToken && nextToken.channel === Token.HIDDEN_CHANNEL) {
+      const tokenType = nextToken.type;
+
+      if (tokenType === pss_lexer.TOKEN_DOC_COMMENT ||
+        tokenType === pss_lexer.TOKEN_SL_COMMENT ||
+        tokenType === pss_lexer.TOKEN_ML_COMMENT) {
+        comments.push(nextToken.text);
+      }
+    }
+
+    return comments;
+  }
+
+  private getCommentsBeforeToken(tokenIndex: number): string[] {
+    const comments: string[] = [];
+
+    /* Search for hidden channel tokens before the current token */
+    let i = tokenIndex - 1;
+    while (i >= 0) {
+      const token = this.tokenStream.get(i);
+
+      /* Check if token is on the hidden channel and is a comment */
+      if (token.channel === Token.HIDDEN_CHANNEL) {
+        const tokenType = token.type;
+
+        /* Check if it's one of your comment types */
+        if (tokenType === pss_lexer.TOKEN_DOC_COMMENT ||
+          tokenType === pss_lexer.TOKEN_SL_COMMENT ||
+          tokenType === pss_lexer.TOKEN_ML_COMMENT) {
+          comments.unshift(token.text);
+        } else {
+          /* Stop if we hit a non-comment hidden token (usually whitespace) */
+          break;
+        }
+      } else {
+        /* Stop if we hit a non-hidden token */
+        break;
+      }
+
+      i--;
+    }
+
+    return comments;
+  }
+
 }
