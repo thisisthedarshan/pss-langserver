@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2025 Darshan(@thisisthedarshan)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 // Generated from ./src/grammar/antlr/pss.g4 by ANTLR 4.13.2
 
 import {ParseTreeListener} from "antlr4";
@@ -223,8 +207,11 @@ import { Function_callContext } from "./pss.js";
 import { Function_ref_pathContext } from "./pss.js";
 import { Symbol_callContext } from "./pss.js";
 import { Function_parameter_listContext } from "./pss.js";
+import { Expression_listContext } from "./pss.js";
 import { String_literalContext } from "./pss.js";
-import { CommentContext } from "./pss.js";
+import { DocCommentContext } from "./pss.js";
+import { SlCommentContext } from "./pss.js";
+import { MlCommentContext } from "./pss.js";
 import { Filename_stringContext } from "./pss.js";
 import { Import_functionContext } from "./pss.js";
 import { Target_template_functionContext } from "./pss.js";
@@ -341,6 +328,18 @@ import { Type_categoryContext } from "./pss.js";
 import { Value_param_declContext } from "./pss.js";
 import { Template_param_value_listContext } from "./pss.js";
 import { Template_param_valueContext } from "./pss.js";
+import { ParseDocCommentContext } from "./pss.js";
+import { DocContentContext } from "./pss.js";
+import { DocLineContext } from "./pss.js";
+import { StarLineContext } from "./pss.js";
+import { CommandLineContext } from "./pss.js";
+import { CommandTypeContext } from "./pss.js";
+import { CommandContentContext } from "./pss.js";
+import { ParamNameContext } from "./pss.js";
+import { ContentLineContext } from "./pss.js";
+import { ContentElementContext } from "./pss.js";
+import { MarkdownContext } from "./pss.js";
+import { InlineCommandContext } from "./pss.js";
 
 
 /**
@@ -2389,6 +2388,16 @@ export default class pssListener extends ParseTreeListener {
 	 */
 	exitFunction_parameter_list?: (ctx: Function_parameter_listContext) => void;
 	/**
+	 * Enter a parse tree produced by `pss.expression_list`.
+	 * @param ctx the parse tree
+	 */
+	enterExpression_list?: (ctx: Expression_listContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.expression_list`.
+	 * @param ctx the parse tree
+	 */
+	exitExpression_list?: (ctx: Expression_listContext) => void;
+	/**
 	 * Enter a parse tree produced by `pss.string_literal`.
 	 * @param ctx the parse tree
 	 */
@@ -2399,15 +2408,41 @@ export default class pssListener extends ParseTreeListener {
 	 */
 	exitString_literal?: (ctx: String_literalContext) => void;
 	/**
-	 * Enter a parse tree produced by `pss.comment`.
+	 * Enter a parse tree produced by the `docComment`
+	 * labeled alternative in `pss.comment`.
 	 * @param ctx the parse tree
 	 */
-	enterComment?: (ctx: CommentContext) => void;
+	enterDocComment?: (ctx: DocCommentContext) => void;
 	/**
-	 * Exit a parse tree produced by `pss.comment`.
+	 * Exit a parse tree produced by the `docComment`
+	 * labeled alternative in `pss.comment`.
 	 * @param ctx the parse tree
 	 */
-	exitComment?: (ctx: CommentContext) => void;
+	exitDocComment?: (ctx: DocCommentContext) => void;
+	/**
+	 * Enter a parse tree produced by the `slComment`
+	 * labeled alternative in `pss.comment`.
+	 * @param ctx the parse tree
+	 */
+	enterSlComment?: (ctx: SlCommentContext) => void;
+	/**
+	 * Exit a parse tree produced by the `slComment`
+	 * labeled alternative in `pss.comment`.
+	 * @param ctx the parse tree
+	 */
+	exitSlComment?: (ctx: SlCommentContext) => void;
+	/**
+	 * Enter a parse tree produced by the `mlComment`
+	 * labeled alternative in `pss.comment`.
+	 * @param ctx the parse tree
+	 */
+	enterMlComment?: (ctx: MlCommentContext) => void;
+	/**
+	 * Exit a parse tree produced by the `mlComment`
+	 * labeled alternative in `pss.comment`.
+	 * @param ctx the parse tree
+	 */
+	exitMlComment?: (ctx: MlCommentContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.filename_string`.
 	 * @param ctx the parse tree
@@ -3568,5 +3603,125 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitTemplate_param_value?: (ctx: Template_param_valueContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.parseDocComment`.
+	 * @param ctx the parse tree
+	 */
+	enterParseDocComment?: (ctx: ParseDocCommentContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.parseDocComment`.
+	 * @param ctx the parse tree
+	 */
+	exitParseDocComment?: (ctx: ParseDocCommentContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.docContent`.
+	 * @param ctx the parse tree
+	 */
+	enterDocContent?: (ctx: DocContentContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.docContent`.
+	 * @param ctx the parse tree
+	 */
+	exitDocContent?: (ctx: DocContentContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.docLine`.
+	 * @param ctx the parse tree
+	 */
+	enterDocLine?: (ctx: DocLineContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.docLine`.
+	 * @param ctx the parse tree
+	 */
+	exitDocLine?: (ctx: DocLineContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.starLine`.
+	 * @param ctx the parse tree
+	 */
+	enterStarLine?: (ctx: StarLineContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.starLine`.
+	 * @param ctx the parse tree
+	 */
+	exitStarLine?: (ctx: StarLineContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.commandLine`.
+	 * @param ctx the parse tree
+	 */
+	enterCommandLine?: (ctx: CommandLineContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.commandLine`.
+	 * @param ctx the parse tree
+	 */
+	exitCommandLine?: (ctx: CommandLineContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.commandType`.
+	 * @param ctx the parse tree
+	 */
+	enterCommandType?: (ctx: CommandTypeContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.commandType`.
+	 * @param ctx the parse tree
+	 */
+	exitCommandType?: (ctx: CommandTypeContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.commandContent`.
+	 * @param ctx the parse tree
+	 */
+	enterCommandContent?: (ctx: CommandContentContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.commandContent`.
+	 * @param ctx the parse tree
+	 */
+	exitCommandContent?: (ctx: CommandContentContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.paramName`.
+	 * @param ctx the parse tree
+	 */
+	enterParamName?: (ctx: ParamNameContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.paramName`.
+	 * @param ctx the parse tree
+	 */
+	exitParamName?: (ctx: ParamNameContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.contentLine`.
+	 * @param ctx the parse tree
+	 */
+	enterContentLine?: (ctx: ContentLineContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.contentLine`.
+	 * @param ctx the parse tree
+	 */
+	exitContentLine?: (ctx: ContentLineContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.contentElement`.
+	 * @param ctx the parse tree
+	 */
+	enterContentElement?: (ctx: ContentElementContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.contentElement`.
+	 * @param ctx the parse tree
+	 */
+	exitContentElement?: (ctx: ContentElementContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.markdown`.
+	 * @param ctx the parse tree
+	 */
+	enterMarkdown?: (ctx: MarkdownContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.markdown`.
+	 * @param ctx the parse tree
+	 */
+	exitMarkdown?: (ctx: MarkdownContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.inlineCommand`.
+	 * @param ctx the parse tree
+	 */
+	enterInlineCommand?: (ctx: InlineCommandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.inlineCommand`.
+	 * @param ctx the parse tree
+	 */
+	exitInlineCommand?: (ctx: InlineCommandContext) => void;
 }
 
