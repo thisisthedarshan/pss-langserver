@@ -277,6 +277,6 @@ WS: [ \t\r\n] -> skip; // Ignore whitespace
 mode DOXYGEN_MODE;
 CLOSE_DOC_COMMENT: '*/' -> popMode, channel(DOXYGEN_CHANNEL);
 DOC_COMMAND: '@' [a-zA-Z]+ -> channel(DOXYGEN_CHANNEL); 
-DOC_STAR_PREFIX: WS* '*'{1,4} WS* -> channel(DOXYGEN_CHANNEL);
+DOC_STAR_PREFIX:  WS* TOKEN_ASTERISK{localctx.getText().length < 5}? WS* -> channel(DOXYGEN_CHANNEL);
 DOC_TEXT: ~[@*/\r\n]+ -> channel(DOXYGEN_CHANNEL);
 DOC_NEWLINE: [\r\n] -> channel(DOXYGEN_CHANNEL);

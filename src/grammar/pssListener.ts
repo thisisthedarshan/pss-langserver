@@ -225,7 +225,6 @@ import { Symbol_callContext } from "./pss.js";
 import { Function_parameter_listContext } from "./pss.js";
 import { Expression_listContext } from "./pss.js";
 import { String_literalContext } from "./pss.js";
-import { DocCommentContext } from "./pss.js";
 import { SlCommentContext } from "./pss.js";
 import { MlCommentContext } from "./pss.js";
 import { Filename_stringContext } from "./pss.js";
@@ -344,7 +343,7 @@ import { Type_categoryContext } from "./pss.js";
 import { Value_param_declContext } from "./pss.js";
 import { Template_param_value_listContext } from "./pss.js";
 import { Template_param_valueContext } from "./pss.js";
-import { ParseDocCommentContext } from "./pss.js";
+import { DoxygenCommentContext } from "./pss.js";
 import { DocContentContext } from "./pss.js";
 import { DocLineContext } from "./pss.js";
 import { StarLineContext } from "./pss.js";
@@ -2424,18 +2423,6 @@ export default class pssListener extends ParseTreeListener {
 	 */
 	exitString_literal?: (ctx: String_literalContext) => void;
 	/**
-	 * Enter a parse tree produced by the `docComment`
-	 * labeled alternative in `pss.comment`.
-	 * @param ctx the parse tree
-	 */
-	enterDocComment?: (ctx: DocCommentContext) => void;
-	/**
-	 * Exit a parse tree produced by the `docComment`
-	 * labeled alternative in `pss.comment`.
-	 * @param ctx the parse tree
-	 */
-	exitDocComment?: (ctx: DocCommentContext) => void;
-	/**
 	 * Enter a parse tree produced by the `slComment`
 	 * labeled alternative in `pss.comment`.
 	 * @param ctx the parse tree
@@ -3620,15 +3607,15 @@ export default class pssListener extends ParseTreeListener {
 	 */
 	exitTemplate_param_value?: (ctx: Template_param_valueContext) => void;
 	/**
-	 * Enter a parse tree produced by `pss.parseDocComment`.
+	 * Enter a parse tree produced by `pss.doxygenComment`.
 	 * @param ctx the parse tree
 	 */
-	enterParseDocComment?: (ctx: ParseDocCommentContext) => void;
+	enterDoxygenComment?: (ctx: DoxygenCommentContext) => void;
 	/**
-	 * Exit a parse tree produced by `pss.parseDocComment`.
+	 * Exit a parse tree produced by `pss.doxygenComment`.
 	 * @param ctx the parse tree
 	 */
-	exitParseDocComment?: (ctx: ParseDocCommentContext) => void;
+	exitDoxygenComment?: (ctx: DoxygenCommentContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.docContent`.
 	 * @param ctx the parse tree
