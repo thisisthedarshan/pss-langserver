@@ -62,8 +62,11 @@ covergroup_coverpoint_body_item :
 covergroup_option
 | covergroup_coverpoint_binspec;
 
-covergroup_coverpoint_binspec : bins_keyword identifier
-(TOKEN_SLBRACE constant_expression? TOKEN_SRBRACE)? TOKEN_EQUALS coverpoint_bins;
+covergroup_coverpoint_binspec
+    : (bins_keyword identifier TOKEN_EQUALS coverpoint_bins)
+    | (bins_keyword identifier TOKEN_SLBRACE TOKEN_SRBRACE TOKEN_EQUALS coverpoint_bins)
+    | (bins_keyword identifier TOKEN_SLBRACE constant_expression TOKEN_SRBRACE TOKEN_EQUALS coverpoint_bins)
+    ;
 
 coverpoint_bins :
 (TOKEN_SLBRACE covergroup_range_list TOKEN_SRBRACE ( TOKEN_WITH TOKEN_FLBRACE covergroup_expression TOKEN_FRBRACE)? TOKEN_SEMICOLON)
@@ -72,10 +75,12 @@ coverpoint_bins :
 
 covergroup_range_list : covergroup_value_range (TOKEN_COMMA covergroup_value_range)*;
 
-covergroup_value_range :
-expression
-| (expression TOKEN_DDOT expression? )
-| (expression? TOKEN_DDOT expression);
+covergroup_value_range
+    : expression                      
+    | expression TOKEN_DDOT expression
+    | expression TOKEN_DDOT           
+    | TOKEN_DDOT expression           
+    ;
 
 bins_keyword : TOKEN_BINS | TOKEN_ILLEGALBINS | TOKEN_IGNOREBINS;
 

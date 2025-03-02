@@ -108,9 +108,14 @@ collection_expression : expression;
 
 cast_expression : TOKEN_FLBRACE casting_type TOKEN_FRBRACE expression;
 
-ref_path :
-(static_ref_path (TOKEN_DOT hierarchical_id)? slice?)
-| ((TOKEN_SUPER TOKEN_DOT) hierarchical_id slice?);
+ref_path
+    : static_ref_path
+    | static_ref_path TOKEN_DOT hierarchical_id     
+    | static_ref_path TOKEN_DOT hierarchical_id slice
+    | static_ref_path slice
+    | TOKEN_SUPER TOKEN_DOT hierarchical_id
+    | TOKEN_SUPER TOKEN_DOT hierarchical_id slice
+    ;
 
 slice : bit_slice | string_slice;
 
@@ -130,4 +135,12 @@ function_call :
 function_ref_path : (member_path_elem TOKEN_DOT)? identifier function_parameter_list;
 
 symbol_call : symbol_identifier function_parameter_list TOKEN_SEMICOLON;
-function_parameter_list : TOKEN_FLBRACE (expression (TOKEN_COMMA expression)* )? TOKEN_FRBRACE;
+
+function_parameter_list
+    : TOKEN_FLBRACE TOKEN_FRBRACE                
+    | TOKEN_FLBRACE expression_list TOKEN_FRBRACE
+    ;
+
+expression_list
+    : expression (TOKEN_COMMA expression)*
+    ;

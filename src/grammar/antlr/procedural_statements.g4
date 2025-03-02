@@ -53,8 +53,10 @@ procedural_void_function_call_stmt: (
 		TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE
 	)? function_call TOKEN_SEMICOLON;
 
-procedural_return_stmt:
-	TOKEN_RETURN expression? TOKEN_SEMICOLON;
+procedural_return_stmt
+    : TOKEN_RETURN TOKEN_SEMICOLON
+    | TOKEN_RETURN expression TOKEN_SEMICOLON
+    ;
 
 procedural_repeat_stmt:
 	TOKEN_REPEAT TOKEN_FLBRACE (index_identifier TOKEN_COLON)? expression TOKEN_FRBRACE

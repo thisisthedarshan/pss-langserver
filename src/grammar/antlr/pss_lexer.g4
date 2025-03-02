@@ -15,7 +15,7 @@
 
 lexer grammar pss_lexer;
 /* Different channels */
-channels { DEFAULT_TOKEN_CHANNEL, HIDDEN, DOXYGEN_CHANNEL }
+channels { DOXYGEN_CHANNEL }
 
 /* CONSTANT CHARACTERS */
 TOKEN_SCOPE: '::';
@@ -232,7 +232,7 @@ TOKEN_BASED_HEX_LITERAL:
 	'\'' ('s' | 'S')? ('h' | 'H') HEX_DIGIT (HEX_DIGIT | '_')*;
 
 /* Comments */
-TOKEN_DOC_COMMENT: '/**' .*? '*/' -> channel(DOXYGEN_CHANNEL);;
+TOKEN_DOC_COMMENT: '/**' .*? '*/' -> channel(DOXYGEN_CHANNEL);
 TOKEN_SL_COMMENT: '//' ~[\r\n]* '\n' -> channel(HIDDEN);
 TOKEN_ML_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
@@ -258,6 +258,16 @@ fragment CODE: '`' ~[`\r\n]* '`';
 fragment LINK: '<' ~[>\r\n]* '>';
 fragment TEXT: ~[\r\n@*`_<]+;
 fragment EOL: '\r'? '\n' | EOF;
+
+TOKEN_STAR_PREFIX: STAR_PREFIX;
+TOKEN_COMMAND: COMMAND;
+TOKEN_ITALIC: ITALIC;
+TOKEN_BOLD: BOLD;
+TOKEN_BOLD_ITALIC: BOLD_ITALIC;
+TOKEN_CODE: CODE;
+TOKEN_LINK: LINK;
+TOKEN_TEXT: TEXT;
+TOKEN_EOL: EOL;
 
 TOKEN_FILENAME_STRING: TOKEN_QUOTED_STRING;
 

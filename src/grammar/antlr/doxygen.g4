@@ -30,11 +30,11 @@ docLine
     ;
 
 starLine
-    : STAR_PREFIX contentElement* EOL
+    : TOKEN_STAR_PREFIX contentElement* TOKEN_EOL
     ;
 
 commandLine
-    : STAR_PREFIX? COMMAND commandType commandContent EOL
+    : TOKEN_STAR_PREFIX? TOKEN_COMMAND commandType commandContent TOKEN_EOL
     ;
 
 commandType
@@ -62,23 +62,23 @@ paramName
     ;
 
 contentLine
-    : STAR_PREFIX? contentElement* EOL
+    : TOKEN_STAR_PREFIX? contentElement* TOKEN_EOL
     ;
 
 contentElement
-    : TEXT
+    : TOKEN_TEXT
     | markdown
     | inlineCommand
     ;
 
 markdown
-    : ITALIC
-    | BOLD
-    | BOLD_ITALIC
-    | CODE
-    | LINK
+    : TOKEN_ITALIC
+    | TOKEN_BOLD
+    | TOKEN_BOLD_ITALIC
+    | TOKEN_CODE
+    | TOKEN_LINK
     ;
 
 inlineCommand
-    : COMMAND commandType (WS+ contentElement*)?
+    : TOKEN_COMMAND commandType (WS+ contentElement*)?
     ;

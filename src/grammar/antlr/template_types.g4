@@ -38,7 +38,9 @@ TOKEN_ACTION
 
 value_param_decl : data_type identifier (TOKEN_EQUALS constant_expression)?;
 
-template_param_value_list :
-TOKEN_LT (template_param_value (TOKEN_COMMA template_param_value)*)? TOKEN_GT;
+template_param_value_list
+    : TOKEN_LT TOKEN_GT
+    | TOKEN_LT template_param_value (TOKEN_COMMA template_param_value)* TOKEN_GT
+    ;
 
 template_param_value : constant_expression | data_type;
