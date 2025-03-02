@@ -22,8 +22,7 @@ TOKEN_QUOTED_STRING
 | TOKEN_TRIPLE_QUOTED_STRING;
 
 comment 
-    : TOKEN_DOC_COMMENT # docComment
-    | TOKEN_SL_COMMENT  # slComment
+    : TOKEN_SL_COMMENT  # slComment
     | TOKEN_ML_COMMENT  # mlComment
     ;
 

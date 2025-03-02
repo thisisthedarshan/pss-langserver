@@ -232,7 +232,7 @@ TOKEN_BASED_HEX_LITERAL:
 	'\'' ('s' | 'S')? ('h' | 'H') HEX_DIGIT (HEX_DIGIT | '_')*;
 
 /* Comments */
-TOKEN_DOC_COMMENT: '/**' .*? '*/' -> channel(DOXYGEN_CHANNEL);
+OPEN_DOC_COMMENT: '/**' -> pushMode(DOXYGEN_MODE), channel(DOXYGEN_CHANNEL);
 TOKEN_SL_COMMENT: '//' ~[\r\n]* '\n' -> channel(HIDDEN);
 TOKEN_ML_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
@@ -249,17 +249,15 @@ fragment ESCAPED_CHARACTER:
 	| '\\' [0-7] [0-7] [0-7]; /* Escapes */
 
 /* Doxygen related */
-fragment STAR_PREFIX: WS* TOKEN_ASTERISK{getText().length() < 5}? WS*;
 fragment COMMAND: '@';
 fragment ITALIC: TOKEN_ASTERISK ~[*\r\n]+ TOKEN_ASTERISK | TOKEN_UNDERSCORE ~[_\r\n]+ TOKEN_UNDERSCORE;
 fragment BOLD: TOKEN_ASTERISK TOKEN_ASTERISK ~[*\r\n]+ TOKEN_ASTERISK TOKEN_ASTERISK;
 fragment BOLD_ITALIC: TOKEN_ASTERISK TOKEN_ASTERISK TOKEN_ASTERISK ~[*\r\n]+ TOKEN_ASTERISK TOKEN_ASTERISK TOKEN_ASTERISK;
-fragment CODE: '`' ~[`\r\n]* '`';
-fragment LINK: '<' ~[>\r\n]* '>';
+fragment CODE: TOKEN_TILDA ~[`\r\n]* TOKEN_TILDA;
+fragment LINK: TOKEN_LT ~[>\r\n]* TOKEN_GT;
 fragment TEXT: ~[\r\n@*`_<]+;
 fragment EOL: '\r'? '\n' | EOF;
 
-TOKEN_STAR_PREFIX: STAR_PREFIX;
 TOKEN_COMMAND: COMMAND;
 TOKEN_ITALIC: ITALIC;
 TOKEN_BOLD: BOLD;
@@ -275,3 +273,10 @@ TOKEN_FILENAME_STRING: TOKEN_QUOTED_STRING;
 ID: [a-zA-Z_] [a-zA-Z_0-9]*;
 ESCAPED_ID: '\\' ~[ \t\r\n]+ [ \t\r\n]+;
 WS: [ \t\r\n] -> skip; // Ignore whitespace
+
+mode DOXYGEN_MODE;
+CLOSE_DOC_COMMENT: '*/' -> popMode, channel(DOXYGEN_CHANNEL);
+DOC_COMMAND: '@' [a-zA-Z]+ -> channel(DOXYGEN_CHANNEL); 
+DOC_STAR_PREFIX: WS* '*'{1,4} WS* -> channel(DOXYGEN_CHANNEL);
+DOC_TEXT: ~[@*/\r\n]+ -> channel(DOXYGEN_CHANNEL);
+DOC_NEWLINE: [\r\n] -> channel(DOXYGEN_CHANNEL);

@@ -15,8 +15,8 @@
 parser grammar doxygen;
 options {tokenVocab=pss_lexer;}
 
-parseDocComment
-    : docContent
+doxygenComment
+    : OPEN_DOC_COMMENT docContent CLOSE_DOC_COMMENT
     ;
 
 docContent
@@ -30,11 +30,11 @@ docLine
     ;
 
 starLine
-    : TOKEN_STAR_PREFIX contentElement* TOKEN_EOL
+    : DOC_STAR_PREFIX contentElement* DOC_NEWLINE
     ;
 
 commandLine
-    : TOKEN_STAR_PREFIX? TOKEN_COMMAND commandType commandContent TOKEN_EOL
+    : DOC_STAR_PREFIX? DOC_COMMAND commandType commandContent DOC_NEWLINE
     ;
 
 commandType
@@ -62,11 +62,11 @@ paramName
     ;
 
 contentLine
-    : TOKEN_STAR_PREFIX? contentElement* TOKEN_EOL
+    : DOC_STAR_PREFIX? contentElement* DOC_NEWLINE
     ;
 
 contentElement
-    : TOKEN_TEXT
+    : DOC_TEXT
     | markdown
     | inlineCommand
     ;
@@ -80,5 +80,5 @@ markdown
     ;
 
 inlineCommand
-    : TOKEN_COMMAND commandType (WS+ contentElement*)?
+    : DOC_COMMAND commandType (WS+ contentElement*)?
     ;
