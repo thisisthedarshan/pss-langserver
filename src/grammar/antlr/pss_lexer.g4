@@ -241,12 +241,12 @@ TOKEN_QUOTED_STRING:
 	'"' (UNESCAPED_CHARACTER | ESCAPED_CHARACTER)* '"';
 TOKEN_TRIPLE_QUOTED_STRING: '"""' .*? '"""';
 
-/* */ String-related characters */
+/* String-related characters */
 fragment UNESCAPED_CHARACTER:
-	~["\\]; /* */ Any printable character except quotes and backslash */
+	~["\\]; /* Any printable character except quotes and backslash */
 fragment ESCAPED_CHARACTER:
 	'\\' ['"\\?abfnrtv]
-	| '\\' [0-7] [0-7] [0-7]; /* */ Escapes */
+	| '\\' [0-7] [0-7] [0-7]; /* Escapes */
 
 /* Doxygen related */
 fragment STAR_PREFIX: WS* TOKEN_ASTERISK{getText().length() < 5}? WS*;
