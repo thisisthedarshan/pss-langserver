@@ -14,6 +14,8 @@
  */
 
 lexer grammar pss_lexer;
+/* Different channels */
+channels { DEFAULT_TOKEN_CHANNEL, HIDDEN, DOXYGEN_CHANNEL }
 
 /* CONSTANT CHARACTERS */
 TOKEN_SCOPE: '::';
@@ -191,7 +193,18 @@ TOKEN_TRUE: 'true';
 TOKEN_FALSE: 'false';
 TOKEN_NULL: 'null';
 TOKEN_FILE: 'file';
-
+TOKEN_PARAM : 'param';
+TOKEN_BRIEF : 'brief';
+TOKEN_RETURNS : 'returns';
+TOKEN_AUTHOR : 'author';
+TOKEN_DATE : 'date';
+TOKEN_SEE : 'see';
+TOKEN_DEPRECATED : 'deprecated';
+TOKEN_DETAILS : 'details';
+TOKEN_TODO : 'todo';
+TOKEN_EXAMPLE : 'example';
+TOKEN_VERSION : 'version';
+TOKEN_ATTENTION : 'attention';
 /* Digits */
 fragment BIN_DIGIT: '0' | '1';
 fragment OCT_DIGIT: [0-7];
@@ -219,7 +232,7 @@ TOKEN_BASED_HEX_LITERAL:
 	'\'' ('s' | 'S')? ('h' | 'H') HEX_DIGIT (HEX_DIGIT | '_')*;
 
 /* Comments */
-TOKEN_DOC_COMMENT: '/**' .*? '*/' -> channel(HIDDEN);
+TOKEN_DOC_COMMENT: '/**' .*? '*/' -> channel(DOXYGEN_CHANNEL);;
 TOKEN_SL_COMMENT: '//' ~[\r\n]* '\n' -> channel(HIDDEN);
 TOKEN_ML_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
@@ -228,12 +241,23 @@ TOKEN_QUOTED_STRING:
 	'"' (UNESCAPED_CHARACTER | ESCAPED_CHARACTER)* '"';
 TOKEN_TRIPLE_QUOTED_STRING: '"""' .*? '"""';
 
-// String-related characters
+/* */ String-related characters */
 fragment UNESCAPED_CHARACTER:
-	~["\\]; // Any printable character except quotes and backslash
+	~["\\]; /* */ Any printable character except quotes and backslash */
 fragment ESCAPED_CHARACTER:
 	'\\' ['"\\?abfnrtv]
-	| '\\' [0-7] [0-7] [0-7]; // Escapes
+	| '\\' [0-7] [0-7] [0-7]; /* */ Escapes */
+
+/* Doxygen related */
+fragment STAR_PREFIX: WS* TOKEN_ASTERISK{getText().length() < 5}? WS*;
+fragment COMMAND: '@';
+fragment ITALIC: TOKEN_ASTERISK ~[*\r\n]+ TOKEN_ASTERISK | TOKEN_UNDERSCORE ~[_\r\n]+ TOKEN_UNDERSCORE;
+fragment BOLD: TOKEN_ASTERISK TOKEN_ASTERISK ~[*\r\n]+ TOKEN_ASTERISK TOKEN_ASTERISK;
+fragment BOLD_ITALIC: TOKEN_ASTERISK TOKEN_ASTERISK TOKEN_ASTERISK ~[*\r\n]+ TOKEN_ASTERISK TOKEN_ASTERISK TOKEN_ASTERISK;
+fragment CODE: '`' ~[`\r\n]* '`';
+fragment LINK: '<' ~[>\r\n]* '>';
+fragment TEXT: ~[\r\n@*`_<]+;
+fragment EOL: '\r'? '\n' | EOF;
 
 TOKEN_FILENAME_STRING: TOKEN_QUOTED_STRING;
 

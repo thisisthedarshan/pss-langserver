@@ -15,7 +15,7 @@
 
 parser grammar pss;
 options {tokenVocab=pss_lexer;}
-import package_body, package_declaration, component_declaration;
+import package_body, package_declaration, component_declaration, doxygen;
 
 pss_entry: pss* EOF;
 

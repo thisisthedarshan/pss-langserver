@@ -18,16 +18,28 @@ options {tokenVocab=pss_lexer;}
 
 import activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 
-action_declaration:
-	TOKEN_ACTION action_identifier template_param_decl_list? action_super_spec? TOKEN_CLBRACE 
-		action_body_item* TOKEN_CRBRACE;
+action_declaration
+	: TOKEN_ACTION 
+		action_identifier 
+		template_param_decl_list? 
+		action_super_spec? 
+	  TOKEN_CLBRACE 
+		action_body_item* 
+	  TOKEN_CRBRACE
+	;
 
-abstract_action_declaration: TOKEN_ABSTRACT action_declaration;
+abstract_action_declaration
+	: TOKEN_ABSTRACT 
+		action_declaration
+	;
 
-action_super_spec: TOKEN_COLON type_identifier;
+action_super_spec
+	: TOKEN_COLON 
+		type_identifier
+	;
 
-action_body_item:
-	activity_declaration
+action_body_item
+	: activity_declaration
 	| override_declaration
 	| constraint_declaration
 	| action_field_declaration
@@ -39,48 +51,83 @@ action_body_item:
 	| compile_assert_stmt
 	| covergroup_instantiation
 	| action_body_compile_if
-	| stmt_terminator;
+	| stmt_terminator
+	;
 
-action_field_declaration:
-	attr_field
+action_field_declaration
+	: attr_field
 	| activity_data_field
 	| action_handle_declaration
-	| object_ref_field_declaration;
+	| object_ref_field_declaration
+	;
 
-object_ref_field_declaration:
-	flow_ref_field_declaration
-	| resource_ref_field_declaration;
+object_ref_field_declaration
+	: flow_ref_field_declaration
+	| resource_ref_field_declaration
+	;
 
-flow_ref_field_declaration:
-	(TOKEN_INPUT | TOKEN_OUTPUT) flow_object_type object_ref_field (
-		TOKEN_COMMA object_ref_field
-	)* TOKEN_SEMICOLON;
+flow_ref_field_declaration
+	: (TOKEN_INPUT | TOKEN_OUTPUT) 
+		flow_object_type 
+		object_ref_field 
+	  ( TOKEN_COMMA 
+		object_ref_field 
+	  )* TOKEN_SEMICOLON
+	;
 
-resource_ref_field_declaration:
-	(TOKEN_LOCK | TOKEN_SHARE) resource_object_type object_ref_field (
-		TOKEN_COMMA object_ref_field
-	)* TOKEN_SEMICOLON;
+resource_ref_field_declaration
+	: (TOKEN_LOCK | TOKEN_SHARE) 
+		resource_object_type 
+		object_ref_field 
+	  (TOKEN_COMMA 
+			object_ref_field 
+	  )* TOKEN_SEMICOLON
+	;
 
-flow_object_type:
-	buffer_type_identifier
+flow_object_type
+	: buffer_type_identifier
 	| state_type_identifier
-	| stream_type_identifier;
+	| stream_type_identifier
+	;
 
-resource_object_type: resource_type_identifier;
-object_ref_field: array_dim?;
+resource_object_type
+	: resource_type_identifier
+	;
 
-action_handle_declaration:
-	action_type_identifier action_instantiation (
-		TOKEN_COMMA action_instantiation
-	)*;
+object_ref_field
+	: array_dim?
+	;
 
-action_instantiation:
-	action_handle_identifier array_dim? (
-		TOKEN_COMMA action_handle_identifier array_dim?
-	);
+action_handle_declaration
+	: action_type_identifier 
+	  action_instantiation 
+	  ( TOKEN_COMMA 
+	  	action_instantiation
+	  )*
+	;
 
-activity_data_field: TOKEN_ACTION data_declaration;
+action_instantiation
+	: action_handle_identifier 
+	  array_dim? 
+	  (TOKEN_COMMA 
+	  	action_handle_identifier 
+		array_dim?
+	  )*
+	;
 
-activity_scheduling_constraint:
-	TOKEN_CONSTRAINT (TOKEN_PARALLEL | TOKEN_SEQUENCE) TOKEN_CLBRACE hierarchical_id TOKEN_COMMA
-		hierarchical_id (TOKEN_COMMA hierarchical_id) TOKEN_CRBRACE TOKEN_SEMICOLON;
+activity_data_field
+	: TOKEN_ACTION 
+	  data_declaration
+	;
+
+activity_scheduling_constraint
+	: TOKEN_CONSTRAINT 
+	  (TOKEN_PARALLEL | TOKEN_SEQUENCE) 
+	  TOKEN_CLBRACE 
+	  	hierarchical_id 
+	  TOKEN_COMMA
+		hierarchical_id 
+	  (TOKEN_COMMA 
+	    hierarchical_id
+	  ) TOKEN_CRBRACE TOKEN_SEMICOLON
+	;
