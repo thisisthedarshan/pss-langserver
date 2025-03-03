@@ -45,7 +45,7 @@ import {
 import { formatDocument } from './providers/formattingProvider';
 import { fullRange, scanDirectory, updateAST, updateStringArray } from './helper_functions';
 import { keywords } from './definitions/keywords';
-import fs from 'fs-extra'
+import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
 
 /* Support all connection types - ipc, stdio, tcp */
@@ -74,8 +74,9 @@ connection.onInitialize((params: InitializeParams) => {
   // Process found files
   for (const file of pssFiles) {
     const content: string = fs.readFileSync(file, 'utf8');
+    const fileURI: string = "file://" + file;
     // Process file content here
-    updateAST(content).then(vars => {
+    updateAST(fileURI, content).then(vars => {
       completionItems = updateStringArray(completionItems, vars);
     });
   }
@@ -165,7 +166,7 @@ connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
   if (!hasConfigurationCapability) {
     globalSettings = change.settings.PSS || defaultSettings;
   }
-  connection.languages.diagnostics.refresh();
+  /*connection.languages.diagnostics.refresh();*/
 });
 
 /* For future use - with diagnostics */
@@ -204,7 +205,7 @@ documents.onDidClose(e => {
 /* Event when a document is changed or first opened */
 documents.onDidChangeContent(change => {
   /* Call async file processor */
-  updateAST(change.document.getText().toString()).then(result => {
+  updateAST(change.document.uri.toString(), change.document.getText().toString()).then(result => {
     completionItems = updateStringArray(completionItems, result);
   });
 

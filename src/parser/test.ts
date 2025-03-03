@@ -35,4 +35,4 @@ extend component pss_top {
  }
 }
 `;
-getAutoCompleteItemsFromFile(file);
+getAutoCompleteItemsFromFile(file, "");

@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New grammar for doxygen style comments
 
+### Changed
+
+- Dropped sending refresh diagnostics message on initialization.
+- Updated logic to parse data in structure format from ast
+
 ## [0.1.6] - 2025-02-28
 
 ### Added

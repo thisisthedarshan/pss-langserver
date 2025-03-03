@@ -20,13 +20,13 @@ import pss_lexer from "../grammar/pss_lexer";
 import { visitor } from "./visitor";
 
 
-export function getAutoCompleteItemsFromFile(fileContents: string): string[] {
+export function getAutoCompleteItemsFromFile(fileURI:string, fileContents: string): string[] {
   let inputStream = new CharStream(fileContents);
   let lexer = new pss_lexer(inputStream);
   let tokenStream = new CommonTokenStream(lexer);
   let parser = new pss(tokenStream);
   let tree = parser.pss_entry();
-  let myVisitor = new visitor();
+  let myVisitor = new visitor(tokenStream, fileURI);
   tree.accept(myVisitor);
   //console.log(tree);
   return [...new Set(myVisitor.getIdentifiers())];

@@ -31,8 +31,8 @@ export function fullRange(document: TextDocument): Range {
   );
 }
 
-export async function updateAST(documentText: string): Promise<string[]> {
-  var items = getAutoCompleteItemsFromFile(documentText);
+export async function updateAST(fileURI: string, documentText: string): Promise<string[]> {
+  var items = getAutoCompleteItemsFromFile(fileURI, documentText);
   return items;
 }
 

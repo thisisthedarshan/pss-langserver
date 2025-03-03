@@ -16,10 +16,18 @@
  */
 
 import pssVisitor from "../grammar/pssVisitor";
+import { objType } from "./helpers";
+
 
 class commentsVisitor extends pssVisitor<string> {
 
     private comment: string = "";
-    getComment(): string { return this.comment; }
+   
+
+    getComment(): string { 
+        
+        var createdComment:string = "";
+
+        return this.comment; }
 
 }
