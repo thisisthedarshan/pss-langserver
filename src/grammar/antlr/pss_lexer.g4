@@ -231,10 +231,12 @@ TOKEN_BASED_DEC_LITERAL:
 TOKEN_BASED_HEX_LITERAL:
 	'\'' ('s' | 'S')? ('h' | 'H') HEX_DIGIT (HEX_DIGIT | '_')*;
 
+TOKEN_NEWLINE: '\n';
+
 /* Comments */
 OPEN_DOC_COMMENT: '/**' -> pushMode(DOXYGEN_MODE), channel(DOXYGEN_CHANNEL);
-TOKEN_SL_COMMENT: '//' ~[\r\n]* '\n' -> channel(HIDDEN);
-TOKEN_ML_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
+TOKEN_SL_COMMENT: '//' ~[\r\n]* TOKEN_NEWLINE -> channel(HIDDEN);
+TOKEN_ML_COMMENT: '/*' .*? '*/' TOKEN_NEWLINE -> channel(HIDDEN);
 
 /* Double and Triple-quoted strings */
 TOKEN_QUOTED_STRING:
@@ -275,7 +277,7 @@ ESCAPED_ID: '\\' ~[ \t\r\n]+ [ \t\r\n]+;
 WS: [ \t\r\n] -> skip; // Ignore whitespace
 
 mode DOXYGEN_MODE;
-CLOSE_DOC_COMMENT: '*/' -> popMode, channel(DOXYGEN_CHANNEL);
+CLOSE_DOC_COMMENT: '*/' TOKEN_NEWLINE -> popMode, channel(DOXYGEN_CHANNEL);
 DOC_COMMAND: '@' [a-zA-Z]+ -> channel(DOXYGEN_CHANNEL); 
 DOC_STAR_PREFIX:  WS* TOKEN_ASTERISK{localctx.getText().length < 5}? WS* -> channel(DOXYGEN_CHANNEL);
 DOC_TEXT: ~[@*/\r\n]+ -> channel(DOXYGEN_CHANNEL);
