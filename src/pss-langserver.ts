@@ -18,8 +18,6 @@
 import {
   createConnection,
   TextDocuments,
-  Diagnostic,
-  DiagnosticSeverity,
   ProposedFeatures,
   InitializeParams,
   DidChangeConfigurationNotification,
@@ -28,25 +26,25 @@ import {
   TextDocumentPositionParams,
   TextDocumentSyncKind,
   InitializeResult,
-  DocumentDiagnosticReportKind,
-  type DocumentDiagnosticReport,
   TextEdit,
   Connection,
   DidChangeConfigurationParams,
   ParameterInformation,
   SignatureInformation,
   SignatureHelpParams,
-  SignatureHelp
+  SignatureHelp,
+  SemanticTokensLegend,
+  SemanticTokensParams
 } from 'vscode-languageserver/node';
 
 import {
   TextDocument
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
-import { fullRange, scanDirectory, updateAST, updateStringArray } from './helper_functions';
-import { keywords } from './definitions/keywords';
+import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, scanDirectory, updateAST, updateStringArray } from './helper_functions';
 import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
+import { metaData, semanticTokensLegend } from './definitions/dataTypes';
 
 /* Support all connection types - ipc, stdio, tcp */
 const connection = createConnection(ProposedFeatures.all);
@@ -54,7 +52,8 @@ const connection = createConnection(ProposedFeatures.all);
 /* Documents manager */
 const documents = new TextDocuments(TextDocument);
 
-var completionItems: string[] = []; /* Holds all autocompletion items */
+var globalAST: metaData[] = []; /* Holds all metaData on all files */
+var builtInCompletions: CompletionItem[]; /* Holds all autocompletion items */
 var isFirst = true;
 
 let hasConfigurationCapability = false;
@@ -67,6 +66,9 @@ connection.onInitialize((params: InitializeParams) => {
   const workspaceFolders = params.workspaceFolders || [];
   const pssFiles: string[] = [];
 
+  /* Start by creating an auto-completion suggestions for built-in functionality */
+  builtInCompletions = buildAutocompletionBuiltinsBlock();
+
   for (const folder of workspaceFolders) {
     scanDirectory(folder.uri.replace('file://', ''), pssFiles);
   }
@@ -77,16 +79,9 @@ connection.onInitialize((params: InitializeParams) => {
     const fileURI: string = "file://" + file;
     // Process file content here
     updateAST(fileURI, content).then(vars => {
-      completionItems = updateStringArray(completionItems, vars);
+      globalAST = [...new Set([...globalAST, ...vars])]
     });
   }
-
-  /* Build the autocompletions with built-in code */
-  keywords.list.forEach(keyword => {
-    if (!(keyword in builtInSignatures)) {
-      completionItems.push(keyword);
-    }
-  });
 
   /* Does the client support the `workspace/configuration` request? */
   /* If not, we fall back using global settings. */
@@ -121,6 +116,12 @@ connection.onInitialize((params: InitializeParams) => {
       signatureHelpProvider: {
         triggerCharacters: ['(', ',']
       },
+      semanticTokensProvider: {
+        legend: semanticTokensLegend,
+        range: true,
+        full: true
+      }
+      /* End Capabilities */
     }
   };
   /* Supports workspace */
@@ -170,7 +171,7 @@ connection.onDidChangeConfiguration((change: DidChangeConfigurationParams) => {
 });
 
 /* For future use - with diagnostics */
-connection.sendDiagnostics({ uri: "", diagnostics: [] });
+/*connection.sendDiagnostics({ uri: "", diagnostics: [] });*/
 
 function getSettings(connection: Connection, resource: string): Thenable<PSS_Config> {
   if (!hasConfigurationCapability) {
@@ -206,7 +207,7 @@ documents.onDidClose(e => {
 documents.onDidChangeContent(change => {
   /* Call async file processor */
   updateAST(change.document.uri.toString(), change.document.getText().toString()).then(result => {
-    completionItems = updateStringArray(completionItems, result);
+    globalAST = [...new Set([...globalAST, ...result])];
   });
 
 });
@@ -219,32 +220,7 @@ connection.onDidChangeWatchedFiles(_change => {
 /* Completions provider */
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    var completions: CompletionItem[] = [];
-
-    completionItems.forEach(item => {
-      completions.push(
-        {
-          label: item,
-          kind: CompletionItemKind.Text
-        }
-      )
-    });
-
-    /* Add function signatures */
-    Object.entries(builtInSignatures).forEach(([name, func]) => {
-      completions.push({
-        label: name,
-        kind: CompletionItemKind.Function,
-        detail: func.signature,
-        documentation: {
-          kind: 'markdown',
-          value: `${func.documentation}\n\n**Parameters:**\n${func.parameters.map(p => `- \`${p.label}\`: ${p.documentation}`).join('\n')
-            }`
-        }
-      });
-    });
-
-    return completions;
+    return [...builtInCompletions, ...buildAutocompletionBlock(globalAST)];
   }
 );
 
@@ -255,7 +231,6 @@ connection.onCompletionResolve(
     return item;
   }
 );
-
 
 /* Provide function Signatures */
 connection.onSignatureHelp(
@@ -298,6 +273,19 @@ connection.onSignatureHelp(
   }
 );
 
+/* Provide semantic tokens to the client */
+connection.languages.semanticTokens.on(async (params: SemanticTokensParams) => {
+  const uri = params.textDocument.uri;
+  const document = documents.get(uri);
+
+  if (!document) return { data: [] };
+
+  const ast = await updateAST(uri, document.getText());
+  return {
+    data: generateSemanticTokens(document.getText(), ast)
+  };
+
+});
 
 /* Provide formatting */
 connection.onDocumentFormatting((params, tokens) => {

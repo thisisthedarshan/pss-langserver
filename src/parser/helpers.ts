@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { integer } from "vscode-languageserver";
-import { builtInSignatures } from "../definitions/builtinFunctions";
+
+import { objType, semanticTokensLegend } from "../definitions/dataTypes";
 
 export function isWithinCommentBlock(document: { lineAt: (arg0: any) => { (): any; new(): any; text: string; }; }, lineNumber: any) {
   for (let i = lineNumber; i >= 0; i--) {
@@ -31,57 +31,76 @@ export function isWithinCommentBlock(document: { lineAt: (arg0: any) => { (): an
   return false;
 }
 
-export enum objType {
-  NONE, COMPONENT, ACTION, FUNCTION, ENUM, REGISTER_NAME, REGISTER_GROUP, INTEGER,
-  BOOL, FLOAT, BUFFER, STRUCT, RESOURCE_OBJECT, PACKAGE, MONITOR, CONSTRAINT, DATA,
-  TYPEDEF
+export function getObjType(str: string): objType {
+  switch (str.toLowerCase()) {
+    case "component":
+      return objType.COMPONENT
+      break;
+    case "action":
+      return objType.ACTION
+      break;
+    case "function":
+      return objType.FUNCTION
+      break;
+    case "enum":
+      return objType.ENUM
+      break;
+    case "buffer":
+      return objType.BUFFER
+      break;
+    case "struct":
+      return objType.STRUCT
+      break;
+    case "resource":
+      return objType.RESOURCE_OBJECT
+      break;
+    case "package":
+      return objType.PACKAGE
+      break;
+    case "monitor":
+      return objType.MONITOR
+      break;
+    case "chandle":
+      return objType.CHANDLE
+      break;
+    case "bit":
+      return objType.BIT
+      break;
+    case "int":
+      return objType.INTEGER
+      break;
+    case "string":
+      return objType.STRING
+      break;
+    case "bool":
+      return objType.BOOL
+      break;
+    case "float32":
+      return objType.FLOAT32
+      break;
+    case "float64":
+      return objType.FLOAT64
+      break;
+    case "ref":
+      return objType.REF
+      break;
+    case "array":
+      return objType.ARRAY
+      break;
+    case "list":
+      return objType.LIST
+      break;
+    case "map":
+      return objType.MAP
+      break;
+    case "set":
+      return objType.SET
+      break;
+    default:
+      return objType.UNKNOWN;
+      break;
+  }
 }
 
-
-export type commentDocs = {
-  name: string;
-  brief: string;
-  details: string;
-  paramNames: string[];
-  paramTypes: string[];
-  paramDescriptions: string[];
-  sees: string[];
-  returns: objType;
-}
-
-/* Tells what line Defines the object */
-type definedOn = {
-  file: string;
-  lineNumber: integer;
-  columnNumber: integer;
-}
-
-/* Tells what line(s) use the object */
-type usedOn = {
-  file: string;
-  lineNumber: integer;
-}
-
-/* Holds info on parameters */
-type params = {
-  paramType: objType;
-  paramDefault: any | undefined;
-}
-
-/* Holds some meta info on the object(s) */
-type metaInfo = {
-  objectType: objType;
-  parent: string | undefined;
-  onLine: definedOn;
-  used: usedOn[];
-  documentation: commentDocs | string | undefined;
-  templateParams: string | params[] | undefined;
-  inherits: string | undefined; /* In ENUMS this is their type, expression for data */
-  subComponents: string[] | undefined;
-}
-
-/* This is the object returned by the visitor */
-export type metaData = {
-  keyword: string;
-  info: metaInfo;
-}
+export const mapTokenTypes = ((arr: string[]) => (str: string) => arr.indexOf(str))(semanticTokensLegend.tokenTypes);
+export const mapTokenModifiers = ((arr) => (str: string) => str in arr ? 1 << arr.indexOf(str) : 0)(semanticTokensLegend.tokenModifiers);

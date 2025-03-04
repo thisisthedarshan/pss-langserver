@@ -18,9 +18,10 @@ import { CharStream, CommonTokenStream } from "antlr4";
 import pss, { Enum_identifierContext, IdentifierContext, Stream_type_identifierContext } from "../grammar/pss";
 import pss_lexer from "../grammar/pss_lexer";
 import { visitor } from "./visitor";
+import { metaData } from "../definitions/dataTypes";
 
 
-export function getAutoCompleteItemsFromFile(fileURI:string, fileContents: string): string[] {
+export function getAutoCompleteItemsFromFile(fileURI: string, fileContents: string): metaData[] {
   let inputStream = new CharStream(fileContents);
   let lexer = new pss_lexer(inputStream);
   let tokenStream = new CommonTokenStream(lexer);
@@ -29,5 +30,5 @@ export function getAutoCompleteItemsFromFile(fileURI:string, fileContents: strin
   let myVisitor = new visitor(tokenStream, fileURI);
   tree.accept(myVisitor);
   //console.log(tree);
-  return [...new Set(myVisitor.getIdentifiers())];
+  return [...new Set(myVisitor.getMeta())];
 }
