@@ -18,8 +18,9 @@ import { CommonTokenStream, ParserRuleContext, Token } from "antlr4";
 import pssVisitor from "../grammar/pssVisitor";
 import { Action_declarationContext, Component_declarationContext, Data_declarationContext, Data_instantiationContext, Enum_declarationContext, Enum_itemContext, Function_declContext, IdentifierContext, Procedural_functionContext } from "../grammar/pss";
 import pss_lexer from "../grammar/pss_lexer";
-import { objType, metaData, params, getObjType } from "./helpers";
+import { getObjType } from "./helpers";
 import { integer } from "vscode-languageserver";
+import { metaData, objType, params } from "../definitions/dataTypes";
 
 export class visitor extends pssVisitor<void> {
   /* Data types */
