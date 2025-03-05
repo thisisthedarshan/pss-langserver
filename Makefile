@@ -64,13 +64,15 @@ distclean: clean
 grammar:
 	$(antlr) ./src/grammar/antlr/pss_lexer.g4 -Dlanguage=TypeScript -listener -visitor
 	$(antlr) ./src/grammar/antlr/pss.g4 -Dlanguage=TypeScript -listener -visitor
+	$(antlr) ./src/grammar/antlr/doxygenLexer.g4 -Dlanguage=TypeScript -listener -visitor
+	$(antlr) ./src/grammar/antlr/doxygenParser.g4 -Dlanguage=TypeScript -listener -visitor
 	mv ./src/grammar/antlr/*.ts $(GRAMMAR_SRCS)
 	$(MAKE) inject-license
 
 # Builds source into dist directory
 source:
 	mkdir -p dist
-	npm run build
+	npm run rebuild
 	echo "#!/usr/bin/env node" | cat - "./dist/pss-langserver.js" > temp && mv temp "./dist/pss-langserver.js"
 
 inject-license:

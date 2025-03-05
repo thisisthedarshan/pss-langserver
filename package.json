@@ -39,7 +39,8 @@
     "vscode-languageserver-textdocument": "^1.0.12"
   },
   "scripts": {
-    "build": "make grammar && tsc",
+    "build": "tsc",
+    "rebuild": "make grammar && tsc",
     "clean": "rm -fr ./dist/*",
     "dev": "tsc --watch",
     "prepublishOnly": "make source",
