@@ -44,7 +44,7 @@ import {
   TextDocument
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
-import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, getGoToDefinition, scanDirectory, updateAST, updateStringArray } from './helper_functions';
+import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, getGoToDefinition, scanDirectory, updateAST, updateASTMeta, updateStringArray } from './helper_functions';
 import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
 import { metaData, PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
@@ -82,7 +82,7 @@ connection.onInitialize((params: InitializeParams) => {
     const fileURI: string = "file://" + file;
     // Process file content here
     updateAST(fileURI, content).then(vars => {
-      globalAST = [...new Set([...globalAST, ...vars])]
+      globalAST = updateASTMeta(globalAST, vars);
     });
   }
 
@@ -206,7 +206,7 @@ documents.onDidClose(e => {
 documents.onDidChangeContent(change => {
   /* Call async file processor */
   updateAST(change.document.uri.toString(), change.document.getText().toString()).then(result => {
-    globalAST = [...new Set([...globalAST, ...result])];
+    globalAST = updateASTMeta(globalAST, result);
   });
 
 });

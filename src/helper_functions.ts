@@ -322,3 +322,13 @@ function wordAt(text: string, offset: number): string | null {
 
   return null;
 }
+
+export function updateASTMeta(old: metaData[], newData: metaData[]): metaData[] {
+  const seenKeys = new Set(newData.flatMap(Object.keys));
+
+  const uniqueArray2 = old.filter(item =>
+    Object.keys(item).every(key => !seenKeys.has(key))
+  );
+
+  return [...newData, ...uniqueArray2];
+}
