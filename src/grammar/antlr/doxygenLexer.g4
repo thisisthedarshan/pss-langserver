@@ -14,30 +14,33 @@
  */
 lexer grammar doxygenLexer;
 
-DOC_START: '/**';
-DOC_END: '*/';
+TOKEN_DOC_START: '/**';
+TOKEN_DOC_END: '*/';
 
 /* Command Markers */
-BRIEF_MARKER: '@brief' | '\\brief';
-PARAM_MARKER: '@param' | '\\param';
-RETURN_MARKER: '@return' | '\\return';
-RETURNS_MARKER: '@returns' | '\\returns';
-DEPRECATED_MARKER: '@deprecated' | '\\deprecated';
-AUTHOR_MARKER: '@author' | '\\author';
-DATE_MARKER: '@date' | '\\date';
-VERSION_MARKER: '@version' | '\\version';
-SEE_MARKER: '@see' | '\\see';
-ATTENTION_MARKER: '@attention' | '\\attention';
-FILE_MARKER: '@file' | '\\file';
-TODO_MARKER: '@todo' | '\\todo';
-EXAMPLE_MARKER: '@example' | '\\example';
+TOKEN_BRIEF_MARKER: '@brief' | '\\brief';
+TOKEN_PARAM_MARKER: '@param' | '\\param';
+TOKEN_RETURN_MARKER: '@return' | '\\return';
+TOKEN_RETURNS_MARKER: '@returns' | '\\returns';
+TOKEN_DEPRECATED_MARKER: '@deprecated' | '\\deprecated';
+TOKEN_AUTHOR_MARKER: '@author' | '\\author';
+TOKEN_DATE_MARKER: '@date' | '\\date';
+TOKEN_VERSION_MARKER: '@version' | '\\version';
+TOKEN_SEE_MARKER: '@see' | '\\see';
+TOKEN_ATTENTION_MARKER: '@attention' | '\\attention';
+TOKEN_FILE_MARKER: '@file' | '\\file';
+TOKEN_TODO_MARKER: '@todo' | '\\todo';
+TOKEN_EXAMPLE_MARKER: '@example' | '\\example';
 
 /* Basic tokens */
-WORD: [a-zA-Z_]+;
-DIGIT: [0-9];
-DATE: DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT;
-NEWLINE: '\r'? '\n';
-WHITESPACE: [ \t]+;
+TOKEN_WORD: [a-zA-Z_]+;
+TOKEN_DIGIT: [0-9];
+TOKEN_DATE: ~[\r\n\t]+;
+TOKEN_NEWLINE: '\r'? '\n';
+TOKEN_WHITESPACE: [ \t]+;
+TOKEN_DOT: '.';
+TOKEN_FSLASH: '/';
+TOKEN_UNDERSCORE: '_';
 
 /* Skip whitespace and newlines in lexer */
 SKIP_WHITESPACE: [ \t\r\n]+ -> skip;

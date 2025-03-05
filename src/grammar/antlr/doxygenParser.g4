@@ -13,11 +13,10 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar doxygenParser;
-import doxygenLexer;
 options {tokenVocab=doxygenLexer;}
 
 documentation_comment
-    : DOC_START doc_content* DOC_END
+    : TOKEN_DOC_START doc_content* TOKEN_DOC_END
     ;
 
 doc_content
@@ -36,108 +35,108 @@ doc_content
     ;
 
 brief_command
-    : BRIEF_MARKER brief_text
+    : TOKEN_BRIEF_MARKER brief_text
     ;
 
 param_command
-    : PARAM_MARKER param_identifier param_description
+    : TOKEN_PARAM_MARKER param_identifier param_description
     ;
 
 return_command
-    : (RETURN_MARKER | RETURNS_MARKER) return_description
+    : (TOKEN_RETURN_MARKER | TOKEN_RETURNS_MARKER) return_description
     ;
 
 deprecated_command
-    : DEPRECATED_MARKER deprecated_description
+    : TOKEN_DEPRECATED_MARKER deprecated_description
     ;
 
 author_command
-    : AUTHOR_MARKER author_name
+    : TOKEN_AUTHOR_MARKER author_name
     ;
 
 date_command
-    : DATE_MARKER date_value
+    : TOKEN_DATE_MARKER date_value
     ;
 
 version_command
-    : VERSION_MARKER version_value
+    : TOKEN_VERSION_MARKER version_value
     ;
 
 see_command
-    : SEE_MARKER see_link (see_description)?
+    : TOKEN_SEE_MARKER see_link (see_description)?
     ;
 
 attention_command
-    : ATTENTION_MARKER attention_description
+    : TOKEN_ATTENTION_MARKER attention_description
     ;
 
 file_command
-    : FILE_MARKER file_path
+    : TOKEN_FILE_MARKER file_path
     ;
 
 todo_command
-    : TODO_MARKER todo_description
+    : TOKEN_TODO_MARKER todo_description
     ;
 
 example_command
-    : EXAMPLE_MARKER example_code
+    : TOKEN_EXAMPLE_MARKER example_code
     ;
 
 /* Text content rules */
 brief_text
-    : ~(PARAM_MARKER | RETURN_MARKER | RETURNS_MARKER | DEPRECATED_MARKER 
-        | AUTHOR_MARKER | DATE_MARKER | VERSION_MARKER | SEE_MARKER 
-        | ATTENTION_MARKER | FILE_MARKER | TODO_MARKER | EXAMPLE_MARKER | DOC_END)+ 
+    : ~(TOKEN_PARAM_MARKER | TOKEN_RETURN_MARKER | TOKEN_RETURNS_MARKER | TOKEN_DEPRECATED_MARKER 
+        | TOKEN_AUTHOR_MARKER | TOKEN_DATE_MARKER | TOKEN_VERSION_MARKER | TOKEN_SEE_MARKER 
+        | TOKEN_ATTENTION_MARKER | TOKEN_FILE_MARKER | TOKEN_TODO_MARKER | TOKEN_EXAMPLE_MARKER | TOKEN_DOC_END)+ 
     ;
 
 param_identifier
-    : WORD
+    : TOKEN_WORD
     ;
 
 param_description
-    : (NEWLINE* ~(PARAM_MARKER | DOC_END))+ 
+    : (TOKEN_NEWLINE* ~(TOKEN_PARAM_MARKER | TOKEN_DOC_END))+ 
     ;
 
 return_description
-    : (NEWLINE* ~(DEPRECATED_MARKER | AUTHOR_MARKER | DOC_END))+ 
+    : (TOKEN_NEWLINE* ~(TOKEN_DEPRECATED_MARKER | TOKEN_AUTHOR_MARKER | TOKEN_DOC_END))+ 
     ;
 
 deprecated_description
-    : (NEWLINE* ~(AUTHOR_MARKER | DOC_END))+ 
+    : (TOKEN_NEWLINE* ~(TOKEN_AUTHOR_MARKER | TOKEN_DOC_END))+ 
     ;
 
 author_name
-    : (WORD | WHITESPACE)+
+    : (TOKEN_WORD | TOKEN_WHITESPACE)+
     ;
 
 date_value
-    : DATE
+    : TOKEN_DATE
     ;
 
 version_value
-    : (WORD | '.' | DIGIT)+
+    : (TOKEN_WORD | TOKEN_DOT | TOKEN_DIGIT)+
     ;
 
 see_link
-    : WORD
+    : TOKEN_WORD
     ;
 
 see_description
-    : (NEWLINE* ~(DOC_END))+ 
+    : (TOKEN_NEWLINE* ~(TOKEN_DOC_END))+ 
     ;
 
 attention_description
-    : (NEWLINE* ~(DOC_END))+ 
+    : (TOKEN_NEWLINE* ~(TOKEN_DOC_END))+ 
     ;
 
 file_path
-    : (WORD | '.' | '/' | '_')+
+    : (TOKEN_WORD | TOKEN_DOT | TOKEN_FSLASH | TOKEN_UNDERSCORE)+
     ;
 
 todo_description
-    : (NEWLINE* ~(DOC_END))+ 
+    : (TOKEN_NEWLINE* ~(TOKEN_DOC_END))+ 
     ;
 
 example_code
-    : (NEWLINE* ~(DOC_END))+ 
+    : (TOKEN_NEWLINE* ~(TOKEN_DOC_END))+ 
     ;
