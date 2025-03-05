@@ -29,5 +29,5 @@ export function getAutoCompleteItemsFromFile(fileURI: string, fileContents: stri
   let tree = parser.pss_entry();
   let myVisitor = new visitor(tokenStream, fileURI);
   tree.accept(myVisitor);
-  return [...myVisitor.getMeta()];
+  return [...new Set(myVisitor.getMeta())];
 }

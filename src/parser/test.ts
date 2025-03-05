@@ -34,8 +34,6 @@ const file: string = `component pss_top {
 }
 `;
 let out = getAutoCompleteItemsFromFile("", file);
-console.log("AST: ", out)
-console
 out.map(astObj => {
   Object.entries(astObj).map(([keyword, info]) => {
     console.log(keyword, info)
