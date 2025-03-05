@@ -19,6 +19,6 @@ import { ErrorListener, RecognitionException, Recognizer, Token } from "antlr4";
 
 export class PSSErrorListener implements ErrorListener<Token> {
   syntaxError(recognizer: Recognizer<Token>, offendingSymbol: Token, line: number, column: number, msg: string, e: RecognitionException | undefined): void {
-    console.error("recognizer: ", recognizer.state.toString(), "offendingSymbol: ", offendingSymbol, "line: ", line, "column: ", column, "msg: ", msg, e?.message)
+    /*console.error("recognizer: ", recognizer.state.toString(), "offendingSymbol: ", offendingSymbol, "line: ", line, "column: ", column, "msg: ", msg, e?.message)*/
   }
 }

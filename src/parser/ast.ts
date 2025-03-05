@@ -21,7 +21,6 @@ import { visitor } from "./visitor";
 import { metaData } from "../definitions/dataTypes";
 import { PSSErrorListener } from "./listener";
 
-
 export function getAutoCompleteItemsFromFile(fileURI: string, fileContents: string): metaData[] {
   let inputStream = new CharStream(fileContents);
   let lexer = new pss_lexer(inputStream);
