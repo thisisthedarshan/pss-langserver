@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2025-03-05 - Unreleased
+
+### Added
+
+- The ability of the parser to continue parsing even after encountering an error.
+
 ## [0.2.0] - 2025-03-05
 
 ### Added
@@ -25,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Grammar to detect document blocks.
 - Beautification of equals to blocks, colons and comments
 
-### FIXED
+### Fixed
 
 - A minor bug fix where config refresh failed due to wrong check.
 - Grammar Syntaxes for data_types.
@@ -39,10 +45,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.4] - 2025-02-24
 
-### FIXED
+### Fixed
 
-- Formatter logic is fixed to remove adding of additional newlines
-- Logic for scanning of the files to get all .pss files in current workspace is fixed to also work with file-paths having spaces
+- Formatter logic is Fixed to remove adding of additional newlines
+- Logic for scanning of the files to get all .pss files in current workspace is Fixed to also work with file-paths having spaces
 - Fixed Diagnostics Popup issue
 
 ## [0.1.3] - 2025-02-24

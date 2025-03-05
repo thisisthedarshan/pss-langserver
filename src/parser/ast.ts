@@ -19,6 +19,7 @@ import pss, { Enum_identifierContext, IdentifierContext, Stream_type_identifierC
 import pss_lexer from "../grammar/pss_lexer";
 import { visitor } from "./visitor";
 import { metaData } from "../definitions/dataTypes";
+import { PSSErrorListener } from "./listener";
 
 
 export function getAutoCompleteItemsFromFile(fileURI: string, fileContents: string): metaData[] {
@@ -27,6 +28,8 @@ export function getAutoCompleteItemsFromFile(fileURI: string, fileContents: stri
   let tokenStream = new CommonTokenStream(lexer);
   let parser = new pss(tokenStream);
   let tree = parser.pss_entry();
+  parser.removeErrorListeners();
+  parser.addErrorListener(new PSSErrorListener())
   let myVisitor = new visitor(tokenStream, fileURI);
   tree.accept(myVisitor);
   return [...new Set(myVisitor.getMeta())];

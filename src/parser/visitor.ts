@@ -213,7 +213,7 @@ export class visitor extends pssVisitor<void> {
               },
               used: [],
               documentation: "",
-              params: dataInstance.array_dim().constant_expression()?.getText() || undefined,
+              params: dataInstance.array_dim()?.constant_expression()?.getText() || undefined,
               type: dataInstance.constant_expression()?.getText() || undefined,
               subComponents: undefined
             }
