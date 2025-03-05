@@ -16,7 +16,7 @@
  */
 import { CommonTokenStream, ParserRuleContext, Token } from "antlr4";
 import pssVisitor from "../grammar/pssVisitor";
-import { Action_declarationContext, Component_declarationContext, Data_declarationContext, Data_instantiationContext, Enum_declarationContext, Enum_itemContext, Function_declContext, IdentifierContext, Procedural_functionContext } from "../grammar/pss";
+import { Action_declarationContext, Component_declarationContext, Data_declarationContext, Data_instantiationContext, Enum_declarationContext, Enum_itemContext, Function_declContext, IdentifierContext, Procedural_functionContext, Pss_entryContext } from "../grammar/pss";
 import pss_lexer from "../grammar/pss_lexer";
 import { getObjType } from "./helpers";
 import { integer } from "vscode-languageserver";
@@ -25,15 +25,16 @@ import { metaData, objType, params } from "../definitions/dataTypes";
 export class visitor extends pssVisitor<void> {
   /* Data types */
   private identifiers: string[] = [];
+  private test: string[] = [];
   private astMeta: metaData[] = [];
   private tokenStream: CommonTokenStream;
 
   /* Getters */
   getIdentifiers(): string[] { return this.identifiers; }
   getMeta(): metaData[] { return this.astMeta; }
+  getTest(): string[] { return this.test; }
 
   constructor(tokenStream: CommonTokenStream, fileURI: string) {
-
     super();
     this.tokenStream = tokenStream;
 
@@ -45,6 +46,12 @@ export class visitor extends pssVisitor<void> {
 
     /* Visit all declarations and generate data */
     this.visitAction_declaration = (ctx: Action_declarationContext): void => {
+      this.test.push("Action");
+      this.test.push(ctx.toString());
+      this.test.push(ctx.start.line.toString());
+      this.test.push(ctx.start.column.toString());
+      this.test.push(ctx.template_param_decl_list.toString());
+      this.test.push(ctx.action_super_spec.toString());
       this.astMeta.push({
         keyword: ctx.action_identifier.toString(),
         info: {
@@ -62,6 +69,7 @@ export class visitor extends pssVisitor<void> {
           subComponents: undefined
         }
       });
+      console.log("Meta: ")
     }
 
     this.visitEnum_declaration = (ctx: Enum_declarationContext): void => {
@@ -82,84 +90,95 @@ export class visitor extends pssVisitor<void> {
           subComponents: ctx.enum_item_list().map(item => item.identifier.toString())
         }
       });
+      console.log("Meta: ", this.astMeta[this.astMeta.length - 1])
     }
 
     this.visitComponent_declaration = (ctx: Component_declarationContext): void => {
-      let compItems: string[] = ctx.component_body_item_list().map(compBodyItems => {
-        if (compBodyItems.abstract_action_declaration()) {
-          return compBodyItems.abstract_action_declaration().action_declaration().action_identifier.toString()
-        }
-        else if (compBodyItems.action_declaration()) {
-          return compBodyItems.action_declaration().action_identifier.toString()
-        }
-        else if (compBodyItems.component_pool_declaration()) {
-          return compBodyItems.component_pool_declaration().identifier.toString()
-        }
-        else if (compBodyItems.enum_declaration()) {
-          return compBodyItems.enum_declaration().enum_identifier.toString()
-        }
-        else if (compBodyItems.export_action()) {
-          return compBodyItems.export_action().action_type_identifier.toString()
-        }
-        else if (compBodyItems.function_decl()) {
-          return compBodyItems.function_decl().function_prototype().function_identifier.toString()
-        }
-        else if (compBodyItems.procedural_function()) {
-          return compBodyItems.procedural_function().function_prototype().function_identifier.toString()
-        }
-        else if (compBodyItems.struct_declaration()) {
-          return compBodyItems.struct_declaration().struct_identifier.toString()
-        }
-        else if (compBodyItems.target_template_function()) {
-          return compBodyItems.target_template_function().function_prototype().function_identifier.toString()
-        }
-        else {
-          return "";
-        }
-      });
+      let compItems: string[] = [];
+      let compDataItems: string[] = [];
+      let templateParameters: params[] = [];
 
-      let compDataItems: string[] = ctx.component_body_item_list().flatMap(compBodyItem => {
-        if (compBodyItem.component_data_declaration()) {
-          return compBodyItem.component_data_declaration().data_declaration().data_instantiation_list().map(dataInst => {
-            return dataInst.identifier().getText();
-          });
-        } else {
-          return [];
-        }
-      });
-
-      let templateParameters: params[] = ctx.template_param_decl_list().template_param_decl_list().map(paramDecl => {
-        if (paramDecl.type_param_decl()) {
-          if (paramDecl.type_param_decl().generic_type_param_decl()) {
-            return {
-              paramType: getObjType("type"),
-              paramName: paramDecl.type_param_decl().generic_type_param_decl().identifier().getText(),
-              paramDefault: paramDecl.type_param_decl().generic_type_param_decl().type_identifier().getText()
-            };
-          } else {
-            const typeParamDecl = paramDecl.type_param_decl().category_type_param_decl();
-            const typeCategory = typeParamDecl.type_category();
-
-            let objStr = typeCategory.struct_kind()
-              ? (typeCategory.struct_kind().object_kind()
-                ? typeCategory.struct_kind().object_kind().getText()
-                : typeCategory.struct_kind().getText())
-              : typeCategory.getText();
-
-            return {
-              paramType: getObjType(objStr),
-              paramName: typeParamDecl.identifier().getText(),
-              paramDefault: typeParamDecl.type_identifier().getText()
-            };
+      if (ctx.component_body_item_list()) {
+        compItems = ctx.component_body_item_list().map(compBodyItems => {
+          if (compBodyItems.abstract_action_declaration()) {
+            return compBodyItems.abstract_action_declaration().action_declaration().action_identifier.toString()
           }
-        } else {
-          return {
-            paramType: getObjType(paramDecl.value_param_decl().data_type().getText()),
-            paramName: paramDecl.value_param_decl().identifier().getText(),
-            paramDefault: paramDecl.value_param_decl().constant_expression().expression().getText()
-          };
+          else if (compBodyItems.action_declaration()) {
+            return compBodyItems.action_declaration().action_identifier.toString()
+          }
+          else if (compBodyItems.component_pool_declaration()) {
+            return compBodyItems.component_pool_declaration().identifier.toString()
+          }
+          else if (compBodyItems.enum_declaration()) {
+            return compBodyItems.enum_declaration().enum_identifier.toString()
+          }
+          else if (compBodyItems.export_action()) {
+            return compBodyItems.export_action().action_type_identifier.toString()
+          }
+          else if (compBodyItems.function_decl()) {
+            return compBodyItems.function_decl().function_prototype().function_identifier.toString()
+          }
+          else if (compBodyItems.procedural_function()) {
+            return compBodyItems.procedural_function().function_prototype().function_identifier.toString()
+          }
+          else if (compBodyItems.struct_declaration()) {
+            return compBodyItems.struct_declaration().struct_identifier.toString()
+          }
+          else if (compBodyItems.target_template_function()) {
+            return compBodyItems.target_template_function().function_prototype().function_identifier.toString()
+          }
+          else {
+            return "";
+          }
+        });
+
+        compDataItems = ctx.component_body_item_list().flatMap(compBodyItem => {
+          if (compBodyItem.component_data_declaration()) {
+            return compBodyItem.component_data_declaration().data_declaration().data_instantiation_list().map(dataInst => {
+              return dataInst.identifier().getText();
+            });
+          } else {
+            return [];
+          }
+        });
+      }
+
+      if (ctx.template_param_decl_list()) {
+        if (ctx.template_param_decl_list().template_param_decl_list()) {
+          templateParameters = ctx.template_param_decl_list().template_param_decl_list().map(paramDecl => {
+            if (paramDecl.type_param_decl()) {
+              if (paramDecl.type_param_decl().generic_type_param_decl()) {
+                return {
+                  paramType: getObjType("type"),
+                  paramName: paramDecl.type_param_decl().generic_type_param_decl().identifier().getText(),
+                  paramDefault: paramDecl.type_param_decl().generic_type_param_decl().type_identifier().getText()
+                };
+              } else {
+                const typeParamDecl = paramDecl.type_param_decl().category_type_param_decl();
+                const typeCategory = typeParamDecl.type_category();
+
+                let objStr = typeCategory.struct_kind()
+                  ? (typeCategory.struct_kind().object_kind()
+                    ? typeCategory.struct_kind().object_kind().getText()
+                    : typeCategory.struct_kind().getText())
+                  : typeCategory.getText();
+
+                return {
+                  paramType: getObjType(objStr),
+                  paramName: typeParamDecl.identifier().getText(),
+                  paramDefault: typeParamDecl.type_identifier().getText()
+                };
+              }
+            } else {
+              return {
+                paramType: getObjType(paramDecl.value_param_decl().data_type().getText()),
+                paramName: paramDecl.value_param_decl().identifier().getText(),
+                paramDefault: paramDecl.value_param_decl().constant_expression().expression().getText()
+              };
+            }
+          });
         }
-      });
+      }
 
       const compItemsFiltered = compItems.filter(item => item !== "" && !(Array.isArray(item) && item.length === 0));
       const compDataItemsFiltered = compDataItems.filter(item => item !== "" && !(Array.isArray(item) && item.length === 0));
@@ -181,12 +200,34 @@ export class visitor extends pssVisitor<void> {
           subComponents: [...new Set(...compItemsFiltered, ...compDataItemsFiltered)]
         }
       });
+      console.log("Meta: ", this.astMeta[this.astMeta.length - 1])
     }
 
     this.visitData_declaration = (ctx: Data_declarationContext): void => {
-      ctx.data_instantiation_list().map(dataInstance => {
+      if (ctx.data_instantiation_list()) {
+        ctx.data_instantiation_list().map(dataInstance => {
+          this.astMeta.push({
+            keyword: dataInstance.identifier.toString(),
+            info: {
+              objectType: objType.DATA,
+              parent: undefined,
+              onLine: {
+                file: fileURI,
+                lineNumber: ctx.start.line,
+                columnNumber: ctx.start.column
+              },
+              used: [],
+              documentation: "",
+              params: dataInstance.array_dim().constant_expression.toString() || undefined,
+              type: dataInstance.constant_expression.toString() || undefined,
+              subComponents: undefined
+            }
+          });
+        });
+      }
+      else {
         this.astMeta.push({
-          keyword: dataInstance.identifier.toString(),
+          keyword: ctx.data_instantiation(0).toString(),
           info: {
             objectType: objType.DATA,
             parent: undefined,
@@ -197,12 +238,13 @@ export class visitor extends pssVisitor<void> {
             },
             used: [],
             documentation: "",
-            params: dataInstance.array_dim().constant_expression.toString() || undefined,
-            type: dataInstance.constant_expression.toString() || undefined,
+            params: ctx.data_instantiation(0).array_dim().constant_expression.toString() || undefined,
+            type: ctx.data_instantiation(0).constant_expression.toString() || undefined,
             subComponents: undefined
           }
         });
-      });
+      }
+      console.log("Meta: ", this.astMeta[this.astMeta.length - 1])
     }
 
     this.visitProcedural_function = (ctx: Procedural_functionContext): void => {
@@ -240,6 +282,7 @@ export class visitor extends pssVisitor<void> {
           subComponents: undefined
         }
       });
+      console.log("Meta: ", this.astMeta[this.astMeta.length - 1])
     }
 
     this.visitEnum_item = (ctx: Enum_itemContext): void => {
@@ -318,5 +361,4 @@ export class visitor extends pssVisitor<void> {
 
     return comments;
   }
-
 }

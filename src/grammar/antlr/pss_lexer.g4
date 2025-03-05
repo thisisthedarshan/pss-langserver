@@ -14,8 +14,6 @@
  */
 
 lexer grammar pss_lexer;
-/* Different channels */
-channels { DOXYGEN_CHANNEL }
 
 /* CONSTANT CHARACTERS */
 TOKEN_SCOPE: '::';
@@ -231,12 +229,10 @@ TOKEN_BASED_DEC_LITERAL:
 TOKEN_BASED_HEX_LITERAL:
 	'\'' ('s' | 'S')? ('h' | 'H') HEX_DIGIT (HEX_DIGIT | '_')*;
 
-TOKEN_NEWLINE: '\n';
-
 /* Comments */
-OPEN_DOC_COMMENT: '/**' -> pushMode(DOXYGEN_MODE), channel(DOXYGEN_CHANNEL);
-TOKEN_SL_COMMENT: '//' ~[\r\n]* TOKEN_NEWLINE -> channel(HIDDEN);
-TOKEN_ML_COMMENT: '/*' .*? '*/' TOKEN_NEWLINE -> channel(HIDDEN);
+TOKEN_DOC_COMMENT: '/**' .*? '*/' -> channel(HIDDEN);
+TOKEN_SL_COMMENT: '//' ~[\r\n]* '\n' -> channel(HIDDEN);
+TOKEN_ML_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
 
 /* Double and Triple-quoted strings */
 TOKEN_QUOTED_STRING:
@@ -250,35 +246,9 @@ fragment ESCAPED_CHARACTER:
 	'\\' ['"\\?abfnrtv]
 	| '\\' [0-7] [0-7] [0-7]; /* Escapes */
 
-/* Doxygen related */
-fragment COMMAND: '@';
-fragment ITALIC: TOKEN_ASTERISK ~[*\r\n]+ TOKEN_ASTERISK | TOKEN_UNDERSCORE ~[_\r\n]+ TOKEN_UNDERSCORE;
-fragment BOLD: TOKEN_ASTERISK TOKEN_ASTERISK ~[*\r\n]+ TOKEN_ASTERISK TOKEN_ASTERISK;
-fragment BOLD_ITALIC: TOKEN_ASTERISK TOKEN_ASTERISK TOKEN_ASTERISK ~[*\r\n]+ TOKEN_ASTERISK TOKEN_ASTERISK TOKEN_ASTERISK;
-fragment CODE: TOKEN_TILDA ~[`\r\n]* TOKEN_TILDA;
-fragment LINK: TOKEN_LT ~[>\r\n]* TOKEN_GT;
-fragment TEXT: ~[\r\n@*`_<]+;
-fragment EOL: '\r'? '\n' | EOF;
-
-TOKEN_COMMAND: COMMAND;
-TOKEN_ITALIC: ITALIC;
-TOKEN_BOLD: BOLD;
-TOKEN_BOLD_ITALIC: BOLD_ITALIC;
-TOKEN_CODE: CODE;
-TOKEN_LINK: LINK;
-TOKEN_TEXT: TEXT;
-TOKEN_EOL: EOL;
-
 TOKEN_FILENAME_STRING: TOKEN_QUOTED_STRING;
 
 /* identifier */
 ID: [a-zA-Z_] [a-zA-Z_0-9]*;
 ESCAPED_ID: '\\' ~[ \t\r\n]+ [ \t\r\n]+;
 WS: [ \t\r\n] -> skip; // Ignore whitespace
-
-mode DOXYGEN_MODE;
-CLOSE_DOC_COMMENT: '*/' TOKEN_NEWLINE -> popMode, channel(DOXYGEN_CHANNEL);
-DOC_COMMAND: '@' [a-zA-Z]+ -> channel(DOXYGEN_CHANNEL); 
-DOC_STAR_PREFIX:  WS* TOKEN_ASTERISK{localctx.getText().length < 5}? WS* -> channel(DOXYGEN_CHANNEL);
-DOC_TEXT: ~[@*/\r\n]+ -> channel(DOXYGEN_CHANNEL);
-DOC_NEWLINE: [\r\n] -> channel(DOXYGEN_CHANNEL);

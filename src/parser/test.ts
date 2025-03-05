@@ -15,8 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { getAutoCompleteItemsFromFile } from "./ast";
-const file: string = `
-extend component pss_top {
+const file: string = `component pss_top {
  import my_mem_ops_c::*;
  action stress_xfer {
  activity {
@@ -35,4 +34,9 @@ extend component pss_top {
  }
 }
 `;
-getAutoCompleteItemsFromFile(file, "");
+let out = getAutoCompleteItemsFromFile("", file);
+console.log("AST: ", out)
+console
+out.forEach(ast => {
+  console.log(ast.keyword, ast.info)
+});

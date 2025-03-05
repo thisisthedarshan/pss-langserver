@@ -16,7 +16,7 @@
  */
 // Generated from ./src/grammar/antlr/pss.g4 by ANTLR 4.13.2
 
-import { ParseTreeVisitor } from 'antlr4';
+import {ParseTreeVisitor} from 'antlr4';
 
 
 import { Pss_entryContext } from "./pss.js";
@@ -343,18 +343,6 @@ import { Type_categoryContext } from "./pss.js";
 import { Value_param_declContext } from "./pss.js";
 import { Template_param_value_listContext } from "./pss.js";
 import { Template_param_valueContext } from "./pss.js";
-import { DoxygenCommentContext } from "./pss.js";
-import { DocContentContext } from "./pss.js";
-import { DocLineContext } from "./pss.js";
-import { StarLineContext } from "./pss.js";
-import { CommandLineContext } from "./pss.js";
-import { CommandTypeContext } from "./pss.js";
-import { CommandContentContext } from "./pss.js";
-import { ParamNameContext } from "./pss.js";
-import { ContentLineContext } from "./pss.js";
-import { ContentElementContext } from "./pss.js";
-import { MarkdownContext } from "./pss.js";
-import { InlineCommandContext } from "./pss.js";
 
 
 /**
@@ -2311,77 +2299,5 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitTemplate_param_value?: (ctx: Template_param_valueContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.doxygenComment`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitDoxygenComment?: (ctx: DoxygenCommentContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.docContent`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitDocContent?: (ctx: DocContentContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.docLine`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitDocLine?: (ctx: DocLineContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.starLine`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitStarLine?: (ctx: StarLineContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.commandLine`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitCommandLine?: (ctx: CommandLineContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.commandType`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitCommandType?: (ctx: CommandTypeContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.commandContent`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitCommandContent?: (ctx: CommandContentContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.paramName`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitParamName?: (ctx: ParamNameContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.contentLine`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitContentLine?: (ctx: ContentLineContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.contentElement`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitContentElement?: (ctx: ContentElementContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.markdown`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitMarkdown?: (ctx: MarkdownContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.inlineCommand`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitInlineCommand?: (ctx: InlineCommandContext) => Result;
 }
 
