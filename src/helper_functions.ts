@@ -158,16 +158,18 @@ export function buildAutocompletionBuiltinsBlock(): CompletionItem[] {
 }
 
 export function buildAutocompletionBlock(ast: metaData[]): CompletionItem[] {
-  let items: CompletionItem[];
-  items = ast.map(astObject => {
-    return {
-      label: astObject.keyword,
-      kind: getCompletionKind(astObject.info.objectType),
-      documentation: {
-        kind: 'markdown',
-        value: astObject.info.documentation || ""
-      }
-    }
+  let items: CompletionItem[] = [];
+  ast.map(astItem => {
+    Object.entries(astItem).map(([name, meta]) => {
+      items.push({
+        label: name,
+        kind: getCompletionKind(meta.objectType),
+        documentation: {
+          kind: 'markdown',
+          value: meta.documentation || ""
+        }
+      })
+    })
   });
 
   return items;
@@ -207,25 +209,29 @@ function encodeSemanticTokens(tokens: SemanticToken[]): number[] {
 /* Provides semantic tokens to the client */
 export function generateSemanticTokens(file: string, ast: metaData[]): number[] {
   let semTokenFromFile: SemanticToken[] = findSemanticTokens(file, semanticTokensBuiltin);
-  let semTokensFromMeta: SemanticToken[] = ast.flatMap(astObject => {
-    let modifiers: number = 0;
-    let objectType: objType = astObject.info.objectType;
-    let semanticTokensForAstObj: KeywordInfo = semanticTokenTypes[objType[objectType]];
+  let semTokensFromMeta: SemanticToken[] = [];
+  ast.flatMap(astObject => {
+    Object.entries(astObject).map(([keyword, info]) => {
+      let modifiers: number = 0;
+      let objectType: objType = info.objectType;
+      let semanticTokensForAstObj: KeywordInfo = semanticTokenTypes[objType[objectType]];
 
-    if (Array.isArray(semanticTokensForAstObj.tokenModifiers)) {
-      semanticTokensForAstObj.tokenModifiers.forEach(token => {
-        modifiers += mapTokenModifiers(token.toString())
-      });
-    }
+      if (Array.isArray(semanticTokensForAstObj.tokenModifiers)) {
+        semanticTokensForAstObj.tokenModifiers.forEach(token => {
+          modifiers += mapTokenModifiers(token.toString())
+        });
+      }
 
-    return [{
-      line: astObject.info.onLine.lineNumber,
-      startChar: astObject.info.onLine.columnNumber,
-      length: astObject.keyword.length,
-      tokenType: typeof semanticTokensForAstObj.tokenType !== "number" ? mapTokenTypes(semanticTokensForAstObj.tokenType.toString()) : semanticTokensForAstObj.tokenType,
-      tokenModifiers: Array.isArray(semanticTokensForAstObj.tokenModifiers) ? modifiers : typeof semanticTokensForAstObj.tokenModifiers !== "number" ? mapTokenModifiers(semanticTokensForAstObj.tokenModifiers.toString()) : semanticTokensForAstObj.tokenModifiers,
-    }
-    ]
+      semTokensFromMeta.push({
+        line: info.onLine.lineNumber,
+        startChar: info.onLine.columnNumber,
+        length: keyword.length,
+        tokenType: typeof semanticTokensForAstObj.tokenType !== "number" ? mapTokenTypes(semanticTokensForAstObj.tokenType.toString()) : semanticTokensForAstObj.tokenType,
+        tokenModifiers: Array.isArray(semanticTokensForAstObj.tokenModifiers) ? modifiers : typeof semanticTokensForAstObj.tokenModifiers !== "number" ? mapTokenModifiers(semanticTokensForAstObj.tokenModifiers.toString()) : semanticTokensForAstObj.tokenModifiers,
+      }
+      );
+    });
+
   });
 
   return encodeSemanticTokens([...semTokenFromFile, ...semTokensFromMeta])

@@ -25,14 +25,12 @@ import { metaData, objType, params } from "../definitions/dataTypes";
 export class visitor extends pssVisitor<void> {
   /* Data types */
   private identifiers: string[] = [];
-  private test: string[] = [];
   private astMeta: metaData[] = [];
   private tokenStream: CommonTokenStream;
 
   /* Getters */
   getIdentifiers(): string[] { return this.identifiers; }
   getMeta(): metaData[] { return this.astMeta; }
-  getTest(): string[] { return this.test; }
 
   constructor(tokenStream: CommonTokenStream, fileURI: string) {
     super();
@@ -46,51 +44,47 @@ export class visitor extends pssVisitor<void> {
 
     /* Visit all declarations and generate data */
     this.visitAction_declaration = (ctx: Action_declarationContext): void => {
-      this.test.push("Action");
-      this.test.push(ctx.toString());
-      this.test.push(ctx.start.line.toString());
-      this.test.push(ctx.start.column.toString());
-      this.test.push(ctx.template_param_decl_list.toString());
-      this.test.push(ctx.action_super_spec.toString());
       this.astMeta.push({
-        keyword: ctx.action_identifier.toString(),
-        info: {
+        [ctx.action_identifier().identifier()?.getText()]: {
           objectType: objType.ACTION,
           parent: undefined,
           onLine: {
             file: fileURI,
-            lineNumber: ctx.start.line,
-            columnNumber: ctx.start.column
+            lineNumber: ctx.action_identifier().identifier().start.line,
+            columnNumber: ctx.action_identifier().identifier().start.column
           },
           used: [],
           documentation: "",
-          params: ctx.template_param_decl_list.toString(),
-          type: ctx.action_super_spec.toString(),
+          params: ctx.template_param_decl_list()?.getText(),
+          type: ctx.action_super_spec()?.getText(),
           subComponents: undefined
+
         }
       });
-      console.log("Meta: ")
+      super.visitChildren(ctx)
     }
 
     this.visitEnum_declaration = (ctx: Enum_declarationContext): void => {
       this.astMeta.push({
-        keyword: ctx.enum_identifier.toString(),
-        info: {
+        [ctx.enum_identifier().identifier()?.getText()]:
+        {
           objectType: objType.ENUM,
           parent: undefined,
           onLine: {
             file: fileURI,
-            lineNumber: ctx.start.line,
-            columnNumber: ctx.start.column
+            lineNumber: ctx.enum_identifier().identifier().start.line,
+            columnNumber: ctx.enum_identifier().identifier().start.column
           },
           used: [],
           documentation: "",
           params: undefined,
-          type: ctx.data_type.toString() || undefined,
-          subComponents: ctx.enum_item_list().map(item => item.identifier.toString())
+          type: ctx.data_type()?.getText() || undefined,
+          subComponents: ctx.enum_item_list().map(item => item.identifier()?.getText())
         }
       });
-      console.log("Meta: ", this.astMeta[this.astMeta.length - 1])
+
+      super.visitChildren(ctx)
+
     }
 
     this.visitComponent_declaration = (ctx: Component_declarationContext): void => {
@@ -101,31 +95,31 @@ export class visitor extends pssVisitor<void> {
       if (ctx.component_body_item_list()) {
         compItems = ctx.component_body_item_list().map(compBodyItems => {
           if (compBodyItems.abstract_action_declaration()) {
-            return compBodyItems.abstract_action_declaration().action_declaration().action_identifier.toString()
+            return compBodyItems.abstract_action_declaration().action_declaration().action_identifier().identifier()?.getText()
           }
           else if (compBodyItems.action_declaration()) {
-            return compBodyItems.action_declaration().action_identifier.toString()
+            return compBodyItems.action_declaration().action_identifier().identifier()?.getText()
           }
           else if (compBodyItems.component_pool_declaration()) {
-            return compBodyItems.component_pool_declaration().identifier.toString()
+            return compBodyItems.component_pool_declaration().identifier()?.getText()
           }
           else if (compBodyItems.enum_declaration()) {
-            return compBodyItems.enum_declaration().enum_identifier.toString()
+            return compBodyItems.enum_declaration().enum_identifier().identifier()?.getText()
           }
           else if (compBodyItems.export_action()) {
-            return compBodyItems.export_action().action_type_identifier.toString()
+            return compBodyItems.export_action().action_type_identifier().type_identifier().type_identifier_elem(0)?.identifier()?.getText()
           }
           else if (compBodyItems.function_decl()) {
-            return compBodyItems.function_decl().function_prototype().function_identifier.toString()
+            return compBodyItems.function_decl().function_prototype().function_identifier().identifier()?.getText()
           }
           else if (compBodyItems.procedural_function()) {
-            return compBodyItems.procedural_function().function_prototype().function_identifier.toString()
+            return compBodyItems.procedural_function().function_prototype().function_identifier().identifier()?.getText()
           }
           else if (compBodyItems.struct_declaration()) {
-            return compBodyItems.struct_declaration().struct_identifier.toString()
+            return compBodyItems.struct_declaration().struct_identifier().identifier()?.getText()
           }
           else if (compBodyItems.target_template_function()) {
-            return compBodyItems.target_template_function().function_prototype().function_identifier.toString()
+            return compBodyItems.target_template_function().function_prototype().function_identifier().identifier()?.getText()
           }
           else {
             return "";
@@ -135,7 +129,7 @@ export class visitor extends pssVisitor<void> {
         compDataItems = ctx.component_body_item_list().flatMap(compBodyItem => {
           if (compBodyItem.component_data_declaration()) {
             return compBodyItem.component_data_declaration().data_declaration().data_instantiation_list().map(dataInst => {
-              return dataInst.identifier().getText();
+              return dataInst.identifier()?.getText();
             });
           } else {
             return [];
@@ -150,8 +144,8 @@ export class visitor extends pssVisitor<void> {
               if (paramDecl.type_param_decl().generic_type_param_decl()) {
                 return {
                   paramType: getObjType("type"),
-                  paramName: paramDecl.type_param_decl().generic_type_param_decl().identifier().getText(),
-                  paramDefault: paramDecl.type_param_decl().generic_type_param_decl().type_identifier().getText()
+                  paramName: paramDecl.type_param_decl().generic_type_param_decl().identifier()?.getText(),
+                  paramDefault: paramDecl.type_param_decl().generic_type_param_decl().type_identifier().type_identifier_elem(0)?.identifier()?.getText()
                 };
               } else {
                 const typeParamDecl = paramDecl.type_param_decl().category_type_param_decl();
@@ -159,67 +153,68 @@ export class visitor extends pssVisitor<void> {
 
                 let objStr = typeCategory.struct_kind()
                   ? (typeCategory.struct_kind().object_kind()
-                    ? typeCategory.struct_kind().object_kind().getText()
-                    : typeCategory.struct_kind().getText())
+                    ? typeCategory.struct_kind().object_kind()?.getText()
+                    : typeCategory.struct_kind()?.getText())
                   : typeCategory.getText();
 
                 return {
                   paramType: getObjType(objStr),
-                  paramName: typeParamDecl.identifier().getText(),
-                  paramDefault: typeParamDecl.type_identifier().getText()
+                  paramName: typeParamDecl.identifier()?.getText(),
+                  paramDefault: typeParamDecl.type_identifier().type_identifier_elem(0)?.identifier()?.getText()
                 };
               }
             } else {
               return {
-                paramType: getObjType(paramDecl.value_param_decl().data_type().getText()),
-                paramName: paramDecl.value_param_decl().identifier().getText(),
-                paramDefault: paramDecl.value_param_decl().constant_expression().expression().getText()
+                paramType: getObjType(paramDecl.value_param_decl().data_type().type_identifier().type_identifier_elem(0)?.identifier()?.getText()),
+                paramName: paramDecl.value_param_decl().identifier()?.getText(),
+                paramDefault: paramDecl.value_param_decl().constant_expression().expression()?.getText()
               };
             }
           });
         }
       }
 
-      const compItemsFiltered = compItems.filter(item => item !== "" && !(Array.isArray(item) && item.length === 0));
-      const compDataItemsFiltered = compDataItems.filter(item => item !== "" && !(Array.isArray(item) && item.length === 0));
+      const compItemsFiltered = compItems;//.filter(item => item !== "" && !(Array.isArray(item) && item.length === 0));
+      const compDataItemsFiltered = compDataItems;//.filter(item => item !== "" && !(Array.isArray(item) && item.length === 0));
 
       this.astMeta.push({
-        keyword: ctx.component_identifier.toString(),
-        info: {
+        [ctx.component_identifier().identifier()?.getText()]:
+        {
           objectType: objType.COMPONENT,
           parent: undefined,
           onLine: {
             file: fileURI,
-            lineNumber: ctx.start.line,
-            columnNumber: ctx.start.column
+            lineNumber: ctx.component_identifier().identifier().start.line,
+            columnNumber: ctx.component_identifier().identifier().start.column
           },
           used: [],
           documentation: "",
           params: templateParameters,
-          type: ctx.component_super_spec.toString(),
-          subComponents: [...new Set(...compItemsFiltered, ...compDataItemsFiltered)]
+          type: ctx.component_super_spec()?.type_identifier()?.type_identifier_elem(0)?.identifier()?.getText() || undefined,
+          subComponents: [...compItemsFiltered, ...compDataItemsFiltered]
         }
       });
-      console.log("Meta: ", this.astMeta[this.astMeta.length - 1])
+
+      super.visitChildren(ctx)
     }
 
     this.visitData_declaration = (ctx: Data_declarationContext): void => {
       if (ctx.data_instantiation_list()) {
         ctx.data_instantiation_list().map(dataInstance => {
           this.astMeta.push({
-            keyword: dataInstance.identifier.toString(),
-            info: {
+            [dataInstance.identifier()?.getText()]:
+            {
               objectType: objType.DATA,
               parent: undefined,
               onLine: {
                 file: fileURI,
-                lineNumber: ctx.start.line,
-                columnNumber: ctx.start.column
+                lineNumber: dataInstance.identifier().start.line,
+                columnNumber: dataInstance.identifier().start.column
               },
               used: [],
               documentation: "",
-              params: dataInstance.array_dim().constant_expression.toString() || undefined,
-              type: dataInstance.constant_expression.toString() || undefined,
+              params: dataInstance.array_dim().constant_expression()?.getText() || undefined,
+              type: dataInstance.constant_expression()?.getText() || undefined,
               subComponents: undefined
             }
           });
@@ -227,62 +222,64 @@ export class visitor extends pssVisitor<void> {
       }
       else {
         this.astMeta.push({
-          keyword: ctx.data_instantiation(0).toString(),
-          info: {
+          [ctx.data_instantiation(0).identifier()?.getText()]:
+          {
             objectType: objType.DATA,
             parent: undefined,
             onLine: {
               file: fileURI,
-              lineNumber: ctx.start.line,
-              columnNumber: ctx.start.column
+              lineNumber: ctx.data_instantiation(0).identifier().start.line,
+              columnNumber: ctx.data_instantiation(0).identifier().start.column
             },
             used: [],
             documentation: "",
-            params: ctx.data_instantiation(0).array_dim().constant_expression.toString() || undefined,
-            type: ctx.data_instantiation(0).constant_expression.toString() || undefined,
+            params: ctx.data_instantiation(0).array_dim().constant_expression()?.getText() || undefined,
+            type: ctx.data_instantiation(0).constant_expression()?.getText() || undefined,
             subComponents: undefined
           }
         });
       }
-      console.log("Meta: ", this.astMeta[this.astMeta.length - 1])
+
+      super.visitChildren(ctx)
     }
 
     this.visitProcedural_function = (ctx: Procedural_functionContext): void => {
       this.astMeta.push({
-        keyword: ctx.function_prototype().function_identifier.toString(),
-        info: {
+        [ctx.function_prototype().function_identifier().identifier()?.getText()]:
+        {
           objectType: objType.PROCEDURAL_FUNCTION,
           parent: undefined,
           onLine: {
             file: fileURI,
-            lineNumber: ctx.start.line,
-            columnNumber: ctx.start.column
+            lineNumber: ctx.function_prototype().function_identifier().identifier().start.line,
+            columnNumber: ctx.function_prototype().function_identifier().identifier().start.column
           },
           used: [],
           documentation: "",
           params: ctx.function_prototype().function_parameter_list_prototype().function_parameter_list().map(paramList => {
             let dataType: string = paramList.data_type()
-              ? paramList.data_type().getText()
+              ? paramList.data_type()?.getText()
               : paramList.type_category()
                 ? (
                   paramList.type_category().struct_kind()?.object_kind()?.getText() ||
                   paramList.type_category().struct_kind()?.getText() ||
-                  paramList.type_category().getText()
+                  paramList.type_category()?.getText()
                 )
                 : paramList.TOKEN_STRUCT()
-                  ? paramList.TOKEN_STRUCT().getText()
-                  : paramList.TOKEN_TYPE().getText();
+                  ? paramList.TOKEN_STRUCT()?.getText()
+                  : paramList.TOKEN_TYPE()?.getText();
             return {
               paramType: getObjType(dataType),
-              paramName: paramList.identifier.toString(),
-              paramDefault: paramList.constant_expression().expression.toString()
+              paramName: paramList.identifier()?.getText(),
+              paramDefault: paramList.constant_expression().expression()?.getText()
             }
           }),
-          type: ctx.function_prototype().function_return_type.toString(),
+          type: ctx.function_prototype().function_return_type()?.getText(),
           subComponents: undefined
         }
       });
-      console.log("Meta: ", this.astMeta[this.astMeta.length - 1])
+
+      super.visitChildren(ctx)
     }
 
     this.visitEnum_item = (ctx: Enum_itemContext): void => {

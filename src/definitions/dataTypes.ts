@@ -94,10 +94,7 @@ type metaInfo = {
 }
 
 /* This is the object returned by the visitor */
-export type metaData = {
-  keyword: string;
-  info: metaInfo;
-}
+export type metaData = Record<string, metaInfo>;
 
 export type semanticToken = {
   line: integer;

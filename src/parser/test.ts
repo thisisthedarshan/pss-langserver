@@ -16,7 +16,6 @@
  */
 import { getAutoCompleteItemsFromFile } from "./ast";
 const file: string = `component pss_top {
- import my_mem_ops_c::*;
  action stress_xfer {
  activity {
  schedule {
@@ -37,6 +36,8 @@ const file: string = `component pss_top {
 let out = getAutoCompleteItemsFromFile("", file);
 console.log("AST: ", out)
 console
-out.forEach(ast => {
-  console.log(ast.keyword, ast.info)
-});
+out.map(astObj => {
+  Object.entries(astObj).map(([keyword, info]) => {
+    console.log(keyword, info)
+  })
+})
