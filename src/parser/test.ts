@@ -14,25 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import { buildAutocompletionBlock } from "../helper_functions";
 import { getAutoCompleteItemsFromFile } from "./ast";
-const file: string = `component pss_top {
- action stress_xfer {
- activity {
- schedule {
- do my_mem_ops_c::write_data;
- do my_mem_ops_c::write_data;
- }
- repeat (5) {
- do my_mem_ops_c::copy_data;
- }
- schedule {
- do my_mem_ops_c::read_check_data;
- do my_mem_ops_c::read_check_data;
- }
- }
- }
- action recv_xfer{
- }
+const file: string = `
+component pss_top {
+    action stress_xfer {
+        activity {
+            schedule {
+                do my_mem_ops_c ::write_data;
+                do my_mem_ops_c ::write_data;
+            }
+            repeat (5) {
+                do my_mem_ops_c::copy_data;
+            }
+            schedule {
+                do my_mem_ops_c ::read_check_data;
+                do my_mem_ops_c ::read_check_data;
+            }
+        }
+    }
+    action recv_xfer {
+    }
 }
 `;
 let out = getAutoCompleteItemsFromFile("", file);
@@ -40,4 +42,10 @@ out.map(astObj => {
   Object.entries(astObj).map(([keyword, info]) => {
     console.log(keyword, info)
   })
+})
+
+let autocompletion = buildAutocompletionBlock(out)
+
+autocompletion.map(astObj => {
+  console.log(astObj)
 })

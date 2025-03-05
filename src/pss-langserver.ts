@@ -219,7 +219,8 @@ connection.onDidChangeWatchedFiles(_change => {
 /* Completions provider */
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    return [...builtInCompletions, ...buildAutocompletionBlock(globalAST)];
+    let completions = [...builtInCompletions, ...buildAutocompletionBlock(globalAST)]
+    return [...new Set(completions)];
   }
 );
 
