@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The ability of the parser to continue parsing even after encountering an error.
 
+### Changed
+
+- Removed the previously added parser error listeners - will be used in later versions?
+
 ## [0.2.0] - 2025-03-05
 
 ### Added

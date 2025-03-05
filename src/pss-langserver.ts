@@ -71,7 +71,7 @@ connection.onInitialize((params: InitializeParams) => {
 
   /* Start by creating an auto-completion suggestions for built-in functionality */
   builtInCompletions = buildAutocompletionBuiltinsBlock();
-
+  connection.console.log("PSS Language Server Started");
   for (const folder of workspaceFolders) {
     scanDirectory(folder.uri.replace('file://', ''), pssFiles);
   }
