@@ -164,10 +164,10 @@ export function buildAutocompletionBlock(ast: metaData[]): CompletionItem[] {
       items.push({
         label: name,
         kind: getCompletionKind(meta.objectType),
-        documentation: {
+        documentation: (meta.documentation !== undefined) ? (meta.documentation.length > 0) ? {
           kind: 'markdown',
-          value: meta.documentation || ""
-        }
+          value: meta.documentation
+        } : undefined : undefined
       })
     })
   });
