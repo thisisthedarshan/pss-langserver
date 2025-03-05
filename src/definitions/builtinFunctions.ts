@@ -21,7 +21,7 @@ export const builtInSignatures = {
     documentation: "Formats a string according to the specified format and arguments. Available on solve platform only.",
     parameters: [
       { label: "format_str", documentation: "The format string." },
-      { label: "args", documentation: "Additional arguments to format." }
+      { label: "...args", documentation: "Additional arguments to format." }
     ]
   },
   "print": {
@@ -29,7 +29,7 @@ export const builtInSignatures = {
     documentation: "Prints a formatted string. Available on solve platform only.",
     parameters: [
       { label: "format_str", documentation: "The format string." },
-      { label: "args", documentation: "Additional arguments to format." }
+      { label: "...args", documentation: "Additional arguments to format." }
     ]
   },
   "message": {
@@ -38,7 +38,7 @@ export const builtInSignatures = {
     parameters: [
       { label: "vrb_level", documentation: "Verbosity level of the message. - NONE, LOW, MEDIUM, HIGH, FULL" },
       { label: "format_str", documentation: "The message format string." },
-      { label: "args", documentation: "Additional arguments for message format." }
+      { label: "...args", documentation: "Additional arguments for message format." }
     ]
   },
   "file_open": {
@@ -69,7 +69,7 @@ export const builtInSignatures = {
     parameters: [
       { label: "file_handle", documentation: "The file handle." },
       { label: "format_str", documentation: "The format string for the data." },
-      { label: "args", documentation: "Additional data arguments for format." }
+      { label: "...args", documentation: "Additional data arguments for format." }
     ]
   },
   "file_read": {
@@ -101,7 +101,7 @@ export const builtInSignatures = {
     documentation: "Outputs an error message with formatted arguments.",
     parameters: [
       { label: "format_str", documentation: "The error format string." },
-      { label: "args", documentation: "Additional arguments for the format." }
+      { label: "...args", documentation: "Additional arguments for the format." }
     ]
   },
   "fatal": {
@@ -110,7 +110,7 @@ export const builtInSignatures = {
     parameters: [
       { label: "status", documentation: "Exit status code." },
       { label: "format_str", documentation: "The fatal error format string." },
-      { label: "args", documentation: "Additional arguments for the format." }
+      { label: "...args", documentation: "Additional arguments for the format." }
     ]
   },
   "urandom": {

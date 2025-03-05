@@ -16,9 +16,9 @@
  */
 
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { Range, Position, CompletionItem, CompletionItemKind, integer, SemanticTokenTypes, SemanticTokens, SemanticTokenModifiers } from "vscode-languageserver/node";
+import { Range, Position, CompletionItem, CompletionItemKind, integer, SemanticTokenTypes, SemanticTokens, SemanticTokenModifiers, TextDocumentIdentifier, Location } from "vscode-languageserver/node";
 import { getAutoCompleteItemsFromFile } from "./parser/ast";
-import { KeywordInfo, metaData, objType, SemanticToken } from "./definitions/dataTypes";
+import { KeywordInfo, metaData, metaInfo, objType, SemanticToken } from "./definitions/dataTypes";
 import { builtInSignatures } from "./definitions/builtinFunctions";
 import { keywords } from "./definitions/keywords";
 import { semanticTokensBuiltin, semanticTokenTypes } from "./definitions/semanticTokenDefinitions";
@@ -290,4 +290,35 @@ function findSemanticTokens(text: string, keywordArray: Record<string, KeywordIn
   return tokens.sort((a, b) =>
     a.line !== b.line ? a.line - b.line : a.startChar - b.startChar
   );
+}
+
+export function getGoToDefinition(document: string, pos: number, ast: metaData[]): Location | null {
+  const keyword = wordAt(document, pos);
+  if (keyword && keyword in ast) {
+    const link: metaInfo = ast[0][keyword];
+    return Location.create(
+      link.onLine.file,
+      Range.create(
+        Position.create(link.onLine.lineNumber, link.onLine.columnNumber),
+        Position.create(link.onLine.lineNumber, link.onLine.columnNumber + keyword.length)
+      )
+    )
+  }
+  return null;
+}
+
+function wordAt(text: string, offset: number): string | null {
+  const wordRegex = /\b[a-zA-Z_][a-zA-Z0-9_]*\b/g;
+  let match;
+
+  while ((match = wordRegex.exec(text))) {
+    const start = match.index;
+    const end = start + match[0].length;
+
+    if (offset >= start && offset <= end) {
+      return match[0];  // Return the matched word
+    }
+  }
+
+  return null;
 }

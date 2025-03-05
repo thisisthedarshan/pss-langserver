@@ -16,6 +16,12 @@
  */
 import { integer, SemanticTokenModifiers, SemanticTokensLegend, SemanticTokenTypes } from "vscode-languageserver";
 
+/* The tool spec config */
+export interface PSS_Config {
+  tabspaces: number,
+  fileAuthor: string;
+}
+
 /* This enum defines the types of objects our AST has */
 export enum objType {
   NONE = 'NONE',
@@ -81,7 +87,7 @@ export type params = {
 }
 
 /* Holds some meta info on the object(s) */
-type metaInfo = {
+export type metaInfo = {
   objectType: objType;
   parent: string | undefined;
   onLine: definedOn;

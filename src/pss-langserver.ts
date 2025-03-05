@@ -34,17 +34,20 @@ import {
   SignatureHelpParams,
   SignatureHelp,
   SemanticTokensLegend,
-  SemanticTokensParams
+  SemanticTokensParams,
+  DefinitionParams,
+  Location,
+  LocationLink
 } from 'vscode-languageserver/node';
 
 import {
   TextDocument
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
-import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, scanDirectory, updateAST, updateStringArray } from './helper_functions';
+import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, getGoToDefinition, scanDirectory, updateAST, updateStringArray } from './helper_functions';
 import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
-import { metaData, semanticTokensLegend } from './definitions/dataTypes';
+import { metaData, PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
 
 /* Support all connection types - ipc, stdio, tcp */
 const connection = createConnection(ProposedFeatures.all);
@@ -99,7 +102,7 @@ connection.onInitialize((params: InitializeParams) => {
 
   const result: InitializeResult = {
     capabilities: {
-      /* Antlr just generates AST so incremental sync isn't a good idea */
+      /* Antlr just generates AST (not CST) so incremental sync isn't a good idea */
       textDocumentSync: TextDocumentSyncKind.Full,
       /* Tell the client that this server supports code completion. */
       completionProvider: {
@@ -120,7 +123,9 @@ connection.onInitialize((params: InitializeParams) => {
         legend: semanticTokensLegend,
         range: true,
         full: true
-      }
+      },
+      definitionProvider: true,
+      declarationProvider: false,
       /* End Capabilities */
     }
   };
@@ -147,12 +152,6 @@ connection.onInitialized(() => {
     });
   }
 });
-
-/* The tool spec config */
-interface PSS_Config {
-  tabspaces: number,
-  fileAuthor: string;
-}
 
 /* Default settings - in case config not supported */
 const defaultSettings: PSS_Config = { tabspaces: 4, fileAuthor: "" };
@@ -253,11 +252,16 @@ connection.onSignatureHelp(
     if (!funcInfo) return null;
 
     // Count commas to determine active parameter
-    const activeParameter = (match[2].match(/,/g) || []).length;
+    var activeParameter = (match[2].match(/,/g) || []).length;
 
     const parameters = funcInfo.parameters.map(p =>
       ParameterInformation.create(p.label, p.documentation)
     );
+
+    /* This hack simply ensures that the function signature helper respects varargs... */
+    if (parameters[parameters.length - 1].label === "...args" && activeParameter > parameters.length - 1) {
+      activeParameter = parameters.length - 1;
+    }
 
     const signature = SignatureInformation.create(
       funcInfo.signature,
@@ -303,6 +307,17 @@ connection.onDocumentFormatting((params, tokens) => {
     return [TextEdit.replace(fullRange(sourceDocument), formattedText)];
   });
 });
+
+/* Provide go-to functionality */
+connection.onDefinition((params: DefinitionParams): Location | null => {
+  const { textDocument, position } = params;
+  const doc = documents.get(textDocument.uri);
+  if (!doc) { return null }
+  const content = doc.getText()
+  const offset = doc.offsetAt(position);
+  return getGoToDefinition(content, offset, globalAST);
+}
+);
 
 /* Prepare to listen */
 documents.listen(connection);

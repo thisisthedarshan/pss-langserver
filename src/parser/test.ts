@@ -31,6 +31,8 @@ const file: string = `component pss_top {
  }
  }
  }
+ action recv_xfer{
+ }
 }
 `;
 let out = getAutoCompleteItemsFromFile("", file);
