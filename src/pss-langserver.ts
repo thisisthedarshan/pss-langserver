@@ -47,6 +47,8 @@ import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
 import { metaData, PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
 import { version } from './version';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 /* To make the process act like an actual executable */
 const args = process.argv.slice(2);
@@ -216,22 +218,31 @@ documents.onDidClose(e => {
 });
 
 connection.onDidOpenTextDocument((params) => {
-  const file = params.textDocument.uri;
   if (isFirst) {
+    const file = params.textDocument.uri;
     const pssFiles: string[] = [];
-    const filePath = decodeURI(file.replace("file://", ""));
-    const folderPath = filePath.substring(0, filePath.lastIndexOf("/") + 1);
-    scanDirectory(folderPath, pssFiles);
-    for (const file of pssFiles) {
-      const content: string = fs.readFileSync(file, 'utf8');
-      const filePath: string = "file://" + file;
-      const fileURI: string = encodeURI(filePath)
-      // Process file content here
-      updateAST(fileURI, content).then(vars => {
-        globalAST = updateASTMeta(globalAST, vars);
-      });
+
+    try {
+      const filePath = fileURLToPath(new URL(file)); // Correct way to convert URI to file path
+      const folderPath = path.dirname(filePath);
+
+      scanDirectory(folderPath, pssFiles);
+      for (const file of pssFiles) {
+        const content: string = fs.readFileSync(file, 'utf8');
+        // Convert it back to URI so that it can be used in goto info
+        const fileURI: string = encodeURI("file://" + file);
+        // Process file content here
+        updateAST(fileURI, content).then(vars => {
+          globalAST = updateASTMeta(globalAST, vars);
+        });
+      }
+      isFirst = false;
+
+      // Continue with the rest of your handler...
+    } catch (e) {
+      console.error(`Error parsing URI ${file}: ${e}`);
     }
-    isFirst = false;
+
   }
 });
 

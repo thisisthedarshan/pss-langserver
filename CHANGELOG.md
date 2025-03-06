@@ -5,12 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.2] - 2025-03-06 - Unreleased
+## [0.2.2] - 2025-03-06
 
 ### Fixed
 
 - The error listener from antlr is removed since it caused problems, flooding stderr with messages - it will be later taken care of.
 - The goto definition provider logic was updated to provide proper goto definitions.
+
+### Changed
+
+- The logic for reading of files from current folder is updated to ensure that it stays cross platform.
 
 ## [0.2.1] - 2025-03-06
 

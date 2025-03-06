@@ -16,9 +16,9 @@
  */
 
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { Range, Position, CompletionItem, CompletionItemKind, integer, SemanticTokenTypes, SemanticTokens, SemanticTokenModifiers, TextDocumentIdentifier, Location } from "vscode-languageserver/node";
+import { Range, Position, CompletionItem, CompletionItemKind, integer, SemanticTokenTypes, SemanticTokens, SemanticTokenModifiers, TextDocumentIdentifier, Location, _Connection } from "vscode-languageserver/node";
 import { getAutoCompleteItemsFromFile } from "./parser/ast";
-import { KeywordInfo, metaData, metaInfo, objType, SemanticToken } from "./definitions/dataTypes";
+import { KeywordInfo, metaData, objType, SemanticToken } from "./definitions/dataTypes";
 import { builtInSignatures } from "./definitions/builtinFunctions";
 import { keywords } from "./definitions/keywords";
 import { semanticTokensBuiltin, semanticTokenTypes } from "./definitions/semanticTokenDefinitions";
@@ -346,6 +346,10 @@ export function updateASTMeta(old: metaData[], newData: metaData[]): metaData[] 
   return [...newData, ...uniqueArray2];
 }
 
-export function notify(conn: any, message: string) {
-  conn.window.showInformationMessage(message);
+export function notify(conn: _Connection, message: string, err: boolean = false) {
+  if (err) {
+    conn.window.showErrorMessage(message);
+  } else {
+    conn.window.showInformationMessage(message);
+  }
 }
