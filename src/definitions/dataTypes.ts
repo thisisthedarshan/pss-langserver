@@ -60,10 +60,10 @@ export type commentDocs = {
   brief: string;
   details: string;
   paramNames: string[];
-  paramTypes: string[];
+  paramTypes: string[] | undefined;
   paramDescriptions: string[];
   sees: string[];
-  returns: objType;
+  returns: string;
 }
 
 /* Tells what line Defines the object */

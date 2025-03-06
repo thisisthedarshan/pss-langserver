@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { CommonTokenStream, ParserRuleContext, Token } from "antlr4";
+import { CharStream, CommonTokenStream, ParserRuleContext, Token } from "antlr4";
 import pssVisitor from "../grammar/pssVisitor";
 import { Action_declarationContext, Component_declarationContext, Data_declarationContext, Data_instantiationContext, Enum_declarationContext, Enum_itemContext, Function_declContext, IdentifierContext, Procedural_functionContext, Pss_entryContext } from "../grammar/pss";
 import pss_lexer from "../grammar/pss_lexer";
 import { getObjType } from "./helpers";
-import { integer } from "vscode-languageserver";
-import { metaData, objType, params } from "../definitions/dataTypes";
+import { commentDocs, metaData, objType, params } from "../definitions/dataTypes";
+import doxygenParserVisitor from "../grammar/doxygenParserVisitor";
+import doxygenParser, { Doc_contentContext, Documentation_commentContext } from "../grammar/doxygenParser";
+import doxygenLexer from "../grammar/doxygenLexer";
 
 export class visitor extends pssVisitor<void> {
   /* Data types */
@@ -44,6 +46,7 @@ export class visitor extends pssVisitor<void> {
 
     /* Visit all declarations and generate data */
     this.visitAction_declaration = (ctx: Action_declarationContext): void => {
+      const comments = this.captureComments(ctx);
       this.astMeta.push({
         [ctx.action_identifier().identifier()?.getText()]: {
           objectType: objType.ACTION,
@@ -289,22 +292,28 @@ export class visitor extends pssVisitor<void> {
   }
 
 
-  private captureComments(ctx: ParserRuleContext): void {
+  private captureComments(ctx: ParserRuleContext, name: string = ''): string | commentDocs {
     /* Get start token index */
     const tokenIndex = ctx.start.tokenIndex;
 
     /* Get comments before this rule */
     const comments = this.getCommentsBeforeToken(tokenIndex);
-
-    if (comments.length > 0) {
-      console.log(`Comments for ${ctx.getText()}:`, comments);
-      /* Process comments as needed */
+    if (this.tokenStream.get(ctx.start.tokenIndex - 1).channel === pss_lexer.TOKEN_DOC_COMMENT) {
+      let inputStream = new CharStream(comments.join('\n'));
+      let lexer = new doxygenLexer(inputStream);
+      let tokenStream = new CommonTokenStream(lexer);
+      let parser = new doxygenParser(tokenStream);
+      parser.removeErrorListeners();
+      let tree = parser.documentation_comment();
+      let visitor = new doxygen_visitor(name, false);
+      tree.accept(visitor);
+      return visitor.getComment();
     }
+    return comments?.join('\n');
   }
 
   private getInlineComments(ctx: ParserRuleContext): string[] {
     const comments: string[] = [];
-
     /* Check if stop exists before using it */
     if (!ctx.stop) return comments;
 
@@ -340,7 +349,7 @@ export class visitor extends pssVisitor<void> {
         const tokenType = token.type;
 
         /* Check if it's one of your comment types */
-        if (
+        if (tokenType === pss_lexer.TOKEN_DOC_COMMENT ||
           tokenType === pss_lexer.TOKEN_SL_COMMENT ||
           tokenType === pss_lexer.TOKEN_ML_COMMENT) {
           comments.unshift(token.text);
@@ -357,5 +366,119 @@ export class visitor extends pssVisitor<void> {
     }
 
     return comments;
+  }
+}
+
+class doxygen_visitor extends doxygenParserVisitor<void> {
+  /* File Name */
+  private name: string = '';
+  /* Common and var specific comments */
+  private paramsNames: string[] = [];
+  private paramDescriptions: string[] = [];
+  private sees: string[] = [];
+  private brief: string = '';
+  private details: string = '';
+  private returns: string = '';
+  private deprecates: string = '';
+  private attention: string = '';
+  private todo: string = '';
+  private examples: string = '';
+  /* File specific comments */
+  private file: string = '';
+  private author: string = '';
+  private date: string = '';
+  private version: string = '';
+  private isFileInfo: boolean = false;
+
+  getComment(): string | commentDocs {
+    if (this.isFileInfo) {
+      return `# ${this.file}
+      ---
+      **Author: ${this.author}**
+      Date: ${this.date}
+
+      Version ${this.version}
+      ---
+      ### About:
+      ${this.brief}
+      ${this.details.length > 0 ? '---\n' + this.details : ''}
+      ${this.deprecates.length > 0 ? '> [!CAUTION] \n> ' + this.deprecates : ''}
+    `.trimStart()
+    } else {
+      return {
+        brief: this.brief,
+        details: this.details,
+        name: this.name,
+        paramDescriptions: this.paramDescriptions,
+        paramNames: this.paramsNames,
+        paramTypes: undefined,
+        sees: this.sees,
+        returns: this.returns
+      }
+    }
+  }
+
+  constructor(name: string, isFileInfo: boolean = false) {
+    super();
+    this.isFileInfo = isFileInfo;
+    this.name = name;
+    /* This is the entry point for doxygen comment */
+    this.visitDocumentation_comment = (ctx: Documentation_commentContext) => {
+      if (ctx.doc_content_list()) {
+        /* Parse the document blocks one by one */
+        ctx.doc_content_list().map(doc_content => {
+          if (doc_content.brief_command()) {
+            /* Parse brief content */
+            this.brief = doc_content.brief_command().brief_text().getText();
+          }
+          if (doc_content.param_command()) {
+            /* Parse param content */
+            this.paramsNames.push(doc_content.param_command().param_identifier().getText());
+            this.paramDescriptions.push(doc_content.param_command().param_description().getText());
+          }
+          if (doc_content.return_command()) {
+            /* Parse return content */
+            this.returns = doc_content.return_command().return_description().getText();
+          }
+          if (doc_content.deprecated_command()) {
+            /* Parse deprecated content */
+            this.deprecates = doc_content.deprecated_command().deprecated_description().getText();
+          }
+          if (doc_content.author_command()) {
+            /* Parse author content */
+            this.author = doc_content.author_command().author_name().getText();
+          }
+          if (doc_content.date_command()) {
+            /* Parse date content */
+            this.date = doc_content.date_command().date_value().getText();
+          }
+          if (doc_content.version_command()) {
+            /* Parse version content */
+            this.version = doc_content.version_command().version_value().getText();
+          }
+          if (doc_content.file_command()) {
+            /* Parse file content */
+            this.file = doc_content.file_command().file_path().getText();
+          }
+          if (doc_content.see_command()) {
+            /* Parse see content */
+            this.sees.push(doc_content.see_command().see_link().getText())
+          }
+          if (doc_content.attention_command()) {
+            /* Parse attention content */
+            this.attention = doc_content.attention_command().attention_description().getText();
+          }
+          if (doc_content.todo_command()) {
+            /* Parse todo content */
+            this.todo = doc_content.todo_command().todo_description().getText();
+          }
+          if (doc_content.example_command()) {
+            /* Parse example content */
+            this.examples = doc_content.example_command().example_code().getText();
+          }
+
+        });
+      }
+    }
   }
 }

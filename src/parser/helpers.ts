@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { objType, semanticTokensLegend } from "../definitions/dataTypes";
+import { commentDocs, objType, semanticTokensLegend } from "../definitions/dataTypes";
 
 export function isWithinCommentBlock(document: { lineAt: (arg0: any) => { (): any; new(): any; text: string; }; }, lineNumber: any) {
   for (let i = lineNumber; i >= 0; i--) {
@@ -104,3 +104,7 @@ export function getObjType(str: string): objType {
 
 export const mapTokenTypes = ((arr: string[]) => (str: string) => arr.indexOf(str))(semanticTokensLegend.tokenTypes);
 export const mapTokenModifiers = ((arr) => (str: string) => str in arr ? 1 << arr.indexOf(str) : 0)(semanticTokensLegend.tokenModifiers);
+
+export function buildMarkdownComment(docComment: commentDocs): string {
+  return '';
+}
