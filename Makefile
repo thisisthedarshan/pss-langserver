@@ -73,7 +73,7 @@ grammar:
 source:
 	mkdir -p dist
 	npm run rebuild
-	echo "#!/usr/bin/env node" | cat - "./dist/pss-langserver.js" > temp && mv temp "./dist/pss-langserver.js"
+	node make-exec.js
 
 inject-license:
 	node put-license.js
