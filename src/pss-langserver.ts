@@ -42,7 +42,7 @@ import {
   TextDocument
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
-import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, getGoToDefinition, scanDirectory, updateAST, updateASTMeta, updateStringArray } from './helper_functions';
+import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, getGoToDefinition, scanDirectory, updateAST, updateASTMeta, updateStringArray } from './helperFunctions';
 import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
 import { metaData, PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
