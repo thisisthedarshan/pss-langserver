@@ -9,11 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- The ability of the parser to continue parsing even after encountering an error.
-
-### Changed
-
-- Removed the previously added parser error listeners - will be used in later versions?
+- Added printing of version when `--version` is passed from command line.
+- Updated functionality to capture workspace files, even if user doesn't give workspace info - this is because PSS code is multi-file dependent.
 
 ## [0.2.0] - 2025-03-05
 

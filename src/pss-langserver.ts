@@ -22,7 +22,6 @@ import {
   InitializeParams,
   DidChangeConfigurationNotification,
   CompletionItem,
-  CompletionItemKind,
   TextDocumentPositionParams,
   TextDocumentSyncKind,
   InitializeResult,
@@ -33,11 +32,9 @@ import {
   SignatureInformation,
   SignatureHelpParams,
   SignatureHelp,
-  SemanticTokensLegend,
   SemanticTokensParams,
   DefinitionParams,
   Location,
-  LocationLink
 } from 'vscode-languageserver/node';
 
 import {
@@ -48,6 +45,15 @@ import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, 
 import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
 import { metaData, PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
+import { version } from './version';
+
+/* To make the process act like an actual executable */
+const args = process.argv.slice(2);
+if (args.includes('--version') || args.includes('-v')) {
+  /* Show build information */
+  version();
+  process.exit(0);
+}
 
 /* Support all connection types - ipc, stdio, tcp */
 const connection = createConnection(ProposedFeatures.all);
@@ -57,7 +63,7 @@ const documents = new TextDocuments(TextDocument);
 
 var globalAST: metaData[] = []; /* Holds all metaData on all files */
 var builtInCompletions: CompletionItem[]; /* Holds all autocompletion items */
-var isFirst = true;
+var isFirst = true; /* To check if an ast has already been built or not */
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = true;
@@ -69,21 +75,23 @@ connection.onInitialize((params: InitializeParams) => {
   const workspaceFolders = params.workspaceFolders || [];
   const pssFiles: string[] = [];
 
-  /* Start by creating an auto-completion suggestions for built-in functionality */
-  builtInCompletions = buildAutocompletionBuiltinsBlock();
   connection.console.log("PSS Language Server Started");
-  for (const folder of workspaceFolders) {
-    scanDirectory(folder.uri.replace('file://', ''), pssFiles);
-  }
 
-  // Process found files
-  for (const file of pssFiles) {
-    const content: string = fs.readFileSync(file, 'utf8');
-    const fileURI: string = "file://" + file;
-    // Process file content here
-    updateAST(fileURI, content).then(vars => {
-      globalAST = updateASTMeta(globalAST, vars);
-    });
+  if (workspaceFolders.length > 0) {
+    for (const folder of workspaceFolders) {
+      scanDirectory(folder.uri.replace('file://', ''), pssFiles);
+    }
+
+    /* Process found files */
+    for (const file of pssFiles) {
+      const content: string = fs.readFileSync(file, 'utf8');
+      const filePath: string = "file://" + file;
+      const fileURI: string = encodeURI(filePath);
+      updateAST(fileURI, content).then(vars => {
+        globalAST = updateASTMeta(globalAST, vars);
+      });
+    }
+    isFirst = false;
   }
 
   /* Does the client support the `workspace/configuration` request? */
@@ -137,6 +145,7 @@ connection.onInitialize((params: InitializeParams) => {
       }
     };
   }
+
   return result;
 });
 
@@ -151,6 +160,10 @@ connection.onInitialized(() => {
       connection.console.log('Workspace folder change event received.');
     });
   }
+
+  /* Create auto-completion suggestions for built-in functionality */
+  builtInCompletions = buildAutocompletionBuiltinsBlock();
+
 });
 
 /* Default settings - in case config not supported */
@@ -201,6 +214,25 @@ documents.onDidClose(e => {
   documentSettings.delete(e.document.uri);
 });
 
+connection.onDidOpenTextDocument((params) => {
+  const file = params.textDocument.uri;
+  if (isFirst) {
+    const pssFiles: string[] = [];
+    const filePath = decodeURI(file.replace("file://", ""));
+    const folderPath = filePath.substring(0, filePath.lastIndexOf("/") + 1);
+    scanDirectory(folderPath, pssFiles);
+    for (const file of pssFiles) {
+      const content: string = fs.readFileSync(file, 'utf8');
+      const filePath: string = "file://" + file;
+      const fileURI: string = encodeURI(filePath)
+      // Process file content here
+      updateAST(fileURI, content).then(vars => {
+        globalAST = updateASTMeta(globalAST, vars);
+      });
+    }
+    isFirst = false;
+  }
+});
 
 /* Event when a document is changed or first opened */
 documents.onDidChangeContent(change => {
