@@ -29,6 +29,7 @@ override_declaration
 | component_data_declaration
 | component_pool_declaration
 | action_declaration
+| action_extension
 | abstract_action_declaration
 | object_bind_stmt
 | exec_block

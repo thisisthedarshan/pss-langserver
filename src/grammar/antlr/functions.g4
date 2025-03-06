@@ -30,17 +30,17 @@ function_prototype : function_return_type function_identifier function_parameter
 
 function_return_type : TOKEN_VOID | data_type;
 
-function_parameter_list_prototype :(
-(TOKEN_FLBRACE (function_parameter ( TOKEN_COMMA function_parameter )*)? TOKEN_FRBRACE)
-| (TOKEN_FLBRACE (function_parameter TOKEN_COMMA)* varargs_parameter TOKEN_FRBRACE));
+function_parameter_list_prototype 
+: (TOKEN_FLBRACE (function_parameter ( TOKEN_COMMA function_parameter )*)? TOKEN_FRBRACE)
+| (TOKEN_FLBRACE (function_parameter TOKEN_COMMA)* varargs_parameter TOKEN_FRBRACE);
 
-function_parameter :
- (function_parameter_dir | TOKEN_CONST)?
-data_type identifier ( TOKEN_EQUALS constant_expression )?
-| TOKEN_CONST? ( TOKEN_TYPE | TOKEN_REF type_category | TOKEN_STRUCT ) identifier;
+function_parameter 
+: ((function_parameter_dir | TOKEN_CONST)?
+  data_type identifier (TOKEN_EQUALS constant_expression)?)
+| (TOKEN_CONST? ( TOKEN_TYPE | TOKEN_REF type_category | TOKEN_STRUCT ) identifier);
 
-function_parameter_dir :
-TOKEN_INPUT
+function_parameter_dir 
+: TOKEN_INPUT
 | TOKEN_OUTPUT
 | TOKEN_INOUT;
 

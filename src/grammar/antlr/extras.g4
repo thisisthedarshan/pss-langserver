@@ -21,11 +21,6 @@ string_literal :
 TOKEN_QUOTED_STRING
 | TOKEN_TRIPLE_QUOTED_STRING;
 
-comment 
-    : TOKEN_SL_COMMENT  # slComment
-    | TOKEN_ML_COMMENT  # mlComment
-    ;
-
 filename_string : TOKEN_QUOTED_STRING;
 
 /* Data Declarations - missing from the LRM */
@@ -40,3 +35,12 @@ TOKEN_SLBRACE constant_expression TOKEN_SRBRACE;
 
 attr_field:
 access_modifier? TOKEN_RAND (TOKEN_STATIC TOKEN_CONST)? data_declaration;
+
+/* Proper extend statements re-declared */
+action_extension
+  : (
+      (TOKEN_EXTEND TOKEN_ACTION action_identifier) 
+    | (TOKEN_EXTEND component_identifier TOKEN_COLON action_identifier)
+    ) TOKEN_CLBRACE (
+		action_body_item*
+	) TOKEN_CRBRACE;

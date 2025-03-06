@@ -19,7 +19,7 @@ options {tokenVocab=pss_lexer;}
 import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,procedural_statements,struct_declaration,template_types;
 
 package_declaration:
-	TOKEN_IMPORT package_id_path TOKEN_CLBRACE (
+	TOKEN_PACKAGE package_id_path TOKEN_CLBRACE (
 		package_body_item*
 	) TOKEN_CRBRACE;
 
@@ -63,18 +63,16 @@ package_import_wildcard: TOKEN_SCOPE TOKEN_ASTERISK;
 package_import_alias: TOKEN_AS package_identifier;
 
 extend_stmt:
-	TOKEN_EXTEND TOKEN_ACTION type_identifier TOKEN_CLBRACE (
-		action_body_item*
-	) TOKEN_CRBRACE
-	| TOKEN_EXTEND TOKEN_COMPONENT type_identifier TOKEN_CLBRACE (
+	action_extension
+	| (TOKEN_EXTEND TOKEN_COMPONENT component_identifier TOKEN_CLBRACE (
 		component_body_item*
-	) TOKEN_CRBRACE
-	| TOKEN_EXTEND struct_kind type_identifier TOKEN_CLBRACE (
+	) TOKEN_CRBRACE)
+	| (TOKEN_EXTEND struct_kind struct_kind_identifier TOKEN_CLBRACE (
 		struct_body_item*
-	) TOKEN_CRBRACE
-	| TOKEN_EXTEND TOKEN_ENUM type_identifier TOKEN_CLBRACE (
+	) TOKEN_CRBRACE)
+	| (TOKEN_EXTEND TOKEN_ENUM enum_identifier TOKEN_CLBRACE (
 		enum_item ( TOKEN_COMMA enum_item)*
-	)? TOKEN_CRBRACE;
+	)? TOKEN_CRBRACE);
 
 const_field_declaration:
 	TOKEN_STATIC? TOKEN_CONST data_declaration;
