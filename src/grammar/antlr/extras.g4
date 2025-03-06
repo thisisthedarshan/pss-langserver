@@ -40,7 +40,7 @@ access_modifier? TOKEN_RAND (TOKEN_STATIC TOKEN_CONST)? data_declaration;
 action_extension
   : (
       (TOKEN_EXTEND TOKEN_ACTION action_identifier) 
-    | (TOKEN_EXTEND component_identifier TOKEN_COLON action_identifier)
+    | (TOKEN_EXTEND component_identifier TOKEN_SCOPE action_identifier)
     ) TOKEN_CLBRACE (
 		action_body_item*
 	) TOKEN_CRBRACE;
