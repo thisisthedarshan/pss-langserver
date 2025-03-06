@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - The error listener from antlr is removed since it caused problems, flooding stderr with messages - it will be later taken care of.
-
+- The goto definition provider logic was updated to provide proper goto definitions.
 
 ## [0.2.1] - 2025-03-06
 

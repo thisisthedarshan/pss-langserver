@@ -35,6 +35,7 @@ import {
   SemanticTokensParams,
   DefinitionParams,
   Location,
+  Definition,
 } from 'vscode-languageserver/node';
 
 import {
@@ -342,13 +343,14 @@ connection.onDocumentFormatting((params, tokens) => {
 });
 
 /* Provide go-to functionality */
-connection.onDefinition((params: DefinitionParams): Location | null => {
+connection.onDefinition((params: DefinitionParams): Definition | null => {
   const { textDocument, position } = params;
   const doc = documents.get(textDocument.uri);
   if (!doc) { return null }
   const content = doc.getText()
   const offset = doc.offsetAt(position);
-  return getGoToDefinition(content, offset, globalAST);
+  const loc = getGoToDefinition(content, offset, globalAST);
+  return loc;
 }
 );
 

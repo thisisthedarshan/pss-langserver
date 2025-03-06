@@ -294,17 +294,30 @@ function findSemanticTokens(text: string, keywordArray: Record<string, KeywordIn
 
 export function getGoToDefinition(document: string, pos: number, ast: metaData[]): Location | null {
   const keyword = wordAt(document, pos);
-  if (keyword && keyword in ast) {
-    const link: metaInfo = ast[0][keyword];
-    return Location.create(
-      link.onLine.file,
-      Range.create(
-        Position.create(link.onLine.lineNumber, link.onLine.columnNumber),
-        Position.create(link.onLine.lineNumber, link.onLine.columnNumber + keyword.length)
-      )
-    )
+  let location: Location | null = null;
+  if (keyword === null) {
+    return null;
   }
-  return null;
+
+  /* Iterate through each metaData object in the array */
+  for (const metaInfoObj of ast) {
+    /* Check if the searchString matches any key in the current metaData object */
+    const matchingKey = Object.keys(metaInfoObj).find(key => key === keyword);
+    /* If a match is found, return the location */
+    if (matchingKey) {
+      const info = metaInfoObj[matchingKey];
+      /* Subtracting 1 from line number since Antlr starts line number from 1 and we expect from 0 */
+      let start_range = Position.create(info.onLine.lineNumber - 1, info.onLine.columnNumber)
+      let end_range = Position.create(info.onLine.lineNumber - 1, info.onLine.columnNumber + keyword.length)
+      location = Location.create(
+        info.onLine.file,
+        Range.create(start_range, end_range)
+      );
+      return location;
+    }
+  }
+
+  return location;
 }
 
 function wordAt(text: string, offset: number): string | null {
