@@ -80,21 +80,18 @@ connection.onInitialize((params: InitializeParams) => {
 
   notify(connection, "PSS Language Server Started");
 
-  if (workspaceFolders.length > 0) {
-    for (const folder of workspaceFolders) {
-      scanDirectory(folder.uri.replace('file://', ''), pssFiles);
-    }
+  for (const folder of workspaceFolders) {
+    scanDirectory(folder.uri.replace('file://', ''), pssFiles);
+  }
 
-    /* Process found files */
-    for (const file of pssFiles) {
-      const content: string = fs.readFileSync(file, 'utf8');
-      const filePath: string = "file://" + file;
-      const fileURI: string = encodeURI(filePath);
-      updateAST(fileURI, content).then(vars => {
-        globalAST = updateASTMeta(globalAST, vars);
-      });
-    }
-    isFirst = false;
+  /* Process found files */
+  for (const file of pssFiles) {
+    const content: string = fs.readFileSync(file, 'utf8');
+    const filePath: string = "file://" + file;
+    const fileURI: string = encodeURI(filePath);
+    updateAST(fileURI, content).then(vars => {
+      globalAST = updateASTMeta(globalAST, vars);
+    });
   }
 
   /* Does the client support the `workspace/configuration` request? */
@@ -126,13 +123,19 @@ connection.onInitialize((params: InitializeParams) => {
         interFileDependencies: true,
         workspaceDiagnostics: false
       },*/
+      /* Our LSP Supports workspace by default - necessary */
+      workspace: {
+        workspaceFolders: {
+          supported: true
+        }
+      },
       documentFormattingProvider: true,
       signatureHelpProvider: {
         triggerCharacters: ['(', ',']
       },
       semanticTokensProvider: {
         legend: semanticTokensLegend,
-        range: true,
+        range: false,
         full: true
       },
       definitionProvider: true,
@@ -140,14 +143,6 @@ connection.onInitialize((params: InitializeParams) => {
       /* End Capabilities */
     }
   };
-  /* Supports workspace */
-  if (hasWorkspaceFolderCapability) {
-    result.capabilities.workspace = {
-      workspaceFolders: {
-        supported: true
-      }
-    };
-  }
 
   return result;
 });
@@ -226,6 +221,7 @@ connection.onDidOpenTextDocument((params) => {
     try {
       const filePath = fileURLToPath(new URL(file)); // Correct way to convert URI to file path
       const folderPath = path.dirname(filePath);
+      notify(connection, `Scanning local folder (${folderPath}) for pss files`)
 
       scanDirectory(folderPath, pssFiles);
       for (const file of pssFiles) {
