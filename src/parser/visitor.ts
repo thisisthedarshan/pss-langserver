@@ -128,7 +128,7 @@ export class visitor extends pssVisitor<void> {
 
         compDataItems = ctx.component_body_item_list().flatMap(compBodyItem => {
           if (compBodyItem.component_data_declaration()) {
-            return compBodyItem.component_data_declaration().data_declaration().data_instantiation_list().map(dataInst => {
+            return compBodyItem.component_data_declaration().data_declaration()?.data_instantiation_list()?.map(dataInst => {
               return dataInst.identifier()?.getText();
             });
           } else {
@@ -145,7 +145,7 @@ export class visitor extends pssVisitor<void> {
                 return {
                   paramType: getObjType("type"),
                   paramName: paramDecl.type_param_decl().generic_type_param_decl().identifier()?.getText(),
-                  paramDefault: paramDecl.type_param_decl().generic_type_param_decl().type_identifier().type_identifier_elem(0)?.identifier()?.getText()
+                  paramDefault: paramDecl.type_param_decl().generic_type_param_decl().type_identifier()?.type_identifier_elem(0)?.identifier()?.getText()
                 };
               } else {
                 const typeParamDecl = paramDecl.type_param_decl().category_type_param_decl();
@@ -160,14 +160,14 @@ export class visitor extends pssVisitor<void> {
                 return {
                   paramType: getObjType(objStr),
                   paramName: typeParamDecl.identifier()?.getText(),
-                  paramDefault: typeParamDecl.type_identifier().type_identifier_elem(0)?.identifier()?.getText()
+                  paramDefault: typeParamDecl.type_identifier()?.type_identifier_elem(0)?.identifier()?.getText()
                 };
               }
             } else {
               return {
-                paramType: getObjType(paramDecl.value_param_decl().data_type().type_identifier().type_identifier_elem(0)?.identifier()?.getText()),
-                paramName: paramDecl.value_param_decl().identifier()?.getText(),
-                paramDefault: paramDecl.value_param_decl().constant_expression().expression()?.getText()
+                paramType: getObjType(paramDecl.value_param_decl()?.data_type()?.type_identifier()?.type_identifier_elem(0)?.identifier()?.getText()),
+                paramName: paramDecl.value_param_decl()?.identifier()?.getText(),
+                paramDefault: paramDecl.value_param_decl()?.constant_expression().expression()?.getText()
               };
             }
           });
@@ -178,7 +178,7 @@ export class visitor extends pssVisitor<void> {
       const compDataItemsFiltered = compDataItems;//.filter(item => item !== "" && !(Array.isArray(item) && item.length === 0));
 
       this.astMeta.push({
-        [ctx.component_identifier().identifier()?.getText()]:
+        [ctx.component_identifier().identifier().getText()]:
         {
           objectType: objType.COMPONENT,
           parent: undefined,
@@ -222,19 +222,19 @@ export class visitor extends pssVisitor<void> {
       }
       else {
         this.astMeta.push({
-          [ctx.data_instantiation(0).identifier()?.getText()]:
+          [ctx.data_instantiation(0)?.identifier()?.getText()]:
           {
             objectType: objType.DATA,
             parent: undefined,
             onLine: {
               file: fileURI,
-              lineNumber: ctx.data_instantiation(0).identifier().start.line,
-              columnNumber: ctx.data_instantiation(0).identifier().start.column
+              lineNumber: ctx.data_instantiation(0)?.identifier().start.line,
+              columnNumber: ctx.data_instantiation(0)?.identifier().start.column
             },
             used: [],
             documentation: "",
-            params: ctx.data_instantiation(0).array_dim().constant_expression()?.getText() || undefined,
-            type: ctx.data_instantiation(0).constant_expression()?.getText() || undefined,
+            params: ctx.data_instantiation(0)?.array_dim()?.constant_expression()?.getText() || undefined,
+            type: ctx.data_instantiation(0)?.constant_expression()?.getText() || undefined,
             subComponents: undefined
           }
         });
@@ -271,7 +271,7 @@ export class visitor extends pssVisitor<void> {
             return {
               paramType: getObjType(dataType),
               paramName: paramList.identifier()?.getText(),
-              paramDefault: paramList.constant_expression().expression()?.getText()
+              paramDefault: paramList.constant_expression()?.expression()?.getText() || undefined
             }
           }),
           type: ctx.function_prototype().function_return_type()?.getText(),
