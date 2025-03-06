@@ -345,3 +345,7 @@ export function updateASTMeta(old: metaData[], newData: metaData[]): metaData[] 
 
   return [...newData, ...uniqueArray2];
 }
+
+export function notify(conn: any, message: string) {
+  conn.window.showInformationMessage(message);
+}

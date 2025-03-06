@@ -42,7 +42,7 @@ import {
   TextDocument
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
-import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, getGoToDefinition, scanDirectory, updateAST, updateASTMeta, updateStringArray } from './helperFunctions';
+import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, getGoToDefinition, notify, scanDirectory, updateAST, updateASTMeta, updateStringArray } from './helperFunctions';
 import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
 import { metaData, PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
@@ -76,7 +76,7 @@ connection.onInitialize((params: InitializeParams) => {
   const workspaceFolders = params.workspaceFolders || [];
   const pssFiles: string[] = [];
 
-  connection.console.log("PSS Language Server Started");
+  notify(connection, "PSS Language Server Started");
 
   if (workspaceFolders.length > 0) {
     for (const folder of workspaceFolders) {
