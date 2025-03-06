@@ -26,8 +26,8 @@ export function getAutoCompleteItemsFromFile(fileURI: string, fileContents: stri
   let lexer = new pss_lexer(inputStream);
   let tokenStream = new CommonTokenStream(lexer);
   let parser = new pss(tokenStream);
-  /*parser.removeErrorListeners();
-  parser.addErrorListener(new PSSErrorListener())*/
+  parser.removeErrorListeners(); /* No need for error listener for now */
+  /*parser.addErrorListener(new PSSErrorListener())*/
   let tree = parser.pss_entry();
   let myVisitor = new visitor(tokenStream, fileURI);
   tree.accept(myVisitor);
