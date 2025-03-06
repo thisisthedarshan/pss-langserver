@@ -26,7 +26,9 @@
     "portable stimulus",
     "pss",
     "accellera pss",
-    "pss 3.0"
+    "pss 3.0",
+    "pss languageserver",
+    "pss-langserver"
   ],
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
@@ -39,8 +41,8 @@
     "vscode-languageserver-textdocument": "^1.0.12"
   },
   "scripts": {
-    "build": "tsc",
-    "rebuild": "make grammar && tsc",
+    "build": "node genbuild.js && tsc",
+    "rebuild": "make grammar && npm run build",
     "clean": "rm -fr ./dist/*",
     "dev": "tsc --watch",
     "prepublishOnly": "make source",

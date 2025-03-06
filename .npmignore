@@ -3,5 +3,4 @@ src/          # Exclude the source code
 *.ts          # Exclude TypeScript files
 *.map         # Exclude source maps, if not needed
 node_modules/ # Exclude node_modules (already handled by npm)
-antlr.jar
-test*.*
+test*.*       # Exclude the test files
