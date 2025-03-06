@@ -166,6 +166,7 @@ connection.onInitialized(() => {
 
   /* Create auto-completion suggestions for built-in functionality */
   builtInCompletions = buildAutocompletionBuiltinsBlock();
+  connection.languages.semanticTokens.refresh();
 
 });
 
@@ -254,6 +255,11 @@ documents.onDidChangeContent(change => {
   });
 
 });
+
+/* Refresh semantic tokens on document saves */
+connection.onDidSaveTextDocument(save => {
+  connection.languages.semanticTokens.refresh();
+})
 
 /* See if monitored files have changed */
 connection.onDidChangeWatchedFiles(_change => {
