@@ -76,6 +76,4 @@ source:
 	echo "#!/usr/bin/env node" | cat - "./dist/pss-langserver.js" > temp && mv temp "./dist/pss-langserver.js"
 
 inject-license:
-	@for file in $(GRAMMAR_SRCS)/*.ts; do \
-		echo "$(license)" | cat - $$file > temp && mv temp $$file; \
-	done
+	node put-license.js
