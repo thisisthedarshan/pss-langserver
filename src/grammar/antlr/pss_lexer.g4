@@ -203,6 +203,8 @@ TOKEN_TODO : 'todo';
 TOKEN_EXAMPLE : 'example';
 TOKEN_VERSION : 'version';
 TOKEN_ATTENTION : 'attention';
+TOKEN_COMP : 'comp';
+
 /* Digits */
 fragment BIN_DIGIT: '0' | '1';
 fragment OCT_DIGIT: [0-7];

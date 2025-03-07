@@ -46,8 +46,10 @@ procedural_data_declaration:
 procedural_data_instantiation:
 	identifier array_dim? (TOKEN_EQUALS expression)?;
 
-procedural_assignment_stmt:
-	ref_path assign_op expression TOKEN_SEMICOLON;
+procedural_assignment_stmt
+	:	(ref_path assign_op expression TOKEN_SEMICOLON)
+	|	(data_type assign_op expression TOKEN_SEMICOLON)
+	|	(data_type? identifier assign_op function_call);
 
 procedural_void_function_call_stmt: (
 		TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE

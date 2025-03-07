@@ -38,7 +38,7 @@ TOKEN_PRESOLVE
 | TOKEN_INITUP
 | TOKEN_INIT;
 
-exec_stmt : procedural_stmt | exec_super_stmt;
+exec_stmt : procedural_stmt | exec_super_stmt | function_call* ;
 
 exec_super_stmt : TOKEN_SUPER TOKEN_SEMICOLON;
 

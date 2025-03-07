@@ -46,3 +46,17 @@ function_parameter_dir
 
 varargs_parameter :
 (data_type | TOKEN_TYPE | TOKEN_REF type_category | TOKEN_STRUCT ) TOKEN_ELLIPSIS identifier;
+
+/* Out-of-spec grammar for detecting function calls */
+/* Example -> comp.function_identifier(function_parameter);*/
+function_call 
+: TOKEN_COMP TOKEN_DOT 
+  function_identifier 
+  TOKEN_FLBRACE
+    function_call_params?
+  TOKEN_FRBRACE 
+  TOKEN_SEMICOLON;
+
+function_call_params
+  : identifier?
+  | identifier (TOKEN_COMMA identifier)*;
