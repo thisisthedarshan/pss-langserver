@@ -20,15 +20,15 @@ import action_declarations,activity_statements,behavioral_coverage,component_dec
 struct_declaration: struct_kind struct_identifier template_param_decl_list? struct_super_spec?
 	TOKEN_CLBRACE struct_body_item* TOKEN_CRBRACE;
 
-  struct_kind: TOKEN_STRUCT
+struct_kind: TOKEN_STRUCT
 	| object_kind;
 
-  object_kind : TOKEN_BUFFER
+object_kind : TOKEN_BUFFER
 	| TOKEN_STREAM
 	| TOKEN_STATE
 	| TOKEN_RESOURCE; 
 
-   struct_super_spec: TOKEN_COLON type_identifier;
+struct_super_spec: TOKEN_COLON type_identifier;
 
   struct_body_item: constraint_declaration
 	| attr_field
