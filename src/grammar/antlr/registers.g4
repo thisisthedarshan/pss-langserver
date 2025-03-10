@@ -18,3 +18,8 @@
  * the official Portable Stimulus Standard Specification v3
  * It is missing from the specification's BNF Syntax section.
  */
+
+parser grammar registers;
+options {tokenVocab=pss_lexer;}
+import identifiers, memory, numbers_and_literals;
+/* */
