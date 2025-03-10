@@ -16,9 +16,11 @@
  */
 
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { Range, Position, CompletionItem, CompletionItemKind, integer, SemanticTokenTypes, SemanticTokens, SemanticTokenModifiers, TextDocumentIdentifier, Location, _Connection } from "vscode-languageserver/node";
+import {
+  Range, Position, CompletionItem, CompletionItemKind, integer, SemanticTokenTypes, SemanticTokens, SemanticTokenModifiers, TextDocumentIdentifier, Location, _Connection, SemanticTokensBuilder
+} from "vscode-languageserver/node";
 import { getAutoCompleteItemsFromFile } from "./parser/ast";
-import { KeywordInfo, metaData, objType, SemanticToken } from "./definitions/dataTypes";
+import { KeywordInfo, metaData, objType, SemanticToken, semanticTokensLegend } from "./definitions/dataTypes";
 import { builtInSignatures } from "./definitions/builtinFunctions";
 import { keywords } from "./definitions/keywords";
 import { semanticTokensBuiltin, semanticTokenTypes } from "./definitions/semanticTokenDefinitions";
@@ -207,9 +209,9 @@ function encodeSemanticTokens(tokens: SemanticToken[]): number[] {
 
 
 /* Provides semantic tokens to the client */
-export function generateSemanticTokens(file: string, ast: metaData[]): number[] {
-  let semTokenFromFile: SemanticToken[] = findSemanticTokens(file, semanticTokensBuiltin);
-  let semTokensFromMeta: SemanticToken[] = [];
+export function generateSemanticTokens(file: string, ast: metaData[]): SemanticTokens {
+  let semTokensFromMeta = new SemanticTokensBuilder();
+  findSemanticTokens(file, semanticTokensBuiltin, semTokensFromMeta);
   ast.flatMap(astObject => {
     Object.entries(astObject).map(([keyword, info]) => {
       let modifiers: number = 0;
@@ -222,24 +224,22 @@ export function generateSemanticTokens(file: string, ast: metaData[]): number[] 
         });
       }
 
-      semTokensFromMeta.push({
-        line: info.onLine.lineNumber,
-        startChar: info.onLine.columnNumber,
-        length: keyword.length,
-        tokenType: typeof semanticTokensForAstObj.tokenType !== "number" ? mapTokenTypes(semanticTokensForAstObj.tokenType.toString()) : semanticTokensForAstObj.tokenType,
-        tokenModifiers: Array.isArray(semanticTokensForAstObj.tokenModifiers) ? modifiers : typeof semanticTokensForAstObj.tokenModifiers !== "number" ? mapTokenModifiers(semanticTokensForAstObj.tokenModifiers.toString()) : semanticTokensForAstObj.tokenModifiers,
-      }
+      semTokensFromMeta.push(
+        info.onLine.lineNumber,
+        info.onLine.columnNumber,
+        keyword.length,
+        typeof semanticTokensForAstObj.tokenType !== "number" ? mapTokenTypes(semanticTokensForAstObj.tokenType.toString()) : semanticTokensForAstObj.tokenType,
+        Array.isArray(semanticTokensForAstObj.tokenModifiers) ? modifiers : typeof semanticTokensForAstObj.tokenModifiers !== "number" ? mapTokenModifiers(semanticTokensForAstObj.tokenModifiers.toString()) : semanticTokensForAstObj.tokenModifiers,
       );
     });
 
   });
 
-  return encodeSemanticTokens([...semTokenFromFile, ...semTokensFromMeta])
+  return semTokensFromMeta.build();
 }
 
-function findSemanticTokens(text: string, keywordArray: Record<string, KeywordInfo>): SemanticToken[] {
+function findSemanticTokens(text: string, keywordArray: Record<string, KeywordInfo>, tokens: SemanticTokensBuilder): SemanticTokens {
   const lines = text.split('\n');
-  const tokens: SemanticToken[] = [];
 
   /* Process each line */
   lines.forEach((line, lineIndex) => {
@@ -271,13 +271,13 @@ function findSemanticTokens(text: string, keywordArray: Record<string, KeywordIn
 
         if (isWordBoundaryBefore && isWordBoundaryAfter) {
           /* Add token */
-          tokens.push({
-            line: lineIndex,
-            startChar: keywordIndex,
-            length: keyword.length,
-            tokenType: typeof info.tokenType !== "number" ? mapTokenTypes(info.tokenType.toString()) : info.tokenType,
-            tokenModifiers: Array.isArray(info.tokenModifiers) ? modifiers : typeof info.tokenModifiers !== "number" ? mapTokenModifiers(info.tokenModifiers.toString()) : info.tokenModifiers,
-          });
+          tokens.push(
+            lineIndex,
+            keywordIndex,
+            keyword.length,
+            typeof info.tokenType !== "number" ? mapTokenTypes(info.tokenType.toString()) : info.tokenType,
+            Array.isArray(info.tokenModifiers) ? modifiers : typeof info.tokenModifiers !== "number" ? mapTokenModifiers(info.tokenModifiers.toString()) : info.tokenModifiers,
+          );
         }
 
         /* Move to the next position */
@@ -287,9 +287,7 @@ function findSemanticTokens(text: string, keywordArray: Record<string, KeywordIn
   });
 
   /* Sort tokens by line and position */
-  return tokens.sort((a, b) =>
-    a.line !== b.line ? a.line - b.line : a.startChar - b.startChar
-  );
+  return tokens.build();
 }
 
 export function getGoToDefinition(document: string, pos: number, ast: metaData[]): Location | null {

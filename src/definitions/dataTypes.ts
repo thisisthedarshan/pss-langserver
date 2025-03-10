@@ -19,7 +19,9 @@ import { integer, SemanticTokenModifiers, SemanticTokensLegend, SemanticTokenTyp
 /* The tool spec config */
 export interface PSS_Config {
   tabspaces: number,
-  fileAuthor: string;
+  fileAuthor: string,
+  formatPatterns: string[],
+  autoFormatHeader: boolean;
 }
 
 /* This enum defines the types of objects our AST has */

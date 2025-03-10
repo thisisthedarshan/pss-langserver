@@ -18,7 +18,7 @@
 import { integer } from "vscode-languageserver";
 import alignTextElements from "./formattingHelper";
 
-export function formatDocument(text: string, tabspace: integer, author: string): string {
+export function formatDocument(fileName: string, text: string, tabspace: integer, author: string, patterns: string[], formatHeader: boolean): string {
   /* First format curly braces */
   let doc = formatCurlyBraces(text);
   /* Then add spaces after commas */
@@ -28,7 +28,7 @@ export function formatDocument(text: string, tabspace: integer, author: string):
   /* Then format semicolons */
   doc = addNewlinesAfterSemicolons(doc);
   /* Then start by formatting patterns - beautification */
-  doc = alignTextElements(doc);
+  doc = alignTextElements(doc, patterns);
 
   /* The make it process line by line */
   let lines = doc.split('\n');
@@ -85,7 +85,12 @@ export function formatDocument(text: string, tabspace: integer, author: string):
 
   }
 
-  return formattedLines.join('\n');
+  let formattedFile = formattedLines.join('\n');
+  if (formatHeader) {
+    formatFileHeader(formattedFile, fileName, "sad", "dsa");
+  }
+
+  return formattedFile;
 }
 
 function formatCurlyBraces(input: string): string {

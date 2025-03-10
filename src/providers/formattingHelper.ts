@@ -15,17 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function alignTextElements(input: string): string {
+function alignTextElements(input: string, patterns: string[]): string {
     // Split the input into lines
     const lines = input.split('\n');
 
     // Process each formatting pattern
-    const colonFormatted = findAndAlignConsecutivePatterns(lines, ':');
-    const formattedEquals = findAndAlignConsecutivePatterns(colonFormatted, '=');
-    const formatted = findAndAlignConsecutivePatterns(formattedEquals, '//', true);
+    let contents = lines;
+    let isEndComment = false;
+    if (patterns.length == 0) {
+        return input; /* Assume user doesn't want any formatting */
+    }
+    patterns.forEach(pattern => {
+        if (pattern === "//") {
+            isEndComment = true;
+        }
+        contents = findAndAlignConsecutivePatterns(contents, pattern, isEndComment);
+    });
+    // const colonFormatted = findAndAlignConsecutivePatterns(lines, ':');
+    // const formattedEquals = findAndAlignConsecutivePatterns(colonFormatted, '=');
+    // const formatted = findAndAlignConsecutivePatterns(formattedEquals, '//', true);
 
     // Join the formatted lines and return
-    return formatted.join('\n');
+    return contents.join('\n');
 }
 
 function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEndComment: boolean = false): string[] {

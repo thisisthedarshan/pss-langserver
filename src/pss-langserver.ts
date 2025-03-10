@@ -36,6 +36,7 @@ import {
   DefinitionParams,
   Location,
   Definition,
+  SemanticTokens,
 } from 'vscode-languageserver/node';
 
 import {
@@ -136,7 +137,9 @@ connection.onInitialize((params: InitializeParams) => {
       semanticTokensProvider: {
         legend: semanticTokensLegend,
         range: false,
-        full: true
+        full: {
+          delta: false
+        },
       },
       definitionProvider: true,
       declarationProvider: false,
@@ -166,7 +169,7 @@ connection.onInitialized(() => {
 });
 
 /* Default settings - in case config not supported */
-const defaultSettings: PSS_Config = { tabspaces: 4, fileAuthor: "" };
+const defaultSettings: PSS_Config = { tabspaces: 4, fileAuthor: "", formatPatterns: [":", "=", "//"], autoFormatHeader: false };
 let globalSettings: PSS_Config = defaultSettings;
 
 /* Cache the settings of all open documents */
@@ -193,13 +196,17 @@ function getSettings(connection: Connection, resource: string): Thenable<PSS_Con
   if (!result) {
     result = Promise.all([
       connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.tabspaces' }),
-      connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.fileAuthor' })
-    ]).then(([tabspaces, fileAuthor]) => {
+      connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.fileAuthor' }),
+      connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.formatPatterns' }),
+      connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.autoFormatHeader' })
+    ]).then(([tabspaces, fileAuthor, formatPatterns, autoFormatHeader]) => {
       // Validate tabspaces
       const validatedTabspaces = Math.min(Math.max(tabspaces ?? defaultSettings.tabspaces, 1), 9);
       return {
         tabspaces: validatedTabspaces,
-        fileAuthor: fileAuthor ?? defaultSettings.fileAuthor
+        fileAuthor: fileAuthor ?? defaultSettings.fileAuthor,
+        formatPatterns: formatPatterns ?? defaultSettings.formatPatterns,
+        autoFormatHeader: autoFormatHeader ?? false,
       };
     });
 
@@ -255,7 +262,7 @@ documents.onDidChangeContent(change => {
 /* Refresh semantic tokens on document saves */
 connection.onDidSaveTextDocument(save => {
   connection.languages.semanticTokens.refresh();
-})
+});
 
 /* See if monitored files have changed */
 connection.onDidChangeWatchedFiles(_change => {
@@ -325,18 +332,16 @@ connection.onSignatureHelp(
 );
 
 /* Provide semantic tokens to the client */
-connection.languages.semanticTokens.on(async (params: SemanticTokensParams) => {
+connection.languages.semanticTokens.on(async (params: SemanticTokensParams): Promise<SemanticTokens> => {
   const uri = params.textDocument.uri;
   const document = documents.get(uri);
 
   if (!document) return { data: [] };
 
   const ast = await updateAST(uri, document.getText());
-  return {
-    data: generateSemanticTokens(document.getText(), ast)
-  };
-
+  return generateSemanticTokens(document.getText(), ast);
 });
+
 
 /* Provide formatting */
 connection.onDocumentFormatting((params, tokens) => {
@@ -347,10 +352,18 @@ connection.onDocumentFormatting((params, tokens) => {
 
   /* Get contents of the document */
   const documentContents = sourceDocument.getText();
+  /* Get the filename */
+  const fileURL = new URL(textDocument.uri);
+  const pathname = fileURL.pathname;
+  /* Normalize for Windows if needed (remove leading slash for Windows paths)*/
+  const normalizedPath = process.platform === 'win32' ? pathname.substring(1) : pathname;
+  /* Extract just the filename using Node's path module*/
+  const filename = path.basename(normalizedPath);
+
 
   /* Get settings for author name and tabspaces and return formatted text */
   return getSettings(connection, sourceDocument.uri).then((settings) => {
-    const formattedText = formatDocument(documentContents, settings.tabspaces, settings.fileAuthor);
+    const formattedText = formatDocument(filename, documentContents, settings.tabspaces, settings.fileAuthor, settings.formatPatterns, settings.autoFormatHeader);
     return [TextEdit.replace(fullRange(sourceDocument), formattedText)];
   });
 });
