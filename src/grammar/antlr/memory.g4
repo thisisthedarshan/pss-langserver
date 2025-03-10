@@ -21,7 +21,7 @@
 
 parser grammar memory;
 options {tokenVocab=pss_lexer;}
-import identifiers, numbers_and_literals;
+import data_types, identifiers, numbers_and_literals;
 
 /* This to identify address handles */
 addr_handle_identifier : identifier;
@@ -31,6 +31,32 @@ addr_space_identifier : identifier;
 
 /* This is the traits struct */
 addr_space_traits : struct_identifier;
+
+/* This identifies claim */
+claim_identifier : identifier;
+
+/* Identify the traits struct */
+trait_identifier : identifier;
+
+/* Offsets for functions that use it */
+offset
+  : integer_number 
+  | (TOKEN_SIZEOF_S 
+    TOKEN_LT 
+      (data_type | type_identifier) 
+    TOKEN_GT 
+    TOKEN_SCOPE (TOKEN_NBITS | TOKEN_NBYTES)
+    );
+
+/* This is the region/claim trait property value types */
+trait_property 
+  : number
+  | bool_literal
+  | enum_item;
+
+/* Identify return types from address related functions */
+number_identifier : identifier;
+bool_identifier : identifier;
 
 /* Contiguous Address Space related grammar */
 contiguous_addr_space_def
@@ -46,6 +72,13 @@ addr_region_setting
     TOKEN_SIZE TOKEN_EQUALS 
     integer_number 
     TOKEN_SEMICOLON;
+
+addr_claim
+  : TOKEN_RAND? TOKEN_ADDRESS_CLAIM 
+    TOKEN_LT 
+      trait_identifier?
+    TOKEN_GT 
+    claim_identifier;
 
 /* Transparent Address Space related grammar */
 transparent_addr_space_def
@@ -64,12 +97,13 @@ transparent_addr_region_setting
       | (TOKEN_TRAIT TOKEN_DOT trait_identifier TOKEN_EQUALS trait_property)
     ) TOKEN_SEMICOLON;
 
-trait_identifier : identifier;
+transparent_addr_claim
+  : TOKEN_RAND? TOKEN_TRANSP_ADDRESS_CLAIM 
+    TOKEN_LT 
+      trait_identifier?
+    TOKEN_GT 
+    claim_identifier;
 
-trait_property 
-  : number
-  | bool_literal
-  | enum_item;
 
 /* Using address regions */
 /* 
@@ -85,7 +119,6 @@ add_addr_region_nonallocatable
     TOK_ADD_NONALLOC_REGION TOKEN_FLBRACE addr_region_dentifier TOKEN_FRBRACE
     TOKEN_SEMICOLON;
 
-
 /* 
   This is => 
   (void)addr_space_identifier.add_region(addr_region_dentifier);
@@ -98,3 +131,41 @@ add_addr_region
     addr_space_identifier TOKEN_DOT 
     TOK_ADD_REGION TOKEN_FLBRACE addr_region_dentifier TOKEN_FRBRACE
     TOKEN_SEMICOLON;
+
+
+/* These are code to detect usage of address handle related functions */
+make_handle_from_claim
+  : addr_handle_identifier TOKEN_EQUALS 
+    TOKEN_MAKE_HANDLE_FROM_CLAIM
+    TOKEN_FLBRACE
+      claim_identifier
+      (TOKEN_COMMA offset)?
+    TOKEN_FRBRACE
+    TOKEN_SEMICOLON;
+
+make_handle_from_handle
+  : addr_handle_identifier TOKEN_EQUALS 
+    TOKEN_MAKE_HANDLE_FROM_HANDLE
+    TOKEN_FLBRACE
+      addr_handle_identifier
+      TOKEN_COMMA offset
+    TOKEN_FRBRACE
+    TOKEN_SEMICOLON;
+
+addr_value
+  : number_identifier TOKEN_EQUALS TOKEN_ADDR_VALUE
+    TOKEN_FLBRACE
+      addr_handle_identifier
+    TOKEN_FRBRACE TOKEN_SEMICOLON;
+
+addr_value_solve
+  : number_identifier TOKEN_EQUALS TOKEN_ADDR_VALUE_SOLVE
+    TOKEN_FLBRACE
+      addr_handle_identifier
+    TOKEN_FRBRACE TOKEN_SEMICOLON;
+
+addr_value_abs
+  : bool_identifier TOKEN_EQUALS TOKEN_ADDR_VALUE_ABS
+    TOKEN_FLBRACE
+      addr_handle_identifier
+    TOKEN_FRBRACE TOKEN_SEMICOLON;
