@@ -34,8 +34,8 @@ expression_constraint_item
 | if_constraint_item
 | implication_constraint_item
 | unique_constraint_item
-| TOKEN_DEFAULT hierarchical_id TOKEN_EQUALEQUAL constant_expression TOKEN_SEMICOLON
-| TOKEN_DEFAULT TOKEN_DISABLE hierarchical_id TOKEN_SEMICOLON
+| (TOKEN_DEFAULT hierarchical_id TOKEN_EQUALEQUAL constant_expression TOKEN_SEMICOLON)
+| (TOKEN_DEFAULT TOKEN_DISABLE hierarchical_id TOKEN_SEMICOLON)
 | dist_directive
 | constraint_body_compile_if
 | stmt_terminator;
