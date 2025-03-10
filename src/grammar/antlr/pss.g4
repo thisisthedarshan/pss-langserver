@@ -17,7 +17,7 @@ parser grammar pss;
 options {tokenVocab=pss_lexer;}
 import package_body, package_declaration, component_declaration;
 
-pss_entry: (pss)* EOF;
+pss_entry: file_doc_comment? (pss)* EOF;
 
 pss
   : package_body 

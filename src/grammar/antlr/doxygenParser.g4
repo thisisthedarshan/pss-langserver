@@ -15,6 +15,9 @@
 parser grammar doxygenParser;
 options {tokenVocab=doxygenLexer;}
 
+file_doc_comment 
+    : documentation_comment;
+
 documentation_comment
     : TOKEN_DOC_START doc_content* TOKEN_DOC_END
     ;

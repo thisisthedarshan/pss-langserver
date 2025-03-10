@@ -10,11 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Function call statements and logic to the grammar
+- Grammar to detect file information from pss files
 
 ### Fixed
 
-= Fixed small grammar mistakes in recognizing some statements
-
+- Fixed small grammar mistakes in recognizing some statements
 
 ## [0.2.2] - 2025-03-06
 
