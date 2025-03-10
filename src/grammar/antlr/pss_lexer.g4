@@ -209,6 +209,10 @@ TOKEN_COMP : 'comp';
 TOKEN_ADDR_REGION : 'addr_region_s';
 TOKEN_TRANSP_ADDR_REGION : 'transparent_addr_region_s';
 TOKEN_SIZE : 'size';
+TOKEN_ADDR : 'addr';
+TOKEN_TRAIT : 'trait';
+TOK_ADD_NONALLOC_REGION : 'add_nonallocatable_region';
+TOK_ADD_REGION : 'add_region';
 TOKEN_CONTI_ADDR_SPACE : 'contiguous_addr_space_c';
 TOKEN_TRANSP_ADDR_SPACE : 'transparent_addr_space_c';
 

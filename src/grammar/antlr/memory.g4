@@ -19,6 +19,10 @@
  * It is missing from the specification's BNF Syntax section.
  */
 
+/* This to identify address handles */
+addr_handle_identifier : identifier;
+
+/* This identifies address space names */
 addr_space_identifier : identifier;
 
 /* This is the traits struct */
@@ -30,7 +34,7 @@ contiguous_addr_space_def
     TOKEN_LT 
         (addr_space_traits)? 
     TOKEN_GT 
-    addr_space_identifier
+    addr_space_identifier (TOKEN_COMMA addr_space_identifier)*
     TOKEN_SEMICOLON;
 
 addr_region_setting 
@@ -45,5 +49,48 @@ transparent_addr_space_def
     TOKEN_LT 
         (addr_space_traits)? 
     TOKEN_GT 
-    addr_space_identifier
+    addr_space_identifier (TOKEN_COMMA addr_space_identifier)*
+    TOKEN_SEMICOLON;
+
+transparent_addr_region_setting
+  : addr_region_dentifier TOKEN_DOT
+    (
+        (TOKEN_SIZE TOKEN_EQUALS integer_number)
+      | (TOKEN_ADDR TOKEN_EQUALS integer_number)
+      | (TOKEN_TRAIT TOKEN_DOT trait_identifier TOKEN_EQUALS trait_property)
+    ) TOKEN_SEMICOLON;
+
+trait_identifier : identifier;
+
+trait_property 
+  : number
+  | bool_literal
+  | enum_item;
+
+/* Using address regions */
+/* 
+  This is => 
+  (void)addr_space_identifier.add_nonallocatable_region(addr_region_dentifier);
+  or
+  addr_handle_identifier = addr_space_identifier.add_nonallocatable_region(addr_region_dentifier);
+*/
+add_addr_region_nonallocatable
+  : ((TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE )
+  | (addr_handle_identifier TOKEN_EQUALS))
+    addr_space_identifier TOKEN_DOT 
+    TOK_ADD_NONALLOC_REGION TOKEN_FLBRACE addr_region_dentifier TOKEN_FRBRACE
+    TOKEN_SEMICOLON;
+
+
+/* 
+  This is => 
+  (void)addr_space_identifier.add_region(addr_region_dentifier);
+  or
+  addr_handle_identifier = addr_space_identifier.add_region(addr_region_dentifier);
+*/
+add_addr_region
+  : ((TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE )
+  | (addr_handle_identifier TOKEN_EQUALS))
+    addr_space_identifier TOKEN_DOT 
+    TOK_ADD_REGION TOKEN_FLBRACE addr_region_dentifier TOKEN_FRBRACE
     TOKEN_SEMICOLON;
