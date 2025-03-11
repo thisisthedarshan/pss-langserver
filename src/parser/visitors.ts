@@ -17,7 +17,7 @@
 import { CharStream, CommonTokenStream, ParserRuleContext, Token } from "antlr4";
 import pssVisitor from "../grammar/pssVisitor";
 import { Action_declarationContext, Component_declarationContext, Data_declarationContext, Data_instantiationContext, Enum_declarationContext, Enum_itemContext, Function_declContext, IdentifierContext, Procedural_functionContext, Pss_entryContext } from "../grammar/pss";
-import pss_lexer from "../grammar/pss_lexer";
+import pss_lexer from "../grammar/pssLex";
 import { getObjType } from "./helpers";
 import { commentDocs, metaData, objType, params } from "../definitions/dataTypes";
 import doxygenParserVisitor from "../grammar/doxygenParserVisitor";

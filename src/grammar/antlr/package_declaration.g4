@@ -14,9 +14,9 @@
  */
 
 parser grammar package_declaration;
-options {tokenVocab=pss_lexer;}
+options {tokenVocab=pssLex;}
 
-import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,procedural_statements,struct_declaration,template_types;
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,procedural_statements,struct_declaration,template_types,memory,registers;
 
 package_declaration:
 	TOKEN_PACKAGE package_id_path TOKEN_CLBRACE (

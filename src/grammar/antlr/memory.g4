@@ -21,7 +21,7 @@
 
 parser grammar memory;
 options {tokenVocab=pssLex;}
-import data_types, identifiers, numbers_and_literals;
+import data_types, identifiers, numbers_and_literals, registers;
 
 /* This identifies address regions */
 addr_region_identifier : identifier;
@@ -91,6 +91,14 @@ transparent_addr_space_def
     TOKEN_GT 
     addr_space_identifier (TOKEN_COMMA addr_space_identifier)*
     TOKEN_SEMICOLON;
+
+
+transparent_addr_region_def 
+  : TOKEN_TRANSP_ADDR_REGION TOKEN_LT
+    TOKEN_LT
+      (addr_space_traits)? 
+    TOKEN_GT
+    addr_region_identifier;
 
 transparent_addr_region_setting
   : addr_region_identifier TOKEN_DOT
@@ -172,3 +180,14 @@ addr_value_abs
     TOKEN_FLBRACE
       addr_handle_identifier
     TOKEN_FRBRACE TOKEN_SEMICOLON;
+
+/* Memory operations in exec blocks */
+mem_ops 
+  : transparent_addr_region_def
+  | transparent_addr_region_setting
+  | addr_region_setting
+  | add_addr_region
+  | add_addr_region_nonallocatable
+  | reg_set_handle;
+
+

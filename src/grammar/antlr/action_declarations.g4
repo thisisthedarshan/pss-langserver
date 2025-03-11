@@ -14,9 +14,9 @@
  */
 
 parser grammar action_declarations;
-options {tokenVocab=pss_lexer;}
+options {tokenVocab=pssLex;}
 
-import activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
+import activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types,memory,registers;
 
 action_declaration
 	: TOKEN_ACTION 
@@ -51,6 +51,9 @@ action_body_item
 	| compile_assert_stmt
 	| covergroup_instantiation
 	| action_body_compile_if
+	| transparent_addr_claim
+	| addr_claim
+	| inout_data
 	| stmt_terminator
 	;
 
@@ -131,3 +134,6 @@ activity_scheduling_constraint
 	    hierarchical_id
 	  ) TOKEN_CRBRACE TOKEN_SEMICOLON
 	;
+
+inout_data
+	: (TOKEN_INPUT | TOKEN_OUTPUT) struct_kind identifier;

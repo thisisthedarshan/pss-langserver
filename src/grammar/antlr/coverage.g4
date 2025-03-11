@@ -13,9 +13,9 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar coverage;
-options {tokenVocab=pss_lexer;}
+options {tokenVocab=pssLex;}
 
-import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types,memory,registers;
 
 covergroup_declaration : TOKEN_COVERGROUP covergroup_identifier
 TOKEN_FLBRACE covergroup_port (TOKEN_COMMA covergroup_port)* TOKEN_FRBRACE TOKEN_CLBRACE covergroup_body_item* TOKEN_CRBRACE;

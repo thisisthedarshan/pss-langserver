@@ -14,9 +14,9 @@
  */
 
 parser grammar behavioral_coverage;
-options {tokenVocab=pss_lexer;}
+options {tokenVocab=pssLex;}
 
-import action_declarations,activity_statements,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
+import action_declarations,activity_statements,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types,memory,registers;
 
 cover_stmt:
 ((label_identifier TOKEN_COLON)? TOKEN_COVER type_identifier TOKEN_SEMICOLON)

@@ -13,7 +13,7 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar numbers_and_literals;
-options {tokenVocab=pss_lexer;}
+options {tokenVocab=pssLex;}
 
 import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
 

@@ -39,7 +39,7 @@ TOKEN_DATE: ~[\r\n\t]+;
 TOKEN_NEWLINE: '\r'? '\n';
 TOKEN_WHITESPACE: [ \t]+;
 TOKEN_DOT: '.';
-TOKEN_FSLASH: '/';
+TOKEN_DIVIDE: '/';
 TOKEN_UNDERSCORE: '_';
 
 /* Skip whitespace and newlines in lexer */

@@ -14,9 +14,9 @@
  */
 
 parser grammar functions;
-options {tokenVocab=pss_lexer;}
+options {tokenVocab=pssLex;}
 
-import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types,memory,registers;
 
 procedural_function : platform_qualifier? TOKEN_PURE? TOKEN_STATIC? TOKEN_FUNCTION
 function_prototype  TOKEN_CLBRACE  procedural_stmt*  TOKEN_CRBRACE;

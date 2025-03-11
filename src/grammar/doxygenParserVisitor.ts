@@ -19,6 +19,7 @@
 import {ParseTreeVisitor} from 'antlr4';
 
 
+import { File_doc_commentContext } from "./doxygenParser.js";
 import { Documentation_commentContext } from "./doxygenParser.js";
 import { Doc_contentContext } from "./doxygenParser.js";
 import { Brief_commandContext } from "./doxygenParser.js";
@@ -57,6 +58,12 @@ import { Example_codeContext } from "./doxygenParser.js";
  * operations with no return type.
  */
 export default class doxygenParserVisitor<Result> extends ParseTreeVisitor<Result> {
+	/**
+	 * Visit a parse tree produced by `doxygenParser.file_doc_comment`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitFile_doc_comment?: (ctx: File_doc_commentContext) => Result;
 	/**
 	 * Visit a parse tree produced by `doxygenParser.documentation_comment`.
 	 * @param ctx the parse tree

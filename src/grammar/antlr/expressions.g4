@@ -13,9 +13,9 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar expressions;
-options {tokenVocab=pss_lexer;}
+options {tokenVocab=pssLex;}
 
-import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types,memory,registers;
 
 constant_expression : expression;
 
@@ -130,9 +130,13 @@ string_slice :
 
 function_call :
 (TOKEN_SUPER TOKEN_DOT function_ref_path)
-| ((TOKEN_SCOPE)? (type_identifier_elem TOKEN_SCOPE)* function_ref_path);
+| ((TOKEN_SCOPE)? (type_identifier_elem TOKEN_SCOPE)* function_ref_path)
+| (TOKEN_COMP TOKEN_DOT function_identifier 
+  TOKEN_FLBRACE function_params? (TOKEN_COMMA function_params)* TOKEN_FRBRACE TOKEN_SEMICOLON);
 
 function_ref_path : (member_path_elem TOKEN_DOT)? identifier function_parameter_list;
+
+function_params : identifier;
 
 symbol_call : symbol_identifier function_parameter_list TOKEN_SEMICOLON;
 

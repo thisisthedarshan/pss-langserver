@@ -16,7 +16,7 @@
  */
 import { CharStream, CommonTokenStream } from "antlr4";
 import pss, { Enum_identifierContext, IdentifierContext, Stream_type_identifierContext } from "../grammar/pss";
-import pss_lexer from "../grammar/pss_lexer";
+import pss_lexer from "../grammar/pssLex";
 import { visitor } from "./visitors";
 import { metaData } from "../definitions/dataTypes";
 import { PSSErrorListener } from "./listener";

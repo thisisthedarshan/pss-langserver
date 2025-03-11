@@ -49,7 +49,7 @@ export default class doxygenLexer extends Lexer {
 	public static readonly TOKEN_NEWLINE = 19;
 	public static readonly TOKEN_WHITESPACE = 20;
 	public static readonly TOKEN_DOT = 21;
-	public static readonly TOKEN_FSLASH = 22;
+	public static readonly TOKEN_DIVIDE = 22;
 	public static readonly TOKEN_UNDERSCORE = 23;
 	public static readonly SKIP_WHITESPACE = 24;
 	public static readonly EOF = Token.EOF;
@@ -88,7 +88,7 @@ export default class doxygenLexer extends Lexer {
                                                              "TOKEN_NEWLINE", 
                                                              "TOKEN_WHITESPACE", 
                                                              "TOKEN_DOT", 
-                                                             "TOKEN_FSLASH", 
+                                                             "TOKEN_DIVIDE", 
                                                              "TOKEN_UNDERSCORE", 
                                                              "SKIP_WHITESPACE" ];
 	public static readonly modeNames: string[] = [ "DEFAULT_MODE", ];
@@ -99,7 +99,7 @@ export default class doxygenLexer extends Lexer {
 		"TOKEN_AUTHOR_MARKER", "TOKEN_DATE_MARKER", "TOKEN_VERSION_MARKER", "TOKEN_SEE_MARKER", 
 		"TOKEN_ATTENTION_MARKER", "TOKEN_FILE_MARKER", "TOKEN_TODO_MARKER", "TOKEN_EXAMPLE_MARKER", 
 		"TOKEN_WORD", "TOKEN_DIGIT", "TOKEN_DATE", "TOKEN_NEWLINE", "TOKEN_WHITESPACE", 
-		"TOKEN_DOT", "TOKEN_FSLASH", "TOKEN_UNDERSCORE", "SKIP_WHITESPACE",
+		"TOKEN_DOT", "TOKEN_DIVIDE", "TOKEN_UNDERSCORE", "SKIP_WHITESPACE",
 	];
 
 

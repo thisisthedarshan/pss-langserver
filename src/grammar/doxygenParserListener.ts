@@ -19,6 +19,7 @@
 import {ParseTreeListener} from "antlr4";
 
 
+import { File_doc_commentContext } from "./doxygenParser.js";
 import { Documentation_commentContext } from "./doxygenParser.js";
 import { Doc_contentContext } from "./doxygenParser.js";
 import { Brief_commandContext } from "./doxygenParser.js";
@@ -54,6 +55,16 @@ import { Example_codeContext } from "./doxygenParser.js";
  * `doxygenParser`.
  */
 export default class doxygenParserListener extends ParseTreeListener {
+	/**
+	 * Enter a parse tree produced by `doxygenParser.file_doc_comment`.
+	 * @param ctx the parse tree
+	 */
+	enterFile_doc_comment?: (ctx: File_doc_commentContext) => void;
+	/**
+	 * Exit a parse tree produced by `doxygenParser.file_doc_comment`.
+	 * @param ctx the parse tree
+	 */
+	exitFile_doc_comment?: (ctx: File_doc_commentContext) => void;
 	/**
 	 * Enter a parse tree produced by `doxygenParser.documentation_comment`.
 	 * @param ctx the parse tree

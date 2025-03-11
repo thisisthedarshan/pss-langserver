@@ -42,6 +42,7 @@ TOKEN_ADD: '+';
 TOKEN_QUESTION: '?';
 TOKEN_UNDERSCORE: '_';
 TOKEN_ZERO: '0';
+TOKEN_QUOTES : '"';
 
 /* Comparison and Shift */
 TOKEN_EQUALEQUAL: '==';
@@ -207,6 +208,7 @@ TOKEN_COMP : 'comp';
 TOKEN_SIZEOF_S : 'sizeof_s';
 TOKEN_NBYTES: 'nbytes';
 TOKEN_NBITS: 'nbits';
+TOKEN_PACKAGE : 'package';
 
 /* Address space and registers related tokens */
 TOKEN_ADDR_REGION : 'addr_region_s';
@@ -214,6 +216,8 @@ TOKEN_TRANSP_ADDR_REGION : 'transparent_addr_region_s';
 TOKEN_SIZE : 'size';
 TOKEN_ADDR : 'addr';
 TOKEN_TRAIT : 'trait';
+
+TOKEN_TRANSP_ADDR_REGION : 'transparent_addr_region_s';
 
 TOK_ADD_NONALLOC_REGION : 'add_nonallocatable_region';
 TOK_ADD_REGION : 'add_region';
@@ -231,6 +235,35 @@ TOKEN_ADDR_VALUE : 'addr_value';
 TOKEN_ADDR_VALUE_SOLVE : 'addr_value_solve';
 TOKEN_ADDR_VALUE_ABS : 'addr_value_abs';
 /* This doesn't cover primitive read/write functions */
+
+/* These are register related constants */
+TOKEN_REGC : 'reg_c';
+TOKEN_REG_GROUP_C : 'reg_group_c';
+
+/* These are the tokens for register related functions */
+TOKEN_BIT64 : 'bit[64]';
+TOKEN_BIT32 : 'bit[32]';
+TOKEN_BIT16 : 'bit[16]';
+TOKEN_BIT8  : 'bit[8]' ;
+TOKEN_M1 : '-1';
+TOKEN_GET_OFFSET_OF_INSTANCE : 'get_offset_of_instance';
+TOKEN_GET_OFFSET_OF_INSTANCE_ARR : 'get_offset_of_instance_array';
+TOKEN_GET_OFFSET_OF_PATH : 'get_offset_of_path';
+TOKEN_LIST_NODES : 'list<node_s>';
+TOKEN_SET_HANDLE : 'set_handle';
+
+TOKEN_READ : 'read';
+TOKEN_WRITE : 'write';
+TOKEN_READVAL: 'read_val';
+TOKEN_WRITEVAL : 'write_val';
+TOKEN_WRITE_MASKED : 'write_masked';
+TOKEN_WRITEVAL_MASKED : 'write_val_masked';
+TOKEN_WRITE_FIELD : 'write_field';
+TOKEN_WRITE_FIELDS : 'write_fields';
+
+TOKEN_READONLY : 'READONLY';
+TOKEN_READWRITE : 'READWRITE';
+TOKEN_WRITEONLY : 'WRITEONLY';
 
 /* Digits */
 fragment BIN_DIGIT: '0' | '1';

@@ -133,7 +133,7 @@ attention_description
     ;
 
 file_path
-    : (TOKEN_WORD | TOKEN_DOT | TOKEN_FSLASH | TOKEN_UNDERSCORE)+
+    : (TOKEN_WORD | TOKEN_DOT | TOKEN_DIVIDE | TOKEN_UNDERSCORE)+
     ;
 
 todo_description

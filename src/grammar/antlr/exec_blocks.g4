@@ -13,9 +13,9 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 parser grammar exec_blocks;
-options {tokenVocab=pss_lexer;}
+options {tokenVocab=pssLex;}
 
-import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types;
+import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types,memory,registers;
 
 exec_block_stmt :
 exec_block
@@ -38,7 +38,7 @@ TOKEN_PRESOLVE
 | TOKEN_INITUP
 | TOKEN_INIT;
 
-exec_stmt : procedural_stmt | exec_super_stmt | function_call* ;
+exec_stmt : procedural_stmt | exec_super_stmt | function_call | mem_ops ;
 
 exec_super_stmt : TOKEN_SUPER TOKEN_SEMICOLON;
 

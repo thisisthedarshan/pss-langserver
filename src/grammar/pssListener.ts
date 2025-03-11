@@ -37,6 +37,7 @@ import { Action_handle_declarationContext } from "./pss.js";
 import { Action_instantiationContext } from "./pss.js";
 import { Activity_data_fieldContext } from "./pss.js";
 import { Activity_scheduling_constraintContext } from "./pss.js";
+import { Inout_dataContext } from "./pss.js";
 import { Activity_declarationContext } from "./pss.js";
 import { Activity_stmtContext } from "./pss.js";
 import { Labeled_activity_stmtContext } from "./pss.js";
@@ -221,13 +222,13 @@ import { Bit_sliceContext } from "./pss.js";
 import { String_sliceContext } from "./pss.js";
 import { Function_callContext } from "./pss.js";
 import { Function_ref_pathContext } from "./pss.js";
+import { Function_paramsContext } from "./pss.js";
 import { Symbol_callContext } from "./pss.js";
 import { Function_parameter_listContext } from "./pss.js";
 import { Expression_listContext } from "./pss.js";
 import { String_literalContext } from "./pss.js";
-import { SlCommentContext } from "./pss.js";
-import { MlCommentContext } from "./pss.js";
 import { Filename_stringContext } from "./pss.js";
+import { Action_extensionContext } from "./pss.js";
 import { Import_functionContext } from "./pss.js";
 import { Target_template_functionContext } from "./pss.js";
 import { Import_class_declContext } from "./pss.js";
@@ -243,6 +244,7 @@ import { Function_parameter_list_prototypeContext } from "./pss.js";
 import { Function_parameterContext } from "./pss.js";
 import { Function_parameter_dirContext } from "./pss.js";
 import { Varargs_parameterContext } from "./pss.js";
+import { Function_call_paramsContext } from "./pss.js";
 import { IdentifierContext } from "./pss.js";
 import { Hierarchical_id_listContext } from "./pss.js";
 import { Hierarchical_idContext } from "./pss.js";
@@ -263,6 +265,7 @@ import { Language_identifierContext } from "./pss.js";
 import { Monitor_identifierContext } from "./pss.js";
 import { Package_identifierContext } from "./pss.js";
 import { Struct_identifierContext } from "./pss.js";
+import { Struct_kind_identifierContext } from "./pss.js";
 import { Symbol_identifierContext } from "./pss.js";
 import { Type_identifierContext } from "./pss.js";
 import { Type_identifier_elemContext } from "./pss.js";
@@ -343,6 +346,95 @@ import { Type_categoryContext } from "./pss.js";
 import { Value_param_declContext } from "./pss.js";
 import { Template_param_value_listContext } from "./pss.js";
 import { Template_param_valueContext } from "./pss.js";
+import { Addr_region_identifierContext } from "./pss.js";
+import { Addr_handle_identifierContext } from "./pss.js";
+import { Addr_space_identifierContext } from "./pss.js";
+import { Addr_space_traitsContext } from "./pss.js";
+import { Claim_identifierContext } from "./pss.js";
+import { Trait_identifierContext } from "./pss.js";
+import { OffsetContext } from "./pss.js";
+import { Trait_propertyContext } from "./pss.js";
+import { Number_identifierContext } from "./pss.js";
+import { Bool_identifierContext } from "./pss.js";
+import { Contiguous_addr_space_defContext } from "./pss.js";
+import { Addr_region_settingContext } from "./pss.js";
+import { Addr_claimContext } from "./pss.js";
+import { Transparent_addr_space_defContext } from "./pss.js";
+import { Transparent_addr_region_defContext } from "./pss.js";
+import { Transparent_addr_region_settingContext } from "./pss.js";
+import { Transparent_addr_claimContext } from "./pss.js";
+import { Add_addr_region_nonallocatableContext } from "./pss.js";
+import { Add_addr_regionContext } from "./pss.js";
+import { Make_handle_from_claimContext } from "./pss.js";
+import { Make_handle_from_handleContext } from "./pss.js";
+import { Addr_valueContext } from "./pss.js";
+import { Addr_value_solveContext } from "./pss.js";
+import { Addr_value_absContext } from "./pss.js";
+import { Mem_opsContext } from "./pss.js";
+import { Register_identifierContext } from "./pss.js";
+import { Register_comp_identifierContext } from "./pss.js";
+import { Register_group_identifierContext } from "./pss.js";
+import { Reg_struct_identifierContext } from "./pss.js";
+import { Value_identifierContext } from "./pss.js";
+import { Mask_struct_identifierContext } from "./pss.js";
+import { Value_struct_identifierContext } from "./pss.js";
+import { Mask_identifierContext } from "./pss.js";
+import { Field_identifierContext } from "./pss.js";
+import { Names_list_identifierContext } from "./pss.js";
+import { Value_list_identifierContext } from "./pss.js";
+import { Access_typeContext } from "./pss.js";
+import { Reg_lengthContext } from "./pss.js";
+import { Register_comp_definitionContext } from "./pss.js";
+import { Register_group_definitionContext } from "./pss.js";
+import { Register_body_definitionContext } from "./pss.js";
+import { Register_comp_instanceContext } from "./pss.js";
+import { Register_definitionContext } from "./pss.js";
+import { Function_offset_of_instance_defContext } from "./pss.js";
+import { Function_offset_of_instance_arr_defContext } from "./pss.js";
+import { Offset_match_stmtsContext } from "./pss.js";
+import { If_else_stmtsContext } from "./pss.js";
+import { Reg_match_stmtsContext } from "./pss.js";
+import { Offset_return_itemsContext } from "./pss.js";
+import { Reg_function_callsContext } from "./pss.js";
+import { Register_operation_callContext } from "./pss.js";
+import { Reg_readContext } from "./pss.js";
+import { Reg_writeContext } from "./pss.js";
+import { Reg_read_valContext } from "./pss.js";
+import { Reg_write_valContext } from "./pss.js";
+import { Reg_write_maskedContext } from "./pss.js";
+import { Reg_write_val_maskedContext } from "./pss.js";
+import { Reg_write_fieldContext } from "./pss.js";
+import { Reg_write_fieldsContext } from "./pss.js";
+import { Reg_set_handleContext } from "./pss.js";
+import { File_doc_commentContext } from "./pss.js";
+import { Documentation_commentContext } from "./pss.js";
+import { Doc_contentContext } from "./pss.js";
+import { Brief_commandContext } from "./pss.js";
+import { Param_commandContext } from "./pss.js";
+import { Return_commandContext } from "./pss.js";
+import { Deprecated_commandContext } from "./pss.js";
+import { Author_commandContext } from "./pss.js";
+import { Date_commandContext } from "./pss.js";
+import { Version_commandContext } from "./pss.js";
+import { See_commandContext } from "./pss.js";
+import { Attention_commandContext } from "./pss.js";
+import { File_commandContext } from "./pss.js";
+import { Todo_commandContext } from "./pss.js";
+import { Example_commandContext } from "./pss.js";
+import { Brief_textContext } from "./pss.js";
+import { Param_identifierContext } from "./pss.js";
+import { Param_descriptionContext } from "./pss.js";
+import { Return_descriptionContext } from "./pss.js";
+import { Deprecated_descriptionContext } from "./pss.js";
+import { Author_nameContext } from "./pss.js";
+import { Date_valueContext } from "./pss.js";
+import { Version_valueContext } from "./pss.js";
+import { See_linkContext } from "./pss.js";
+import { See_descriptionContext } from "./pss.js";
+import { Attention_descriptionContext } from "./pss.js";
+import { File_pathContext } from "./pss.js";
+import { Todo_descriptionContext } from "./pss.js";
+import { Example_codeContext } from "./pss.js";
 
 
 /**
@@ -530,6 +622,16 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitActivity_scheduling_constraint?: (ctx: Activity_scheduling_constraintContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.inout_data`.
+	 * @param ctx the parse tree
+	 */
+	enterInout_data?: (ctx: Inout_dataContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.inout_data`.
+	 * @param ctx the parse tree
+	 */
+	exitInout_data?: (ctx: Inout_dataContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.activity_declaration`.
 	 * @param ctx the parse tree
@@ -2371,6 +2473,16 @@ export default class pssListener extends ParseTreeListener {
 	 */
 	exitFunction_ref_path?: (ctx: Function_ref_pathContext) => void;
 	/**
+	 * Enter a parse tree produced by `pss.function_params`.
+	 * @param ctx the parse tree
+	 */
+	enterFunction_params?: (ctx: Function_paramsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.function_params`.
+	 * @param ctx the parse tree
+	 */
+	exitFunction_params?: (ctx: Function_paramsContext) => void;
+	/**
 	 * Enter a parse tree produced by `pss.symbol_call`.
 	 * @param ctx the parse tree
 	 */
@@ -2411,30 +2523,6 @@ export default class pssListener extends ParseTreeListener {
 	 */
 	exitString_literal?: (ctx: String_literalContext) => void;
 	/**
-	 * Enter a parse tree produced by the `slComment`
-	 * labeled alternative in `pss.comment`.
-	 * @param ctx the parse tree
-	 */
-	enterSlComment?: (ctx: SlCommentContext) => void;
-	/**
-	 * Exit a parse tree produced by the `slComment`
-	 * labeled alternative in `pss.comment`.
-	 * @param ctx the parse tree
-	 */
-	exitSlComment?: (ctx: SlCommentContext) => void;
-	/**
-	 * Enter a parse tree produced by the `mlComment`
-	 * labeled alternative in `pss.comment`.
-	 * @param ctx the parse tree
-	 */
-	enterMlComment?: (ctx: MlCommentContext) => void;
-	/**
-	 * Exit a parse tree produced by the `mlComment`
-	 * labeled alternative in `pss.comment`.
-	 * @param ctx the parse tree
-	 */
-	exitMlComment?: (ctx: MlCommentContext) => void;
-	/**
 	 * Enter a parse tree produced by `pss.filename_string`.
 	 * @param ctx the parse tree
 	 */
@@ -2444,6 +2532,16 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitFilename_string?: (ctx: Filename_stringContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.action_extension`.
+	 * @param ctx the parse tree
+	 */
+	enterAction_extension?: (ctx: Action_extensionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.action_extension`.
+	 * @param ctx the parse tree
+	 */
+	exitAction_extension?: (ctx: Action_extensionContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.import_function`.
 	 * @param ctx the parse tree
@@ -2594,6 +2692,16 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitVarargs_parameter?: (ctx: Varargs_parameterContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.function_call_params`.
+	 * @param ctx the parse tree
+	 */
+	enterFunction_call_params?: (ctx: Function_call_paramsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.function_call_params`.
+	 * @param ctx the parse tree
+	 */
+	exitFunction_call_params?: (ctx: Function_call_paramsContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.identifier`.
 	 * @param ctx the parse tree
@@ -2794,6 +2902,16 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitStruct_identifier?: (ctx: Struct_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.struct_kind_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterStruct_kind_identifier?: (ctx: Struct_kind_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.struct_kind_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitStruct_kind_identifier?: (ctx: Struct_kind_identifierContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.symbol_identifier`.
 	 * @param ctx the parse tree
@@ -3594,5 +3712,895 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitTemplate_param_value?: (ctx: Template_param_valueContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.addr_region_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterAddr_region_identifier?: (ctx: Addr_region_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.addr_region_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitAddr_region_identifier?: (ctx: Addr_region_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.addr_handle_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterAddr_handle_identifier?: (ctx: Addr_handle_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.addr_handle_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitAddr_handle_identifier?: (ctx: Addr_handle_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.addr_space_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterAddr_space_identifier?: (ctx: Addr_space_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.addr_space_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitAddr_space_identifier?: (ctx: Addr_space_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.addr_space_traits`.
+	 * @param ctx the parse tree
+	 */
+	enterAddr_space_traits?: (ctx: Addr_space_traitsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.addr_space_traits`.
+	 * @param ctx the parse tree
+	 */
+	exitAddr_space_traits?: (ctx: Addr_space_traitsContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.claim_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterClaim_identifier?: (ctx: Claim_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.claim_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitClaim_identifier?: (ctx: Claim_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.trait_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterTrait_identifier?: (ctx: Trait_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.trait_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitTrait_identifier?: (ctx: Trait_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.offset`.
+	 * @param ctx the parse tree
+	 */
+	enterOffset?: (ctx: OffsetContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.offset`.
+	 * @param ctx the parse tree
+	 */
+	exitOffset?: (ctx: OffsetContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.trait_property`.
+	 * @param ctx the parse tree
+	 */
+	enterTrait_property?: (ctx: Trait_propertyContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.trait_property`.
+	 * @param ctx the parse tree
+	 */
+	exitTrait_property?: (ctx: Trait_propertyContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.number_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterNumber_identifier?: (ctx: Number_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.number_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitNumber_identifier?: (ctx: Number_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.bool_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterBool_identifier?: (ctx: Bool_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.bool_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitBool_identifier?: (ctx: Bool_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.contiguous_addr_space_def`.
+	 * @param ctx the parse tree
+	 */
+	enterContiguous_addr_space_def?: (ctx: Contiguous_addr_space_defContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.contiguous_addr_space_def`.
+	 * @param ctx the parse tree
+	 */
+	exitContiguous_addr_space_def?: (ctx: Contiguous_addr_space_defContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.addr_region_setting`.
+	 * @param ctx the parse tree
+	 */
+	enterAddr_region_setting?: (ctx: Addr_region_settingContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.addr_region_setting`.
+	 * @param ctx the parse tree
+	 */
+	exitAddr_region_setting?: (ctx: Addr_region_settingContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.addr_claim`.
+	 * @param ctx the parse tree
+	 */
+	enterAddr_claim?: (ctx: Addr_claimContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.addr_claim`.
+	 * @param ctx the parse tree
+	 */
+	exitAddr_claim?: (ctx: Addr_claimContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.transparent_addr_space_def`.
+	 * @param ctx the parse tree
+	 */
+	enterTransparent_addr_space_def?: (ctx: Transparent_addr_space_defContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.transparent_addr_space_def`.
+	 * @param ctx the parse tree
+	 */
+	exitTransparent_addr_space_def?: (ctx: Transparent_addr_space_defContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.transparent_addr_region_def`.
+	 * @param ctx the parse tree
+	 */
+	enterTransparent_addr_region_def?: (ctx: Transparent_addr_region_defContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.transparent_addr_region_def`.
+	 * @param ctx the parse tree
+	 */
+	exitTransparent_addr_region_def?: (ctx: Transparent_addr_region_defContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.transparent_addr_region_setting`.
+	 * @param ctx the parse tree
+	 */
+	enterTransparent_addr_region_setting?: (ctx: Transparent_addr_region_settingContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.transparent_addr_region_setting`.
+	 * @param ctx the parse tree
+	 */
+	exitTransparent_addr_region_setting?: (ctx: Transparent_addr_region_settingContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.transparent_addr_claim`.
+	 * @param ctx the parse tree
+	 */
+	enterTransparent_addr_claim?: (ctx: Transparent_addr_claimContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.transparent_addr_claim`.
+	 * @param ctx the parse tree
+	 */
+	exitTransparent_addr_claim?: (ctx: Transparent_addr_claimContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.add_addr_region_nonallocatable`.
+	 * @param ctx the parse tree
+	 */
+	enterAdd_addr_region_nonallocatable?: (ctx: Add_addr_region_nonallocatableContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.add_addr_region_nonallocatable`.
+	 * @param ctx the parse tree
+	 */
+	exitAdd_addr_region_nonallocatable?: (ctx: Add_addr_region_nonallocatableContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.add_addr_region`.
+	 * @param ctx the parse tree
+	 */
+	enterAdd_addr_region?: (ctx: Add_addr_regionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.add_addr_region`.
+	 * @param ctx the parse tree
+	 */
+	exitAdd_addr_region?: (ctx: Add_addr_regionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.make_handle_from_claim`.
+	 * @param ctx the parse tree
+	 */
+	enterMake_handle_from_claim?: (ctx: Make_handle_from_claimContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.make_handle_from_claim`.
+	 * @param ctx the parse tree
+	 */
+	exitMake_handle_from_claim?: (ctx: Make_handle_from_claimContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.make_handle_from_handle`.
+	 * @param ctx the parse tree
+	 */
+	enterMake_handle_from_handle?: (ctx: Make_handle_from_handleContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.make_handle_from_handle`.
+	 * @param ctx the parse tree
+	 */
+	exitMake_handle_from_handle?: (ctx: Make_handle_from_handleContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.addr_value`.
+	 * @param ctx the parse tree
+	 */
+	enterAddr_value?: (ctx: Addr_valueContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.addr_value`.
+	 * @param ctx the parse tree
+	 */
+	exitAddr_value?: (ctx: Addr_valueContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.addr_value_solve`.
+	 * @param ctx the parse tree
+	 */
+	enterAddr_value_solve?: (ctx: Addr_value_solveContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.addr_value_solve`.
+	 * @param ctx the parse tree
+	 */
+	exitAddr_value_solve?: (ctx: Addr_value_solveContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.addr_value_abs`.
+	 * @param ctx the parse tree
+	 */
+	enterAddr_value_abs?: (ctx: Addr_value_absContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.addr_value_abs`.
+	 * @param ctx the parse tree
+	 */
+	exitAddr_value_abs?: (ctx: Addr_value_absContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.mem_ops`.
+	 * @param ctx the parse tree
+	 */
+	enterMem_ops?: (ctx: Mem_opsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.mem_ops`.
+	 * @param ctx the parse tree
+	 */
+	exitMem_ops?: (ctx: Mem_opsContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.register_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterRegister_identifier?: (ctx: Register_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.register_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitRegister_identifier?: (ctx: Register_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.register_comp_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterRegister_comp_identifier?: (ctx: Register_comp_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.register_comp_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitRegister_comp_identifier?: (ctx: Register_comp_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.register_group_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterRegister_group_identifier?: (ctx: Register_group_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.register_group_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitRegister_group_identifier?: (ctx: Register_group_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_struct_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_struct_identifier?: (ctx: Reg_struct_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_struct_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_struct_identifier?: (ctx: Reg_struct_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.value_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterValue_identifier?: (ctx: Value_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.value_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitValue_identifier?: (ctx: Value_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.mask_struct_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterMask_struct_identifier?: (ctx: Mask_struct_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.mask_struct_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitMask_struct_identifier?: (ctx: Mask_struct_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.value_struct_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterValue_struct_identifier?: (ctx: Value_struct_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.value_struct_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitValue_struct_identifier?: (ctx: Value_struct_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.mask_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterMask_identifier?: (ctx: Mask_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.mask_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitMask_identifier?: (ctx: Mask_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.field_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterField_identifier?: (ctx: Field_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.field_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitField_identifier?: (ctx: Field_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.names_list_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterNames_list_identifier?: (ctx: Names_list_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.names_list_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitNames_list_identifier?: (ctx: Names_list_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.value_list_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterValue_list_identifier?: (ctx: Value_list_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.value_list_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitValue_list_identifier?: (ctx: Value_list_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.access_type`.
+	 * @param ctx the parse tree
+	 */
+	enterAccess_type?: (ctx: Access_typeContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.access_type`.
+	 * @param ctx the parse tree
+	 */
+	exitAccess_type?: (ctx: Access_typeContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_length`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_length?: (ctx: Reg_lengthContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_length`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_length?: (ctx: Reg_lengthContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.register_comp_definition`.
+	 * @param ctx the parse tree
+	 */
+	enterRegister_comp_definition?: (ctx: Register_comp_definitionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.register_comp_definition`.
+	 * @param ctx the parse tree
+	 */
+	exitRegister_comp_definition?: (ctx: Register_comp_definitionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.register_group_definition`.
+	 * @param ctx the parse tree
+	 */
+	enterRegister_group_definition?: (ctx: Register_group_definitionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.register_group_definition`.
+	 * @param ctx the parse tree
+	 */
+	exitRegister_group_definition?: (ctx: Register_group_definitionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.register_body_definition`.
+	 * @param ctx the parse tree
+	 */
+	enterRegister_body_definition?: (ctx: Register_body_definitionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.register_body_definition`.
+	 * @param ctx the parse tree
+	 */
+	exitRegister_body_definition?: (ctx: Register_body_definitionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.register_comp_instance`.
+	 * @param ctx the parse tree
+	 */
+	enterRegister_comp_instance?: (ctx: Register_comp_instanceContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.register_comp_instance`.
+	 * @param ctx the parse tree
+	 */
+	exitRegister_comp_instance?: (ctx: Register_comp_instanceContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.register_definition`.
+	 * @param ctx the parse tree
+	 */
+	enterRegister_definition?: (ctx: Register_definitionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.register_definition`.
+	 * @param ctx the parse tree
+	 */
+	exitRegister_definition?: (ctx: Register_definitionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.function_offset_of_instance_def`.
+	 * @param ctx the parse tree
+	 */
+	enterFunction_offset_of_instance_def?: (ctx: Function_offset_of_instance_defContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.function_offset_of_instance_def`.
+	 * @param ctx the parse tree
+	 */
+	exitFunction_offset_of_instance_def?: (ctx: Function_offset_of_instance_defContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.function_offset_of_instance_arr_def`.
+	 * @param ctx the parse tree
+	 */
+	enterFunction_offset_of_instance_arr_def?: (ctx: Function_offset_of_instance_arr_defContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.function_offset_of_instance_arr_def`.
+	 * @param ctx the parse tree
+	 */
+	exitFunction_offset_of_instance_arr_def?: (ctx: Function_offset_of_instance_arr_defContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.offset_match_stmts`.
+	 * @param ctx the parse tree
+	 */
+	enterOffset_match_stmts?: (ctx: Offset_match_stmtsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.offset_match_stmts`.
+	 * @param ctx the parse tree
+	 */
+	exitOffset_match_stmts?: (ctx: Offset_match_stmtsContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.if_else_stmts`.
+	 * @param ctx the parse tree
+	 */
+	enterIf_else_stmts?: (ctx: If_else_stmtsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.if_else_stmts`.
+	 * @param ctx the parse tree
+	 */
+	exitIf_else_stmts?: (ctx: If_else_stmtsContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_match_stmts`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_match_stmts?: (ctx: Reg_match_stmtsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_match_stmts`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_match_stmts?: (ctx: Reg_match_stmtsContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.offset_return_items`.
+	 * @param ctx the parse tree
+	 */
+	enterOffset_return_items?: (ctx: Offset_return_itemsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.offset_return_items`.
+	 * @param ctx the parse tree
+	 */
+	exitOffset_return_items?: (ctx: Offset_return_itemsContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_function_calls`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_function_calls?: (ctx: Reg_function_callsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_function_calls`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_function_calls?: (ctx: Reg_function_callsContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.register_operation_call`.
+	 * @param ctx the parse tree
+	 */
+	enterRegister_operation_call?: (ctx: Register_operation_callContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.register_operation_call`.
+	 * @param ctx the parse tree
+	 */
+	exitRegister_operation_call?: (ctx: Register_operation_callContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_read`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_read?: (ctx: Reg_readContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_read`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_read?: (ctx: Reg_readContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_write`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_write?: (ctx: Reg_writeContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_write`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_write?: (ctx: Reg_writeContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_read_val`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_read_val?: (ctx: Reg_read_valContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_read_val`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_read_val?: (ctx: Reg_read_valContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_write_val`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_write_val?: (ctx: Reg_write_valContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_write_val`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_write_val?: (ctx: Reg_write_valContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_write_masked`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_write_masked?: (ctx: Reg_write_maskedContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_write_masked`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_write_masked?: (ctx: Reg_write_maskedContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_write_val_masked`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_write_val_masked?: (ctx: Reg_write_val_maskedContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_write_val_masked`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_write_val_masked?: (ctx: Reg_write_val_maskedContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_write_field`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_write_field?: (ctx: Reg_write_fieldContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_write_field`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_write_field?: (ctx: Reg_write_fieldContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_write_fields`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_write_fields?: (ctx: Reg_write_fieldsContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_write_fields`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_write_fields?: (ctx: Reg_write_fieldsContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.reg_set_handle`.
+	 * @param ctx the parse tree
+	 */
+	enterReg_set_handle?: (ctx: Reg_set_handleContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.reg_set_handle`.
+	 * @param ctx the parse tree
+	 */
+	exitReg_set_handle?: (ctx: Reg_set_handleContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.file_doc_comment`.
+	 * @param ctx the parse tree
+	 */
+	enterFile_doc_comment?: (ctx: File_doc_commentContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.file_doc_comment`.
+	 * @param ctx the parse tree
+	 */
+	exitFile_doc_comment?: (ctx: File_doc_commentContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.documentation_comment`.
+	 * @param ctx the parse tree
+	 */
+	enterDocumentation_comment?: (ctx: Documentation_commentContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.documentation_comment`.
+	 * @param ctx the parse tree
+	 */
+	exitDocumentation_comment?: (ctx: Documentation_commentContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.doc_content`.
+	 * @param ctx the parse tree
+	 */
+	enterDoc_content?: (ctx: Doc_contentContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.doc_content`.
+	 * @param ctx the parse tree
+	 */
+	exitDoc_content?: (ctx: Doc_contentContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.brief_command`.
+	 * @param ctx the parse tree
+	 */
+	enterBrief_command?: (ctx: Brief_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.brief_command`.
+	 * @param ctx the parse tree
+	 */
+	exitBrief_command?: (ctx: Brief_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.param_command`.
+	 * @param ctx the parse tree
+	 */
+	enterParam_command?: (ctx: Param_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.param_command`.
+	 * @param ctx the parse tree
+	 */
+	exitParam_command?: (ctx: Param_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.return_command`.
+	 * @param ctx the parse tree
+	 */
+	enterReturn_command?: (ctx: Return_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.return_command`.
+	 * @param ctx the parse tree
+	 */
+	exitReturn_command?: (ctx: Return_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.deprecated_command`.
+	 * @param ctx the parse tree
+	 */
+	enterDeprecated_command?: (ctx: Deprecated_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.deprecated_command`.
+	 * @param ctx the parse tree
+	 */
+	exitDeprecated_command?: (ctx: Deprecated_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.author_command`.
+	 * @param ctx the parse tree
+	 */
+	enterAuthor_command?: (ctx: Author_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.author_command`.
+	 * @param ctx the parse tree
+	 */
+	exitAuthor_command?: (ctx: Author_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.date_command`.
+	 * @param ctx the parse tree
+	 */
+	enterDate_command?: (ctx: Date_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.date_command`.
+	 * @param ctx the parse tree
+	 */
+	exitDate_command?: (ctx: Date_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.version_command`.
+	 * @param ctx the parse tree
+	 */
+	enterVersion_command?: (ctx: Version_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.version_command`.
+	 * @param ctx the parse tree
+	 */
+	exitVersion_command?: (ctx: Version_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.see_command`.
+	 * @param ctx the parse tree
+	 */
+	enterSee_command?: (ctx: See_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.see_command`.
+	 * @param ctx the parse tree
+	 */
+	exitSee_command?: (ctx: See_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.attention_command`.
+	 * @param ctx the parse tree
+	 */
+	enterAttention_command?: (ctx: Attention_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.attention_command`.
+	 * @param ctx the parse tree
+	 */
+	exitAttention_command?: (ctx: Attention_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.file_command`.
+	 * @param ctx the parse tree
+	 */
+	enterFile_command?: (ctx: File_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.file_command`.
+	 * @param ctx the parse tree
+	 */
+	exitFile_command?: (ctx: File_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.todo_command`.
+	 * @param ctx the parse tree
+	 */
+	enterTodo_command?: (ctx: Todo_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.todo_command`.
+	 * @param ctx the parse tree
+	 */
+	exitTodo_command?: (ctx: Todo_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.example_command`.
+	 * @param ctx the parse tree
+	 */
+	enterExample_command?: (ctx: Example_commandContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.example_command`.
+	 * @param ctx the parse tree
+	 */
+	exitExample_command?: (ctx: Example_commandContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.brief_text`.
+	 * @param ctx the parse tree
+	 */
+	enterBrief_text?: (ctx: Brief_textContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.brief_text`.
+	 * @param ctx the parse tree
+	 */
+	exitBrief_text?: (ctx: Brief_textContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.param_identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterParam_identifier?: (ctx: Param_identifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.param_identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitParam_identifier?: (ctx: Param_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.param_description`.
+	 * @param ctx the parse tree
+	 */
+	enterParam_description?: (ctx: Param_descriptionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.param_description`.
+	 * @param ctx the parse tree
+	 */
+	exitParam_description?: (ctx: Param_descriptionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.return_description`.
+	 * @param ctx the parse tree
+	 */
+	enterReturn_description?: (ctx: Return_descriptionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.return_description`.
+	 * @param ctx the parse tree
+	 */
+	exitReturn_description?: (ctx: Return_descriptionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.deprecated_description`.
+	 * @param ctx the parse tree
+	 */
+	enterDeprecated_description?: (ctx: Deprecated_descriptionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.deprecated_description`.
+	 * @param ctx the parse tree
+	 */
+	exitDeprecated_description?: (ctx: Deprecated_descriptionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.author_name`.
+	 * @param ctx the parse tree
+	 */
+	enterAuthor_name?: (ctx: Author_nameContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.author_name`.
+	 * @param ctx the parse tree
+	 */
+	exitAuthor_name?: (ctx: Author_nameContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.date_value`.
+	 * @param ctx the parse tree
+	 */
+	enterDate_value?: (ctx: Date_valueContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.date_value`.
+	 * @param ctx the parse tree
+	 */
+	exitDate_value?: (ctx: Date_valueContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.version_value`.
+	 * @param ctx the parse tree
+	 */
+	enterVersion_value?: (ctx: Version_valueContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.version_value`.
+	 * @param ctx the parse tree
+	 */
+	exitVersion_value?: (ctx: Version_valueContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.see_link`.
+	 * @param ctx the parse tree
+	 */
+	enterSee_link?: (ctx: See_linkContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.see_link`.
+	 * @param ctx the parse tree
+	 */
+	exitSee_link?: (ctx: See_linkContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.see_description`.
+	 * @param ctx the parse tree
+	 */
+	enterSee_description?: (ctx: See_descriptionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.see_description`.
+	 * @param ctx the parse tree
+	 */
+	exitSee_description?: (ctx: See_descriptionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.attention_description`.
+	 * @param ctx the parse tree
+	 */
+	enterAttention_description?: (ctx: Attention_descriptionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.attention_description`.
+	 * @param ctx the parse tree
+	 */
+	exitAttention_description?: (ctx: Attention_descriptionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.file_path`.
+	 * @param ctx the parse tree
+	 */
+	enterFile_path?: (ctx: File_pathContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.file_path`.
+	 * @param ctx the parse tree
+	 */
+	exitFile_path?: (ctx: File_pathContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.todo_description`.
+	 * @param ctx the parse tree
+	 */
+	enterTodo_description?: (ctx: Todo_descriptionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.todo_description`.
+	 * @param ctx the parse tree
+	 */
+	exitTodo_description?: (ctx: Todo_descriptionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.example_code`.
+	 * @param ctx the parse tree
+	 */
+	enterExample_code?: (ctx: Example_codeContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.example_code`.
+	 * @param ctx the parse tree
+	 */
+	exitExample_code?: (ctx: Example_codeContext) => void;
 }
 

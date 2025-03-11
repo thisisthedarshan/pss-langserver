@@ -13,13 +13,5 @@
  * not, see <https://www.gnu.org/licenses/>.
  */
 
-parser grammar pss;
-options {tokenVocab=pssLex;}
-import package_body, package_declaration, component_declaration, doxygenParser;
-
-pss_entry: file_doc_comment? (pss)* EOF;
-
-pss
-  : package_body 
-  | package_declaration 
-  | component_declaration;
+lexer grammar pssLex;
+import pss_lexer, doxygenLexer;
