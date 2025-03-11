@@ -50,7 +50,8 @@ all: clean grammar source
 
 # Just cleans the grammar files
 clean:
-	rm -f ./src/grammar/pss*.*								
+	rm -f ./src/grammar/pss*.*			
+	rm -f ./src/grammar/*.ts					
 	rm -f ./src/grammar/antlr/*.tokens 
 	rm -f ./src/grammar/antlr/*.interp
 	rm -f ./src/grammar/antlr/*.ts
@@ -59,12 +60,13 @@ clean:
 distclean: clean
 	rm -fr ./dist
 	mkdir -p ./dist
+	make clean
 
 # Builds the grammar
 grammar:
-	$(antlr) ./src/grammar/antlr/pss_lexer.g4 -Dlanguage=TypeScript -listener -visitor
-	$(antlr) ./src/grammar/antlr/pss.g4 -Dlanguage=TypeScript -listener -visitor
+	$(antlr) ./src/grammar/antlr/pssLex.g4 -Dlanguage=TypeScript -listener -visitor
 	$(antlr) ./src/grammar/antlr/doxygenLexer.g4 -Dlanguage=TypeScript -listener -visitor
+	$(antlr) ./src/grammar/antlr/pss.g4 -Dlanguage=TypeScript -listener -visitor
 	$(antlr) ./src/grammar/antlr/doxygenParser.g4 -Dlanguage=TypeScript -listener -visitor
 	mv ./src/grammar/antlr/*.ts $(GRAMMAR_SRCS)
 	$(MAKE) inject-license
