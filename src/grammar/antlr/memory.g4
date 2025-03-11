@@ -20,8 +20,11 @@
  */
 
 parser grammar memory;
-options {tokenVocab=pss_lexer;}
+options {tokenVocab=pssLex;}
 import data_types, identifiers, numbers_and_literals;
+
+/* This identifies address regions */
+addr_region_identifier : identifier;
 
 /* This to identify address handles */
 addr_handle_identifier : identifier;
@@ -68,7 +71,7 @@ contiguous_addr_space_def
     TOKEN_SEMICOLON;
 
 addr_region_setting 
- :  addr_region_dentifier TOKEN_DOT 
+ :  addr_region_identifier TOKEN_DOT 
     TOKEN_SIZE TOKEN_EQUALS 
     integer_number 
     TOKEN_SEMICOLON;
@@ -90,7 +93,7 @@ transparent_addr_space_def
     TOKEN_SEMICOLON;
 
 transparent_addr_region_setting
-  : addr_region_dentifier TOKEN_DOT
+  : addr_region_identifier TOKEN_DOT
     (
         (TOKEN_SIZE TOKEN_EQUALS integer_number)
       | (TOKEN_ADDR TOKEN_EQUALS integer_number)
@@ -116,7 +119,7 @@ add_addr_region_nonallocatable
   : ((TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE )
   | (addr_handle_identifier TOKEN_EQUALS))
     addr_space_identifier TOKEN_DOT 
-    TOK_ADD_NONALLOC_REGION TOKEN_FLBRACE addr_region_dentifier TOKEN_FRBRACE
+    TOK_ADD_NONALLOC_REGION TOKEN_FLBRACE addr_region_identifier TOKEN_FRBRACE
     TOKEN_SEMICOLON;
 
 /* 
@@ -129,7 +132,7 @@ add_addr_region
   : ((TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE )
   | (addr_handle_identifier TOKEN_EQUALS))
     addr_space_identifier TOKEN_DOT 
-    TOK_ADD_REGION TOKEN_FLBRACE addr_region_dentifier TOKEN_FRBRACE
+    TOK_ADD_REGION TOKEN_FLBRACE addr_region_identifier TOKEN_FRBRACE
     TOKEN_SEMICOLON;
 
 
