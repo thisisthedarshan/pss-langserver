@@ -85,14 +85,14 @@ register_definition
 
 /* These functions are part of the register group */
 function_offset_of_instance_def
-  : TOKEN_FUNCTION TOKEN_BIT64 TOKEN_GET_OFFSET_OF_INSTANCE
+  : TOKEN_FUNCTION TOKEN_BIT TOKEN_64 TOKEN_GET_OFFSET_OF_INSTANCE
     TOKEN_FLBRACE TOKEN_STRING identifier TOKEN_FRBRACE
     TOKEN_CLBRACE
     ( if_else_stmts | reg_match_stmts )
     TOKEN_CRBRACE;
 
 function_offset_of_instance_arr_def
-  : TOKEN_FUNCTION TOKEN_BIT64 TOKEN_GET_OFFSET_OF_INSTANCE_ARR
+  : TOKEN_FUNCTION TOKEN_BIT TOKEN_64 TOKEN_GET_OFFSET_OF_INSTANCE_ARR
     TOKEN_FLBRACE TOKEN_STRING identifier TOKEN_COMMA TOKEN_INT identifier TOKEN_FRBRACE
     TOKEN_CLBRACE
     ( if_else_stmts | reg_match_stmts )

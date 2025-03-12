@@ -241,11 +241,6 @@ TOKEN_REGC : 'reg_c';
 TOKEN_REG_GROUP_C : 'reg_group_c';
 
 /* These are the tokens for register related functions */
-TOKEN_BIT64 : 'bit[64]';
-TOKEN_BIT32 : 'bit[32]';
-TOKEN_BIT16 : 'bit[16]';
-TOKEN_BIT8  : 'bit[8]' ;
-TOKEN_M1 : '-1';
 TOKEN_GET_OFFSET_OF_INSTANCE : 'get_offset_of_instance';
 TOKEN_GET_OFFSET_OF_INSTANCE_ARR : 'get_offset_of_instance_array';
 TOKEN_GET_OFFSET_OF_PATH : 'get_offset_of_path';
@@ -309,6 +304,10 @@ fragment ESCAPED_CHARACTER:
 	| '\\' [0-7] [0-7] [0-7]; /* Escapes */
 
 TOKEN_FILENAME_STRING: TOKEN_QUOTED_STRING;
+
+/* Specific tokens */
+TOKEN_M1 : '-1';
+TOKEN_64 : '64';
 
 /* identifier */
 ID: [a-zA-Z_] [a-zA-Z_0-9]*;

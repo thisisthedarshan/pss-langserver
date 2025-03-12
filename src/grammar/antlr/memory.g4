@@ -74,7 +74,7 @@ contiguous_addr_space_def
 addr_region_setting 
  :  addr_region_identifier TOKEN_DOT 
     TOKEN_SIZE TOKEN_EQUALS 
-    integer_number 
+    (integer_number  | expression )
     TOKEN_SEMICOLON;
 
 addr_claim
