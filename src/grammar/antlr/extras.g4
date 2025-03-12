@@ -47,7 +47,7 @@ action_extension
 
 /* Comments - to maintain line numbers properly */
 comments
-  : TOKEN_DOC_COMMENT_START
+  : TOKEN_DOC_COMMENT
   | TOKEN_SL_COMMENT
   | TOKEN_ML_COMMENT
   ;

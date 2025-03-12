@@ -313,4 +313,4 @@ TOKEN_FILENAME_STRING: TOKEN_QUOTED_STRING;
 /* identifier */
 ID: [a-zA-Z_] [a-zA-Z_0-9]*;
 ESCAPED_ID: '\\' ~[ \t\r\n]+ [ \t\r\n]+;
-WS: [ \t\r\n] -> skip; // Ignore whitespace
+WS: [ \t\r\n]+ -> skip; // Ignore whitespace

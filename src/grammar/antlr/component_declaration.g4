@@ -29,6 +29,7 @@ component_body_item
 | override_declaration
 | register_comp_instance
 | addr_space_def
+| addr_region_def
 | component_data_declaration
 | component_pool_declaration
 | action_declaration

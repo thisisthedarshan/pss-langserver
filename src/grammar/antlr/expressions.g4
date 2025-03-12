@@ -35,7 +35,8 @@ expression :
 | (logical_or expression)
 | (binary_operator expression)
 | (conditional_expression)
-| primary;
+| primary
+| identifier;
 
 primary:
 number

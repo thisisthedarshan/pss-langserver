@@ -55,7 +55,8 @@ offset
 trait_property 
   : number
   | bool_literal
-  | enum_item;
+  | enum_item
+  | expression;
 
 /* Identify return types from address related functions */
 number_identifier : identifier;
@@ -93,7 +94,7 @@ transparent_addr_space_def
     TOKEN_SEMICOLON;
 
 transparent_addr_region_def 
-  : TOKEN_TRANSP_ADDR_REGION TOKEN_LT
+  : TOKEN_TRANSP_ADDR_REGION
     TOKEN_LT
       (addr_space_traits)? 
     TOKEN_GT
@@ -102,8 +103,8 @@ transparent_addr_region_def
 transparent_addr_region_setting
   : addr_region_identifier TOKEN_DOT
     (
-        (TOKEN_SIZE TOKEN_EQUALS integer_number)
-      | (TOKEN_ADDR TOKEN_EQUALS integer_number)
+        (TOKEN_SIZE TOKEN_EQUALS (integer_number | expression))
+      | (TOKEN_ADDR TOKEN_EQUALS (integer_number | expression))
       | (TOKEN_TRAIT TOKEN_DOT trait_identifier TOKEN_EQUALS trait_property)
     ) TOKEN_SEMICOLON;
 

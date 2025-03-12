@@ -71,6 +71,7 @@ register_group_definition
 register_body_definition
   : register_comp_instance
   | register_definition
+  | (function_offset_of_instance_def function_offset_of_instance_arr_def)
   ;
 
 register_comp_instance
