@@ -65,6 +65,7 @@ distclean: clean
 # Builds the grammar
 grammar:
 	$(antlr) ./src/grammar/antlr/pssLex.g4 -Dlanguage=TypeScript -listener -visitor
+	$(antlr) ./src/grammar/antlr/doxygenLexer.g4 -Dlanguage=TypeScript -listener -visitor
 	$(antlr) ./src/grammar/antlr/pss.g4 -Dlanguage=TypeScript -listener -visitor
 	$(antlr) ./src/grammar/antlr/doxygenParser.g4 -Dlanguage=TypeScript -listener -visitor
 	mv ./src/grammar/antlr/*.ts $(GRAMMAR_SRCS)
