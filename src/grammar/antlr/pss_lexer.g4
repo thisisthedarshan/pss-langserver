@@ -292,7 +292,7 @@ TOKEN_BASED_HEX_LITERAL:
 	'\'' ('s' | 'S')? ('h' | 'H') HEX_DIGIT (HEX_DIGIT | '_')*;
 
 /* Comments */
-TOKEN_DOC_COMMENT_START: '/**' .*? '*/';
+TOKEN_DOC_COMMENT: '/**' .*? '*/';
 TOKEN_SL_COMMENT: '//' ~[\r\n]*;
 TOKEN_ML_COMMENT: '/*' .*? '*/';
 
