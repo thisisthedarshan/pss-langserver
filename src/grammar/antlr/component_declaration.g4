@@ -24,8 +24,9 @@ component_super_spec? TOKEN_CLBRACE (component_body_item)* TOKEN_CRBRACE;
 
 component_super_spec : TOKEN_COLON type_identifier;
 
-component_body_item :
-override_declaration
+component_body_item 
+: comments
+| override_declaration
 | register_comp_instance
 | addr_space_def
 | component_data_declaration

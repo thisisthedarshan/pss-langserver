@@ -26,8 +26,9 @@ package_declaration:
 package_id_path:
 	package_identifier (TOKEN_SCOPE package_identifier);
 
-package_body_item:
-	abstract_action_declaration
+package_body_item
+	:	comments
+	|	abstract_action_declaration
 	| abstract_monitor_declaration
 	| struct_declaration
 	| enum_declaration

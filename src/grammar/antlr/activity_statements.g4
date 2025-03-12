@@ -25,11 +25,12 @@ activity_declaration
     ;
 
 activity_stmt 
-    : (
+    : comments
+    | ((
         label_identifier 
       TOKEN_COLON
       )? 
-      labeled_activity_stmt
+      labeled_activity_stmt)
     | activity_action_traversal_stmt
     | activity_data_field
     | activity_bind_stmt
@@ -40,12 +41,14 @@ activity_stmt
     ;
 
 labeled_activity_stmt 
-    : activity_sequence_block_stmt
+    : comments
+    | activity_sequence_block_stmt
     | activity_parallel_stmt
     | activity_schedule_stmt
     | activity_repeat_stmt
     | activity_foreach_stmt
     | activity_select_stmt
+    
     | activity_if_else_stmt
     | activity_match_stmt
     | activity_replicate_stmt
@@ -69,12 +72,14 @@ activity_action_traversal_stmt
         type_identifier 
         inline_constraints_or_empty
        )
+    | comments
     ;
 
 inline_constraints_or_empty 
     : (TOKEN_WITH 
         constraint_set
       )
+    | comments
     | TOKEN_SEMICOLON
     ;
 

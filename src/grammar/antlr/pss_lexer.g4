@@ -292,9 +292,9 @@ TOKEN_BASED_HEX_LITERAL:
 	'\'' ('s' | 'S')? ('h' | 'H') HEX_DIGIT (HEX_DIGIT | '_')*;
 
 /* Comments */
-TOKEN_DOC_COMMENT: '/**' .*? '*/' -> channel(HIDDEN);
-TOKEN_SL_COMMENT: '//' ~[\r\n]* '\n' -> channel(HIDDEN);
-TOKEN_ML_COMMENT: '/*' .*? '*/' -> channel(HIDDEN);
+TOKEN_DOC_COMMENT_START: '/**' .*? '*/';
+TOKEN_SL_COMMENT: '//' ~[\r\n]*;
+TOKEN_ML_COMMENT: '/*' .*? '*/';
 
 /* Double and Triple-quoted strings */
 TOKEN_QUOTED_STRING:

@@ -44,3 +44,10 @@ action_extension
     ) TOKEN_CLBRACE (
 		action_body_item*
 	) TOKEN_CRBRACE;
+
+/* Comments - to maintain line numbers properly */
+comments
+  : TOKEN_DOC_COMMENT_START
+  | TOKEN_SL_COMMENT
+  | TOKEN_ML_COMMENT
+  ;

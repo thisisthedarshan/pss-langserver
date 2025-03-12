@@ -39,7 +39,8 @@ action_super_spec
 	;
 
 action_body_item
-	: activity_declaration
+	: comments
+	| activity_declaration
 	| override_declaration
 	| constraint_declaration
 	| action_field_declaration
@@ -58,14 +59,16 @@ action_body_item
 	;
 
 action_field_declaration
-	: attr_field
+	: comments
+	| attr_field
 	| activity_data_field
 	| action_handle_declaration
 	| object_ref_field_declaration
 	;
 
 object_ref_field_declaration
-	: flow_ref_field_declaration
+	: comments
+	| flow_ref_field_declaration
 	| resource_ref_field_declaration
 	;
 

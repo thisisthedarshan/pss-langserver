@@ -229,6 +229,7 @@ import { Expression_listContext } from "./pss.js";
 import { String_literalContext } from "./pss.js";
 import { Filename_stringContext } from "./pss.js";
 import { Action_extensionContext } from "./pss.js";
+import { CommentsContext } from "./pss.js";
 import { Import_functionContext } from "./pss.js";
 import { Target_template_functionContext } from "./pss.js";
 import { Import_class_declContext } from "./pss.js";
@@ -371,6 +372,8 @@ import { Addr_valueContext } from "./pss.js";
 import { Addr_value_solveContext } from "./pss.js";
 import { Addr_value_absContext } from "./pss.js";
 import { Mem_opsContext } from "./pss.js";
+import { Addr_space_defContext } from "./pss.js";
+import { Addr_region_defContext } from "./pss.js";
 import { Register_identifierContext } from "./pss.js";
 import { Register_comp_identifierContext } from "./pss.js";
 import { Register_group_identifierContext } from "./pss.js";
@@ -1706,6 +1709,12 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 */
 	visitAction_extension?: (ctx: Action_extensionContext) => Result;
 	/**
+	 * Visit a parse tree produced by `pss.comments`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitComments?: (ctx: CommentsContext) => Result;
+	/**
 	 * Visit a parse tree produced by `pss.import_function`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -2557,6 +2566,18 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitMem_ops?: (ctx: Mem_opsContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.addr_space_def`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitAddr_space_def?: (ctx: Addr_space_defContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.addr_region_def`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitAddr_region_def?: (ctx: Addr_region_defContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.register_identifier`.
 	 * @param ctx the parse tree

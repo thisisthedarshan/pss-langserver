@@ -18,8 +18,9 @@ options {tokenVocab=pssLex;}
 
 import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,struct_declaration,template_types,memory,registers;
 
-procedural_stmt:
-	procedural_sequence_block_stmt
+procedural_stmt
+	: comments
+	| procedural_sequence_block_stmt
 	| procedural_data_declaration
 	| procedural_assignment_stmt
 	| procedural_void_function_call_stmt
@@ -44,12 +45,12 @@ procedural_data_declaration:
 	)*;
 
 procedural_data_instantiation:
-	identifier array_dim? (TOKEN_EQUALS expression)?;
+	identifier array_dim? (TOKEN_EQUALS expression)? TOKEN_SEMICOLON;
 
 procedural_assignment_stmt
 	:	(ref_path assign_op expression TOKEN_SEMICOLON)
 	|	(data_type assign_op expression TOKEN_SEMICOLON)
-	|	(data_type? identifier assign_op function_call);
+	|	(data_type? identifier assign_op function_call TOKEN_SEMICOLON);
 
 procedural_void_function_call_stmt: (
 		TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE
@@ -61,10 +62,10 @@ procedural_return_stmt
     ;
 
 procedural_repeat_stmt:
-	TOKEN_REPEAT TOKEN_FLBRACE (index_identifier TOKEN_COLON)? expression TOKEN_FRBRACE
-		procedural_stmt
-	| TOKEN_REPEAT procedural_stmt TOKEN_WHILE (expression) TOKEN_SEMICOLON
-	| TOKEN_WHILE TOKEN_FLBRACE expression TOKEN_FRBRACE procedural_stmt;
+	(TOKEN_REPEAT TOKEN_FLBRACE (index_identifier TOKEN_COLON)? expression TOKEN_FRBRACE
+		procedural_stmt)
+	| (TOKEN_REPEAT procedural_stmt TOKEN_WHILE (expression) TOKEN_SEMICOLON)
+	| (TOKEN_WHILE TOKEN_FLBRACE expression TOKEN_FRBRACE procedural_stmt);
 
 procedural_foreach_stmt:
 	TOKEN_FOREACH TOKEN_FLBRACE (iterator_identifier TOKEN_COLON)? expression (
@@ -81,8 +82,8 @@ procedural_match_stmt:
 		procedural_match_choice* TOKEN_CRBRACE;
 
 procedural_match_choice:
-	(TOKEN_SLBRACE open_range_list TOKEN_SRBRACE) TOKEN_COLON procedural_stmt
-	| TOKEN_DEFAULT TOKEN_COLON procedural_stmt;
+	((TOKEN_SLBRACE open_range_list TOKEN_SRBRACE) TOKEN_COLON procedural_stmt)
+	| (TOKEN_DEFAULT TOKEN_COLON procedural_stmt);
 
 procedural_break_stmt: TOKEN_BREAK TOKEN_SEMICOLON;
 
@@ -95,7 +96,7 @@ procedural_randomization_target:
 	hierarchical_id (TOKEN_COMMA hierarchical_id)*;
 
 procedural_randomization_term:
-	TOKEN_WITH constraint_set
+	(TOKEN_WITH constraint_set)
 	| TOKEN_SEMICOLON;
 
 procedural_yield_stmt: TOKEN_YIELD TOKEN_SEMICOLON;

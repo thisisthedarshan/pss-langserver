@@ -17,7 +17,10 @@ parser grammar pss;
 options {tokenVocab=pssLex;}
 import package_body, package_declaration, component_declaration, doxygenParser;
 
-pss_entry: file_doc_comment? (pss)* EOF;
+pss_entry
+: (file_doc_comment | comments)? 
+  (pss)* 
+  EOF;
 
 pss
   : package_body 
