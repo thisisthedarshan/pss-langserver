@@ -62,7 +62,7 @@ register_comp_definition
     TOKEN_GT TOKEN_CLBRACE TOKEN_CRBRACE;
 
 register_group_definition
-  : TOKEN_PURE TOKEN_COMPONENT register_group_identifier 
+  : TOKEN_PURE? TOKEN_COMPONENT register_group_identifier 
     TOKEN_COLON TOKEN_REG_GROUP_C TOKEN_CLBRACE
     register_body_definition 
     (register_body_definition)*

@@ -24,7 +24,7 @@ package_declaration:
 	) TOKEN_CRBRACE;
 
 package_id_path:
-	package_identifier (TOKEN_SCOPE package_identifier);
+	package_identifier (TOKEN_SCOPE package_identifier)?;
 
 package_body_item
 	:	comments
