@@ -182,3 +182,7 @@ reg_set_handle
     TOKEN_FLBRACE
     addr_handle_identifier
     TOKEN_FRBRACE TOKEN_SEMICOLON;
+
+reg_declarations
+  : register_comp_definition
+  | register_group_definition;
