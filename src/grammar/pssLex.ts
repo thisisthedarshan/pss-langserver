@@ -256,7 +256,7 @@ export default class pssLex extends Lexer {
 	public static readonly TOKEN_BASED_OCT_LITERAL = 226;
 	public static readonly TOKEN_BASED_DEC_LITERAL = 227;
 	public static readonly TOKEN_BASED_HEX_LITERAL = 228;
-	public static readonly TOKEN_DOC_COMMENT_START = 229;
+	public static readonly TOKEN_DOC_COMMENT = 229;
 	public static readonly TOKEN_SL_COMMENT = 230;
 	public static readonly TOKEN_ML_COMMENT = 231;
 	public static readonly TOKEN_QUOTED_STRING = 232;
@@ -677,7 +677,7 @@ export default class pssLex extends Lexer {
                                                              "TOKEN_BASED_OCT_LITERAL", 
                                                              "TOKEN_BASED_DEC_LITERAL", 
                                                              "TOKEN_BASED_HEX_LITERAL", 
-                                                             "TOKEN_DOC_COMMENT_START", 
+                                                             "TOKEN_DOC_COMMENT", 
                                                              "TOKEN_SL_COMMENT", 
                                                              "TOKEN_ML_COMMENT", 
                                                              "TOKEN_QUOTED_STRING", 
@@ -757,7 +757,7 @@ export default class pssLex extends Lexer {
 		"HEX_DIGIT", "EXP", "SIGN", "TOKEN_EXP", "TOKEN_SIGN", "TOKEN_BIN_NUMBER", 
 		"TOKEN_OCT_NUMBER", "TOKEN_DEC_NUMBER", "TOKEN_HEX_NUMBER", "TOKEN_BASED_BIN_LITERAL", 
 		"TOKEN_BASED_OCT_LITERAL", "TOKEN_BASED_DEC_LITERAL", "TOKEN_BASED_HEX_LITERAL", 
-		"TOKEN_DOC_COMMENT_START", "TOKEN_SL_COMMENT", "TOKEN_ML_COMMENT", "TOKEN_QUOTED_STRING", 
+		"TOKEN_DOC_COMMENT", "TOKEN_SL_COMMENT", "TOKEN_ML_COMMENT", "TOKEN_QUOTED_STRING", 
 		"TOKEN_TRIPLE_QUOTED_STRING", "UNESCAPED_CHARACTER", "ESCAPED_CHARACTER", 
 		"TOKEN_FILENAME_STRING", "ID", "ESCAPED_ID", "WS", "TOKEN_DOC_START", 
 		"TOKEN_DOC_END", "TOKEN_BRIEF_MARKER", "TOKEN_PARAM_MARKER", "TOKEN_RETURN_MARKER", 
