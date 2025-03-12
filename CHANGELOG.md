@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Function call statements and logic to the grammar
 - Grammar to detect file information from pss files
 - More options to let user customize the formatting. User can now opt to have custom pattern formatting. The user can also keep the options empty to skip formatting the patterns. The user can now also let the formatter auto-add headers when updating saved ones.
+- Grammar to detect address related operations and register usage.
 
 ### Fixed
 

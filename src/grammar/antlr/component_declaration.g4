@@ -26,9 +26,8 @@ component_super_spec : TOKEN_COLON type_identifier;
 
 component_body_item :
 override_declaration
-| contiguous_addr_space_def
-| transparent_addr_space_def
 | register_comp_instance
+| addr_space_def
 | component_data_declaration
 | component_pool_declaration
 | action_declaration

@@ -92,7 +92,6 @@ transparent_addr_space_def
     addr_space_identifier (TOKEN_COMMA addr_space_identifier)*
     TOKEN_SEMICOLON;
 
-
 transparent_addr_region_def 
   : TOKEN_TRANSP_ADDR_REGION TOKEN_LT
     TOKEN_LT
@@ -191,3 +190,11 @@ mem_ops
   | reg_set_handle;
 
 
+addr_space_def
+  : transparent_addr_space_def
+  | contiguous_addr_space_def
+  ;
+
+addr_region_def
+  : transparent_addr_region_def
+  ;
