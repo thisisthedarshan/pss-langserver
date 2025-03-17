@@ -82,7 +82,8 @@ connection.onInitialize((params: InitializeParams) => {
   notify(connection, "PSS Language Server Started");
 
   for (const folder of workspaceFolders) {
-    scanDirectory(folder.uri.replace('file://', ''), pssFiles);
+    let dir = decodeURIComponent(folder.uri.replace('file://', ''));
+    scanDirectory(dir, pssFiles);
   }
 
   /* Process found files */
@@ -226,7 +227,7 @@ connection.onDidOpenTextDocument((params) => {
     const pssFiles: string[] = [];
 
     try {
-      const filePath = fileURLToPath(new URL(file)); // Correct way to convert URI to file path
+      const filePath = fileURLToPath(file);
       const folderPath = path.dirname(filePath);
       notify(connection, `Scanning local folder (${folderPath}) for pss files`)
 
@@ -352,13 +353,10 @@ connection.onDocumentFormatting((params, tokens) => {
 
   /* Get contents of the document */
   const documentContents = sourceDocument.getText();
+
   /* Get the filename */
-  const fileURL = new URL(textDocument.uri);
-  const pathname = fileURL.pathname;
-  /* Normalize for Windows if needed (remove leading slash for Windows paths)*/
-  const normalizedPath = process.platform === 'win32' ? pathname.substring(1) : pathname;
-  /* Extract just the filename using Node's path module*/
-  const filename = path.basename(normalizedPath);
+  const filePath = fileURLToPath(textDocument.uri);
+  const filename = path.basename(filePath);
 
 
   /* Get settings for author name and tabspaces and return formatted text */

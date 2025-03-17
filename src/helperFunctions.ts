@@ -57,14 +57,11 @@ export function updateStringArray(array1: string[], array2: string[]): string[] 
 }
 
 export async function scanDirectory(dirPath: string, files: string[]): Promise<void> {
-  // Decode the URI-encoded path
-  const decodedPath = decodeURIComponent(dirPath);
-
   try {
-    const entries = fs.readdirSync(decodedPath, { withFileTypes: true });
+    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
 
     for (const entry of entries) {
-      const fullPath = path.join(decodedPath, entry.name);
+      const fullPath = path.join(dirPath, entry.name);
 
       if (entry.isDirectory()) {
         await scanDirectory(fullPath, files);
@@ -73,7 +70,7 @@ export async function scanDirectory(dirPath: string, files: string[]): Promise<v
       }
     }
   } catch (error) {
-    console.error(`Error scanning directory: ${decodedPath}`, error);
+    console.error(`Error scanning directory: ${dirPath}`, error);
     throw error;
   }
 }

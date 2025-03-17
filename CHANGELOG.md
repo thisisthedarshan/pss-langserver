@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed small grammar mistakes in recognizing some statements
 - Updated semantic token generation logic
+- Updated logic to get file paths
 
 ## [0.2.2] - 2025-03-06
 
