@@ -69,33 +69,41 @@ register_group_definition
     TOKEN_CRBRACE;
 
 register_body_definition
-  : register_comp_instance
+  : comments
+  | register_comp_instance
   | register_definition
-  | (function_offset_of_instance_def function_offset_of_instance_arr_def)
+  | function_offset_of_instance_def 
+  | function_offset_of_instance_arr_def
   ;
 
 register_comp_instance
-  : register_group_identifier register_identifier TOKEN_SEMICOLON;
+  : register_group_identifier 
+    register_identifier 
+    (TOKEN_SLBRACE (integer_number) TOKEN_SRBRACE)? TOKEN_SEMICOLON;
 
 register_definition
   : TOKEN_REGC TOKEN_LT 
     reg_struct_identifier  (TOKEN_COMMA access_type (TOKEN_COMMA reg_length)?)?
-    TOKEN_GT register_identifier
+    TOKEN_GT register_identifier (TOKEN_SLBRACE (integer_number) TOKEN_SRBRACE)?
     TOKEN_SEMICOLON;
 
 /* These functions are part of the register group */
 function_offset_of_instance_def
-  : TOKEN_FUNCTION TOKEN_BIT TOKEN_64 TOKEN_GET_OFFSET_OF_INSTANCE
+  : TOKEN_FUNCTION integer_atom_type 
+    TOKEN_GET_OFFSET_OF_INSTANCE
     TOKEN_FLBRACE TOKEN_STRING identifier TOKEN_FRBRACE
     TOKEN_CLBRACE
-    ( if_else_stmts | reg_match_stmts )
+    ( if_else_stmts+ | offset_match_stmts | (TOKEN_RETURN (offset_return_items | TOKEN_M1) TOKEN_SEMICOLON))
+    (TOKEN_RETURN TOKEN_M1 TOKEN_SEMICOLON)?
     TOKEN_CRBRACE;
 
 function_offset_of_instance_arr_def
-  : TOKEN_FUNCTION TOKEN_BIT TOKEN_64 TOKEN_GET_OFFSET_OF_INSTANCE_ARR
+  : TOKEN_FUNCTION integer_atom_type 
+    TOKEN_GET_OFFSET_OF_INSTANCE_ARR
     TOKEN_FLBRACE TOKEN_STRING identifier TOKEN_COMMA TOKEN_INT identifier TOKEN_FRBRACE
     TOKEN_CLBRACE
-    ( if_else_stmts | reg_match_stmts )
+    ( if_else_stmts+ | offset_match_stmts | (TOKEN_RETURN (offset_return_items | TOKEN_M1)TOKEN_SEMICOLON))
+    (TOKEN_RETURN TOKEN_M1 TOKEN_SEMICOLON)?
     TOKEN_CRBRACE;
 
 /* Currently, we don't support get_offset_of_path since I don't know an example which uses this? */
@@ -104,23 +112,27 @@ function_offset_of_instance_arr_def
 offset_match_stmts
   : TOKEN_MATCH TOKEN_FLBRACE identifier TOKEN_FRBRACE TOKEN_CLBRACE
     reg_match_stmts
-    reg_match_stmts*
+    (reg_match_stmts | comments )*
     TOKEN_DEFAULT TOKEN_COLON TOKEN_RETURN (offset_return_items | TOKEN_M1) TOKEN_SEMICOLON
     TOKEN_CRBRACE;
 
 if_else_stmts
-  : TOKEN_IF TOKEN_FLBRACE expression TOKEN_FRBRACE
+  : (comments if_else_stmts?)
+  | (TOKEN_IF TOKEN_FLBRACE expression TOKEN_FRBRACE
     TOKEN_CLBRACE TOKEN_RETURN offset_return_items TOKEN_SEMICOLON TOKEN_CRBRACE
-    (TOKEN_ELSE if_else_stmts)*
-    (TOKEN_ELSE TOKEN_CLBRACE TOKEN_RETURN (offset_return_items | TOKEN_M1) TOKEN_SEMICOLON TOKEN_CRBRACE)?
+    (comments* TOKEN_ELSE if_else_stmts)*
+    (comments* TOKEN_ELSE TOKEN_CLBRACE TOKEN_RETURN (offset_return_items | TOKEN_M1) TOKEN_SEMICOLON TOKEN_CRBRACE)?)
   ;
 
 reg_match_stmts
-  : TOKEN_SLBRACE TOKEN_QUOTES 
-    register_identifier TOKEN_QUOTES TOKEN_SRBRACE 
-    TOKEN_COLON TOKEN_RETURN offset_return_items TOKEN_SEMICOLON;
+  : TOKEN_SLBRACE TOKEN_QUOTES register_identifier TOKEN_QUOTES 
+    TOKEN_SRBRACE TOKEN_COLON TOKEN_RETURN offset_return_items TOKEN_SEMICOLON;
 
-offset_return_items : offset | expression | integer_number;
+offset_return_items :
+ (TOKEN_FLBRACE+ offset_returns TOKEN_FRBRACE+) | offset_returns;
+
+
+offset_returns : constant_expression | integer_number | offset;
 
 /* These syntaxes are for using registers - mainly into execs and native functions */
 reg_function_calls
@@ -185,4 +197,5 @@ reg_set_handle
 
 reg_declarations
   : register_comp_definition
-  | register_group_definition;
+  | register_group_definition
+  ;

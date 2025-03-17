@@ -17,10 +17,11 @@ options {tokenVocab=pssLex;}
 
 import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types,memory,registers;
 
-constant_expression : expression;
+constant_expression : primary expression;
 
-expression :
-| (unary_operator primary)
+expression 
+: primary?
+  ((unary_operator expression)
 | (power_op expression)
 | (mul_div expression)
 | (add_sub expression)
@@ -34,20 +35,20 @@ expression :
 | (logical_and expression)
 | (logical_or expression)
 | (binary_operator expression)
-| (conditional_expression)
-| primary
-| identifier;
+| (conditional_expression))
+| primary;
 
 primary:
-number
-|aggregate_literal
-|bool_literal
-|string_literal
-|null_ref
-|parenthesis_expressions
-|cast_expression
-|ref_path
-|compile_has_expr;
+  number
+| aggregate_literal
+| bool_literal
+| string_literal
+| null_ref
+| cast_expression
+| ref_path
+| compile_has_expr
+| parenthesis_expressions
+| identifier;
 
 unary_operator : TOKEN_MINUS | TOKEN_EXCLAMATION | TOKEN_TILDA | TOKEN_AND | TOKEN_OR | TOKEN_CARET;
 
@@ -102,8 +103,6 @@ in_expression :
 | (expression TOKEN_IN collection_expression);
 
 open_range_list : open_range_value (TOKEN_COMMA open_range_value)*;
-
-/* open_range_value : expression (TOKEN_DDOT expression)?; */
 
 collection_expression : expression;
 
