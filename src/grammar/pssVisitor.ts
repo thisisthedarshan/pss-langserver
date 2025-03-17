@@ -398,6 +398,7 @@ import { Offset_match_stmtsContext } from "./pss.js";
 import { If_else_stmtsContext } from "./pss.js";
 import { Reg_match_stmtsContext } from "./pss.js";
 import { Offset_return_itemsContext } from "./pss.js";
+import { Offset_returnsContext } from "./pss.js";
 import { Reg_function_callsContext } from "./pss.js";
 import { Register_operation_callContext } from "./pss.js";
 import { Reg_readContext } from "./pss.js";
@@ -409,6 +410,7 @@ import { Reg_write_val_maskedContext } from "./pss.js";
 import { Reg_write_fieldContext } from "./pss.js";
 import { Reg_write_fieldsContext } from "./pss.js";
 import { Reg_set_handleContext } from "./pss.js";
+import { Reg_declarationsContext } from "./pss.js";
 import { File_doc_commentContext } from "./pss.js";
 import { Documentation_commentContext } from "./pss.js";
 import { Doc_contentContext } from "./pss.js";
@@ -2723,6 +2725,12 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 */
 	visitOffset_return_items?: (ctx: Offset_return_itemsContext) => Result;
 	/**
+	 * Visit a parse tree produced by `pss.offset_returns`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitOffset_returns?: (ctx: Offset_returnsContext) => Result;
+	/**
 	 * Visit a parse tree produced by `pss.reg_function_calls`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -2788,6 +2796,12 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitReg_set_handle?: (ctx: Reg_set_handleContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.reg_declarations`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitReg_declarations?: (ctx: Reg_declarationsContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.file_doc_comment`.
 	 * @param ctx the parse tree
