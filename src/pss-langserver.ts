@@ -170,7 +170,7 @@ connection.onInitialized(() => {
 });
 
 /* Default settings - in case config not supported */
-const defaultSettings: PSS_Config = { tabspaces: 4, fileAuthor: "", formatPatterns: [":", "=", "//"], autoFormatHeader: false };
+const defaultSettings: PSS_Config = { tabspaces: 4, fileAuthor: "", formatPatterns: ["=", "//"], autoFormatHeader: false };
 let globalSettings: PSS_Config = defaultSettings;
 
 /* Cache the settings of all open documents */

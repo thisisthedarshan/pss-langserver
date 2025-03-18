@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configuration options to let user have empty setting for patterns
 - Formatting logic for patterns to only format standalone pattern. This also excludes formatting when lines have brackets or in string.
 
+### Removed
+
+- Dropped colons from default alignment patterns.
+
 ## [0.2.2] - 2025-03-06
 
 ### Fixed
