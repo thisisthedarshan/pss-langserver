@@ -38,17 +38,28 @@ function alignTextElements(input: string, patterns: string[]): string {
     // Join the formatted lines and return
     return contents.join('\n');
 }
+
 function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEndComment: boolean = false): string[] {
     const result = [...lines];
     let i = 0;
+    let inTripleQuotes = false;
 
     while (i < result.length) {
+        // Check if entering or exiting triple quotes
+        if (result[i].includes('"""')) {
+            inTripleQuotes = !inTripleQuotes;
+        }
+
         // Find consecutive lines with the pattern
         const blockStart = i;
         let hasPattern = false;
 
         // Skip lines that don't contain the pattern
-        while (i < result.length && !hasStandalonePattern(result[i], pattern)) {
+        while (i < result.length && !shouldProcessLine(result[i], pattern, inTripleQuotes)) {
+            // Check if entering or exiting triple quotes
+            if (result[i].includes('"""')) {
+                inTripleQuotes = !inTripleQuotes;
+            }
             i++;
         }
 
@@ -56,8 +67,12 @@ function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEnd
         const blockStartWithPattern = i;
 
         // Count consecutive lines with the pattern
-        while (i < result.length && hasStandalonePattern(result[i], pattern)) {
+        while (i < result.length && shouldProcessLine(result[i], pattern, inTripleQuotes)) {
             hasPattern = true;
+            // Check if entering or exiting triple quotes in this line
+            if (result[i].includes('"""')) {
+                inTripleQuotes = !inTripleQuotes;
+            }
             i++;
         }
 
@@ -79,10 +94,42 @@ function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEnd
     return result;
 }
 
-function hasStandalonePattern(line: string, pattern: string): boolean {
-    const index = line.indexOf(pattern);
-    if (index === -1) return false;
+function shouldProcessLine(line: string, pattern: string, inTripleQuotes: boolean): boolean {
+    // Don't process if line doesn't contain the pattern at all
+    if (!line.includes(pattern)) return false;
 
+    // Check if the pattern is inside a double quoted string
+    let inDoubleQuotes = false;
+    let patternIndex = -1;
+
+    for (let i = 0; i < line.length; i++) {
+        if (line[i] === '"' && (i === 0 || line[i - 1] !== '\\')) {
+            // Toggle double quotes state (but only if not in triple quotes context)
+            if (!inTripleQuotes || line[i - 1] !== '"' || line[i + 1] !== '"') {
+                inDoubleQuotes = !inDoubleQuotes;
+            }
+        }
+
+        // Check if we're at the pattern
+        if (!inDoubleQuotes && line.substring(i, i + pattern.length) === pattern) {
+            patternIndex = i;
+            // Check if pattern is standalone
+            if (isStandalonePattern(line, patternIndex, pattern)) {
+                // Check if line ends with bracket
+                const trimmedLine = line.trimEnd();
+                const lastChar = trimmedLine[trimmedLine.length - 1];
+                if (lastChar === '{' || lastChar === '}' || lastChar === '[' || lastChar === ']' || lastChar === '(' || lastChar === ')') {
+                    return false;
+                }
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function isStandalonePattern(line: string, index: number, pattern: string): boolean {
     // Check character before pattern (if it exists)
     if (index > 0) {
         const charBefore = line[index - 1];

@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated semantic token generation logic
 - Updated logic to get file paths
 - Configuration options to let user have empty setting for patterns
-- Formatting logic for patterns to only format standalone pattern.
+- Formatting logic for patterns to only format standalone pattern. This also excludes formatting when lines have brackets or in string.
 
 ## [0.2.2] - 2025-03-06
 
