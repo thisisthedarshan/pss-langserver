@@ -42,85 +42,115 @@ function alignTextElements(input: string, patterns: string[]): string {
 function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEndComment: boolean = false): string[] {
     const result = [...lines];
     let i = 0;
-    let inTripleQuotes = false;
+    let blockStart = 0;
+    let inBlock = false;
 
+    // Group lines by code blocks (determined by indentation)
     while (i < result.length) {
-        // Check if entering or exiting triple quotes
-        if (result[i].includes('"""')) {
-            inTripleQuotes = !inTripleQuotes;
+        // Detect blocks based on indentation or braces
+        if (!inBlock && result[i].includes('{')) {
+            blockStart = i;
+            inBlock = true;
         }
 
-        // Find consecutive lines with the pattern
-        const blockStart = i;
-        let hasPattern = false;
-
-        // Skip lines that don't contain the pattern
-        while (i < result.length && !shouldProcessLine(result[i], pattern, inTripleQuotes)) {
-            // Check if entering or exiting triple quotes
-            if (result[i].includes('"""')) {
-                inTripleQuotes = !inTripleQuotes;
-            }
-            i++;
+        if (inBlock && result[i].includes('}')) {
+            // Process this block separately
+            processBlockForAlignment(result, blockStart, i + 1, pattern, isEndComment);
+            inBlock = false;
         }
 
-        // Check the current block of lines with the pattern
-        const blockStartWithPattern = i;
-
-        // Count consecutive lines with the pattern
-        while (i < result.length && shouldProcessLine(result[i], pattern, inTripleQuotes)) {
-            hasPattern = true;
-            // Check if entering or exiting triple quotes in this line
-            if (result[i].includes('"""')) {
-                inTripleQuotes = !inTripleQuotes;
-            }
-            i++;
-        }
-
-        const blockEnd = i;
-
-        // Only align if there are at least 2 consecutive lines with the pattern
-        if (hasPattern && blockEnd - blockStartWithPattern >= 2) {
-            // For patterns not at the end (= and :)
-            if (!isEndComment) {
-                alignBlockByPattern(result, blockStartWithPattern, blockEnd, pattern);
-            }
-            // For end comments (//)
-            else {
-                alignEndComments(result, blockStartWithPattern, blockEnd);
-            }
-        }
+        i++;
     }
+
+    // Process the top level (non-block) lines
+    processBlockForAlignment(result, 0, result.length, pattern, isEndComment, true);
 
     return result;
 }
 
-function shouldProcessLine(line: string, pattern: string, inTripleQuotes: boolean): boolean {
-    // Don't process if line doesn't contain the pattern at all
-    if (!line.includes(pattern)) return false;
+function processBlockForAlignment(lines: string[], start: number, end: number, pattern: string, isEndComment: boolean, isTopLevel: boolean = false): void {
+    // Find consecutive lines with the pattern at the same indent level
+    let currentIndent = -1;
+    let blockStartLine = start;
+    let consecutiveCount = 0;
 
-    // Check if the pattern is inside a double quoted string
-    let inDoubleQuotes = false;
-    let patternIndex = -1;
+    for (let i = start; i < end; i++) {
+        const line = lines[i].trim();
 
-    for (let i = 0; i < line.length; i++) {
-        if (line[i] === '"' && (i === 0 || line[i - 1] !== '\\')) {
-            // Toggle double quotes state (but only if not in triple quotes context)
-            if (!inTripleQuotes || line[i - 1] !== '"' || line[i + 1] !== '"') {
-                inDoubleQuotes = !inDoubleQuotes;
-            }
+        // Skip empty lines or block delimiters
+        if (line === '' || line === '{' || line === '}') {
+            continue;
         }
 
-        // Check if we're at the pattern
-        if (!inDoubleQuotes && line.substring(i, i + pattern.length) === pattern) {
-            patternIndex = i;
-            // Check if pattern is standalone
-            if (isStandalonePattern(line, patternIndex, pattern)) {
-                // Check if line ends with bracket
-                const trimmedLine = line.trimEnd();
-                const lastChar = trimmedLine[trimmedLine.length - 1];
-                if (lastChar === '{' || lastChar === '}' || lastChar === '[' || lastChar === ']' || lastChar === '(' || lastChar === ')') {
-                    return false;
-                }
+        // Calculate indent level
+        const indent = lines[i].length - lines[i].trimStart().length;
+
+        // If moving to a different indent level, process the previous block
+        if (currentIndent !== -1 && indent !== currentIndent) {
+            if (consecutiveCount >= 2) {
+                alignPatternInBlock(lines, blockStartLine, i, pattern, isEndComment);
+            }
+            blockStartLine = i;
+            consecutiveCount = 0;
+        }
+
+        currentIndent = indent;
+
+        // Check if line contains the pattern outside of brackets
+        if (hasPatternOutsideBrackets(lines[i], pattern)) {
+            consecutiveCount++;
+        } else {
+            // If we had consecutive lines and now found a non-matching one, process the block
+            if (consecutiveCount >= 2) {
+                alignPatternInBlock(lines, blockStartLine, i, pattern, isEndComment);
+            }
+            blockStartLine = i + 1;
+            consecutiveCount = 0;
+        }
+    }
+
+    // Process the last block if needed
+    if (consecutiveCount >= 2) {
+        alignPatternInBlock(lines, blockStartLine, end, pattern, isEndComment);
+    }
+}
+
+function hasPatternOutsideBrackets(line: string, pattern: string): boolean {
+    // Skip if pattern isn't in the line
+    if (!line.includes(pattern)) return false;
+
+    // Track bracket nesting and quotes
+    let inSingleQuote = false;
+    let inDoubleQuote = false;
+    let bracketDepth = 0;  // Tracks all bracket types
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+
+        // Handle quotes (toggle state if not escaped)
+        if (char === "'" && (i === 0 || line[i - 1] !== '\\')) {
+            inSingleQuote = !inSingleQuote;
+        } else if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
+            inDoubleQuote = !inDoubleQuote;
+        }
+
+        // Skip processing if in quotes
+        if (inSingleQuote || inDoubleQuote) continue;
+
+        // Track bracket depth
+        if (char === '(' || char === '[' || char === '{') {
+            bracketDepth++;
+        } else if (char === ')' || char === ']' || char === '}') {
+            bracketDepth--;
+        }
+
+        // Check for pattern at current position, but only if not inside brackets
+        if (bracketDepth === 0 && line.substring(i, i + pattern.length) === pattern) {
+            // Verify it's a standalone pattern (not part of another token)
+            const beforeChar = i > 0 ? line[i - 1] : ' ';
+            const afterChar = i + pattern.length < line.length ? line[i + pattern.length] : ' ';
+
+            if (/[\s\w]/.test(beforeChar) && /[\s\w=;,)]/.test(afterChar)) {
                 return true;
             }
         }
@@ -129,85 +159,79 @@ function shouldProcessLine(line: string, pattern: string, inTripleQuotes: boolea
     return false;
 }
 
-function isStandalonePattern(line: string, index: number, pattern: string): boolean {
-    // Check character before pattern (if it exists)
-    if (index > 0) {
-        const charBefore = line[index - 1];
-        // If char before is not whitespace and not alphanumeric, it's part of another operator
-        if (!/[\s\w]/.test(charBefore)) {
-            return false;
-        }
-    }
-
-    // Check character after pattern (if it exists)
-    const afterIndex = index + pattern.length;
-    if (afterIndex < line.length) {
-        const charAfter = line[afterIndex];
-        // If char after is not whitespace and not alphanumeric, it's part of another operator
-        if (!/[\s\w=;,)]/.test(charAfter)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function alignBlockByPattern(lines: string[], start: number, end: number, pattern: string): void {
-    // Find the longest prefix before the pattern
+function alignPatternInBlock(lines: string[], start: number, end: number, pattern: string, isEndComment: boolean): void {
+    // Find the longest prefix before the pattern (ignoring patterns inside brackets)
     let maxPrefixLength = 0;
+    let linesToAlign = [];
 
+    // First, collect all valid lines and determine max prefix length
     for (let i = start; i < end; i++) {
         const line = lines[i];
-        const patternIndex = line.indexOf(pattern);
-        if (patternIndex !== -1) {
-            // Get content before the pattern, trimming trailing spaces
-            const prefix = line.substring(0, patternIndex).trimEnd();
-            maxPrefixLength = Math.max(maxPrefixLength, prefix.length);
-        }
+        if (!hasPatternOutsideBrackets(line, pattern)) continue;
+
+        const { prefix } = getPatternPosition(line, pattern);
+        maxPrefixLength = Math.max(maxPrefixLength, prefix.length);
+        linesToAlign.push(i);
     }
 
-    // Align the pattern in each line
-    for (let i = start; i < end; i++) {
+    // Now align each line
+    for (const i of linesToAlign) {
         const line = lines[i];
-        const patternIndex = line.indexOf(pattern);
+        const { prefix, suffix } = getPatternPosition(line, pattern);
 
-        if (patternIndex !== -1) {
-            const prefix = line.substring(0, patternIndex).trimEnd();
-            const padding = ' '.repeat(maxPrefixLength - prefix.length);
-            const suffix = line.substring(patternIndex);
+        const padding = ' '.repeat(maxPrefixLength - prefix.length);
 
-            lines[i] = prefix + padding + ' ' + suffix;
+        if (isEndComment) {
+            // For comments, add more padding
+            lines[i] = prefix + padding + ' '.repeat(4) + suffix;
+        } else {
+            // For other patterns, maintain a single space before and after
+            lines[i] = prefix + padding + ' ' + pattern + ' ' + suffix.trimStart().substring(pattern.length).trimStart();
         }
     }
 }
 
-function alignEndComments(lines: string[], start: number, end: number): void {
-    // Find the longest content before the comment
-    let maxContentLength = 0;
+function getPatternPosition(line: string, pattern: string): { prefix: string, suffix: string } {
+    let inSingleQuote = false;
+    let inDoubleQuote = false;
+    let bracketDepth = 0;
 
-    for (let i = start; i < end; i++) {
-        const line = lines[i];
-        const commentIndex = line.indexOf('//');
-        if (commentIndex !== -1) {
-            // Get content before the comment
-            const content = line.substring(0, commentIndex).trimEnd();
-            maxContentLength = Math.max(maxContentLength, content.length);
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+
+        // Handle quotes
+        if (char === "'" && (i === 0 || line[i - 1] !== '\\')) {
+            inSingleQuote = !inSingleQuote;
+        } else if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
+            inDoubleQuote = !inDoubleQuote;
+        }
+
+        // Skip if in quotes
+        if (inSingleQuote || inDoubleQuote) continue;
+
+        // Track bracket depth
+        if (char === '(' || char === '[' || char === '{') {
+            bracketDepth++;
+        } else if (char === ')' || char === ']' || char === '}') {
+            bracketDepth--;
+        }
+
+        // Found pattern outside brackets
+        if (bracketDepth === 0 && line.substring(i, i + pattern.length) === pattern) {
+            // Verify it's a standalone pattern
+            const beforeChar = i > 0 ? line[i - 1] : ' ';
+            const afterChar = i + pattern.length < line.length ? line[i + pattern.length] : ' ';
+
+            if (/[\s\w]/.test(beforeChar) && /[\s\w=;,)]/.test(afterChar)) {
+                const prefix = line.substring(0, i).trimEnd();
+                const suffix = line.substring(i);
+                return { prefix, suffix };
+            }
         }
     }
 
-    // Align the comments in each line
-    for (let i = start; i < end; i++) {
-        const line = lines[i];
-        const commentIndex = line.indexOf('//');
-
-        if (commentIndex !== -1) {
-            const content = line.substring(0, commentIndex).trimEnd();
-            const comment = line.substring(commentIndex);
-            const padding = ' '.repeat(maxContentLength - content.length + 4); // +4 for spacing
-
-            lines[i] = content + padding + comment;
-        }
-    }
+    // Fallback (should not happen if hasPatternOutsideBrackets returned true)
+    return { prefix: line, suffix: '' };
 }
 
 export default alignTextElements;
