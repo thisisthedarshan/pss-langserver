@@ -38,7 +38,6 @@ function alignTextElements(input: string, patterns: string[]): string {
     // Join the formatted lines and return
     return contents.join('\n');
 }
-
 function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEndComment: boolean = false): string[] {
     const result = [...lines];
     let i = 0;
@@ -49,7 +48,7 @@ function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEnd
         let hasPattern = false;
 
         // Skip lines that don't contain the pattern
-        while (i < result.length && !result[i].includes(pattern)) {
+        while (i < result.length && !hasStandalonePattern(result[i], pattern)) {
             i++;
         }
 
@@ -57,7 +56,7 @@ function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEnd
         const blockStartWithPattern = i;
 
         // Count consecutive lines with the pattern
-        while (i < result.length && result[i].includes(pattern)) {
+        while (i < result.length && hasStandalonePattern(result[i], pattern)) {
             hasPattern = true;
             i++;
         }
@@ -78,6 +77,32 @@ function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEnd
     }
 
     return result;
+}
+
+function hasStandalonePattern(line: string, pattern: string): boolean {
+    const index = line.indexOf(pattern);
+    if (index === -1) return false;
+
+    // Check character before pattern (if it exists)
+    if (index > 0) {
+        const charBefore = line[index - 1];
+        // If char before is not whitespace and not alphanumeric, it's part of another operator
+        if (!/[\s\w]/.test(charBefore)) {
+            return false;
+        }
+    }
+
+    // Check character after pattern (if it exists)
+    const afterIndex = index + pattern.length;
+    if (afterIndex < line.length) {
+        const charAfter = line[afterIndex];
+        // If char after is not whitespace and not alphanumeric, it's part of another operator
+        if (!/[\s\w=;,)]/.test(charAfter)) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 function alignBlockByPattern(lines: string[], start: number, end: number, pattern: string): void {

@@ -28,7 +28,10 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
   /* Then format semicolons */
   doc = addNewlinesAfterSemicolons(doc);
   /* Then start by formatting patterns - beautification */
-  doc = alignTextElements(doc, patterns);
+  if (patterns.length > 0) {
+    doc = alignTextElements(doc, patterns);
+  }
+
 
   /* The make it process line by line */
   let lines = doc.split('\n');

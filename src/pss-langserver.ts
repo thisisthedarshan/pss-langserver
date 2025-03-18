@@ -206,7 +206,7 @@ function getSettings(connection: Connection, resource: string): Thenable<PSS_Con
       return {
         tabspaces: validatedTabspaces,
         fileAuthor: fileAuthor ?? defaultSettings.fileAuthor,
-        formatPatterns: formatPatterns ?? defaultSettings.formatPatterns,
+        formatPatterns: formatPatterns ?? [],
         autoFormatHeader: autoFormatHeader ?? false,
       };
     });
