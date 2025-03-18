@@ -238,24 +238,84 @@ export function generateSemanticTokens(file: string, ast: metaData[]): SemanticT
 function findSemanticTokens(text: string, keywordArray: Record<string, KeywordInfo>, tokens: SemanticTokensBuilder): SemanticTokens {
   const lines = text.split('\n');
 
+  /* Track comment state across lines */
+  let inMultilineComment = false;
+
   /* Process each line */
   lines.forEach((line, lineIndex) => {
+    let processedLine = line;
+    let offsetMap: number[] = [];
+
+    /* Build offset map for original positions */
+    for (let i = 0; i < line.length; i++) {
+      offsetMap[i] = i;
+    }
+
+    /* Handle multiline comments */
+    if (inMultilineComment) {
+      const endCommentIndex = line.indexOf('*/');
+      if (endCommentIndex !== -1) {
+        /* End of multiline comment found */
+        processedLine = line.substring(endCommentIndex + 2);
+        inMultilineComment = false;
+
+        /* Adjust offset map for removed comment part */
+        offsetMap = offsetMap.slice(endCommentIndex + 2);
+      } else {
+        /* Entire line is within a comment */
+        return;
+      }
+    }
+
+    /* Handle single line comments and start of multiline comments */
+    let singleLineCommentIndex = processedLine.indexOf('//');
+    let multilineCommentStartIndex = processedLine.indexOf('/*');
+
+    /* Handle single line comments */
+    if (singleLineCommentIndex !== -1) {
+      if (multilineCommentStartIndex === -1 || singleLineCommentIndex < multilineCommentStartIndex) {
+        processedLine = processedLine.substring(0, singleLineCommentIndex);
+      }
+    }
+
+    /* Handle start of multiline comments */
+    if (multilineCommentStartIndex !== -1) {
+      if (singleLineCommentIndex === -1 || multilineCommentStartIndex < singleLineCommentIndex) {
+        const endCommentIndex = processedLine.indexOf('*/', multilineCommentStartIndex + 2);
+        if (endCommentIndex !== -1) {
+          /* Multiline comment ends on the same line */
+          processedLine =
+            processedLine.substring(0, multilineCommentStartIndex) +
+            processedLine.substring(endCommentIndex + 2);
+        } else {
+          /* Multiline comment continues to next line */
+          processedLine = processedLine.substring(0, multilineCommentStartIndex);
+          inMultilineComment = true;
+        }
+      }
+    }
+
+    /* Skip empty lines after comment removal */
+    if (processedLine.trim() === '') {
+      return;
+    }
+
     /* Check each keyword */
     for (const [keyword, info] of Object.entries(keywordArray)) {
       let startIndex = 0;
 
       /* Find all occurrences of the keyword in the line */
-      while (startIndex < line.length) {
-        const keywordIndex = line.indexOf(keyword, startIndex);
+      while (startIndex < processedLine.length) {
+        const keywordIndex = processedLine.indexOf(keyword, startIndex);
         let modifiers: number = 0;
         if (keywordIndex === -1) {
           break; /* No more occurrences */
         }
 
         /* Check for word boundaries to avoid partial matches */
-        const beforeChar = keywordIndex > 0 ? line[keywordIndex - 1] : ' ';
-        const afterChar = keywordIndex + keyword.length < line.length ?
-          line[keywordIndex + keyword.length] : ' ';
+        const beforeChar = keywordIndex > 0 ? processedLine[keywordIndex - 1] : ' ';
+        const afterChar = keywordIndex + keyword.length < processedLine.length ?
+          processedLine[keywordIndex + keyword.length] : ' ';
 
         const isWordBoundaryBefore = /\W/.test(beforeChar);
         const isWordBoundaryAfter = /\W/.test(afterChar);
@@ -267,10 +327,13 @@ function findSemanticTokens(text: string, keywordArray: Record<string, KeywordIn
         }
 
         if (isWordBoundaryBefore && isWordBoundaryAfter) {
+          /* Map position back to original line using offset map */
+          const originalIndex = offsetMap[keywordIndex] || keywordIndex;
+
           /* Add token */
           tokens.push(
             lineIndex,
-            keywordIndex,
+            originalIndex,
             keyword.length,
             typeof info.tokenType !== "number" ? mapTokenTypes(info.tokenType.toString()) : info.tokenType,
             Array.isArray(info.tokenModifiers) ? modifiers : typeof info.tokenModifiers !== "number" ? mapTokenModifiers(info.tokenModifiers.toString()) : info.tokenModifiers,
@@ -283,7 +346,6 @@ function findSemanticTokens(text: string, keywordArray: Record<string, KeywordIn
     }
   });
 
-  /* Sort tokens by line and position */
   return tokens.build();
 }
 
