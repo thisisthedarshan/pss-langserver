@@ -28,7 +28,7 @@ data_declaration:
 data_type data_instantiation (TOKEN_COMMA data_instantiation)* TOKEN_SEMICOLON;
 
 data_instantiation:
-identifier array_dim? (TOKEN_EQUALS constant_expression)?;
+identifier array_dim? (TOKEN_EQUALS (constant_expression | function_call))?;
 
 array_dim:
 TOKEN_SLBRACE constant_expression TOKEN_SRBRACE;

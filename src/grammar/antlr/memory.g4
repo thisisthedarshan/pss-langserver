@@ -119,9 +119,9 @@ transparent_addr_claim
 /* Using address regions */
 /* 
   This is => 
-  (void)addr_space_identifier.add_nonallocatable_region(addr_region_dentifier);
+  (void)addr_space_identifier.add_nonallocatable_region(addr_region_identifier);
   or
-  addr_handle_identifier = addr_space_identifier.add_nonallocatable_region(addr_region_dentifier);
+  addr_handle_identifier = addr_space_identifier.add_nonallocatable_region(addr_region_identifier);
 */
 add_addr_region_nonallocatable
   : ((TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE )
@@ -132,9 +132,9 @@ add_addr_region_nonallocatable
 
 /* 
   This is => 
-  (void)addr_space_identifier.add_region(addr_region_dentifier);
+  (void)addr_space_identifier.add_region(addr_region_identifier);
   or
-  addr_handle_identifier = addr_space_identifier.add_region(addr_region_dentifier);
+  addr_handle_identifier = addr_space_identifier.add_region(addr_region_identifier);
 */
 add_addr_region
   : ((TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE )

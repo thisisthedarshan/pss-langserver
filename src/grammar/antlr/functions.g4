@@ -59,4 +59,4 @@ function_call
 
 function_call_params
   : identifier?
-  | identifier (TOKEN_COMMA identifier)*;
+  | (identifier (TOKEN_COMMA identifier)*);
