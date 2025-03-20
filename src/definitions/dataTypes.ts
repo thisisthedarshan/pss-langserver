@@ -65,6 +65,7 @@ export enum objType {
   MEMORY_REGION = 'MEMORY_REGION',
   MEMORY_CLAIM = 'MEMORY_CLAIM',
   VARARGS = "VARARGS",
+  TEMPLATE_ITEM = 'TEMPLATE_ITEM',
   UNKNOWN = 'UNKNOWN'
 }
 
@@ -85,7 +86,7 @@ export type commentDocs = {
 }
 
 /* Tells what line Defines the object */
-type definedOn = {
+export type definedOn = {
   file: string;
   lineNumber: integer;
   columnNumber: integer;
@@ -115,7 +116,8 @@ export interface PSSNode {
   type: objType;
   name: string;
   definedOn: definedOn | undefined;
-  usedOn: usedOn[];
+  /*usedOn: usedOn[];*/ /* Not used for now */
+  comments: string | commentDocs;
   children: PSSNode[]; /* Array of child nodes - defined in ds file */
 }
 
