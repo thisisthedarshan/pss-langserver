@@ -369,7 +369,7 @@ export class visitor extends pssVisitor<void> {
   }
 }
 
-class doxygen_visitor extends doxygenParserVisitor<void> {
+export class doxygen_visitor extends doxygenParserVisitor<void> {
   /* File Name */
   private name: string = '';
   /* Common and var specific comments */
