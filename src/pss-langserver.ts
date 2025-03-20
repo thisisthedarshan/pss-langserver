@@ -43,13 +43,17 @@ import {
   TextDocument
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
-import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock, fullRange, generateSemanticTokens, getGoToDefinition, notify, scanDirectory, updateAST, updateASTMeta, updateStringArray } from './helperFunctions';
 import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
 import { metaData, PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
 import { version } from './version';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
+import { notify } from './helpers';
+import { fullRange, scanDirectory, updateAST, updateASTMeta } from './parser/helpers';
+import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
+import { generateSemanticTokens } from './providers/semanticTokenProvider';
+import { getGoToDefinition } from './providers/gotoProvider';
 
 /* To make the process act like an actual executable */
 const args = process.argv.slice(2);

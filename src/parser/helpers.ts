@@ -15,7 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { commentDocs, objType, semanticTokensLegend } from "../definitions/dataTypes";
+import { Position, Range } from "vscode-languageserver/node";
+import { commentDocs, metaData, objType, semanticTokensLegend } from "../definitions/dataTypes";
+import { getAutoCompleteItemsFromFile } from "./ast";
+import { TextDocument } from "vscode-languageserver-textdocument";
+const fs = require('fs-extra')
+const path = require('path')
 
 export function isWithinCommentBlock(document: { lineAt: (arg0: any) => { (): any; new(): any; text: string; }; }, lineNumber: any) {
   for (let i = lineNumber; i >= 0; i--) {
@@ -107,4 +112,48 @@ export const mapTokenModifiers = ((arr) => (str: string) => str in arr ? 1 << ar
 
 export function buildMarkdownComment(docComment: commentDocs): string {
   return '';
+}
+
+export function fullRange(document: TextDocument): Range {
+  const lastLine = document.lineCount - 1;
+  const lastChar = document.getText().split("\n")[lastLine]?.length || 0;
+
+  return Range.create(
+    Position.create(0, 0), // Start position at first character
+    Position.create(lastLine, lastChar) // End position at last character
+  );
+}
+
+export async function updateAST(fileURI: string, documentText: string): Promise<metaData[]> {
+  var items = getAutoCompleteItemsFromFile(fileURI, documentText);
+  return items;
+}
+
+export async function scanDirectory(dirPath: string, files: string[]): Promise<void> {
+  try {
+    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dirPath, entry.name);
+
+      if (entry.isDirectory()) {
+        await scanDirectory(fullPath, files);
+      } else if (entry.isFile() && entry.name.endsWith('.pss')) {
+        files.push(fullPath);
+      }
+    }
+  } catch (error) {
+    console.error(`Error scanning directory: ${dirPath}`, error);
+    throw error;
+  }
+}
+
+export function updateASTMeta(old: metaData[], newData: metaData[]): metaData[] {
+  const seenKeys = new Set(newData.flatMap(Object.keys));
+
+  const uniqueArray2 = old.filter(item =>
+    Object.keys(item).every(key => !seenKeys.has(key))
+  );
+
+  return [...newData, ...uniqueArray2];
 }

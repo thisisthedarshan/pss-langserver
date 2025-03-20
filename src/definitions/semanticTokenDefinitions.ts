@@ -557,7 +557,7 @@ export const semanticTokenTypes: Record<keyof typeof objType, KeywordInfo> = {
   FUNCTION: { tokenType: SemanticTokenTypes.function, tokenModifiers: [] },
   PROCEDURAL_FUNCTION: { tokenType: SemanticTokenTypes.function, tokenModifiers: [SemanticTokenModifiers.declaration] },
   ENUM: { tokenType: SemanticTokenTypes.enum, tokenModifiers: [] },
-  REGISTER_NAME: { tokenType: SemanticTokenTypes.variable, tokenModifiers: [] },
+  REGISTER_BODY_ITEM: { tokenType: SemanticTokenTypes.variable, tokenModifiers: [] },
   REGISTER_GROUP: { tokenType: SemanticTokenTypes.struct, tokenModifiers: [] },
   BUFFER: { tokenType: SemanticTokenTypes.struct, tokenModifiers: [] },
   STRUCT: { tokenType: SemanticTokenTypes.struct, tokenModifiers: [] },
@@ -579,5 +579,16 @@ export const semanticTokenTypes: Record<keyof typeof objType, KeywordInfo> = {
   LIST: { tokenType: SemanticTokenTypes.type, tokenModifiers: [] },
   MAP: { tokenType: SemanticTokenTypes.type, tokenModifiers: [] },
   SET: { tokenType: SemanticTokenTypes.type, tokenModifiers: [] },
-  UNKNOWN: { tokenType: SemanticTokenTypes.type, tokenModifiers: [SemanticTokenModifiers.deprecated] }
+  UNKNOWN: { tokenType: SemanticTokenTypes.type, tokenModifiers: [SemanticTokenModifiers.deprecated] },
+  ACTIVITY: { tokenType: SemanticTokenTypes.class, tokenModifiers: [] },
+  REGISTER_COMP: { tokenType: SemanticTokenTypes.class, tokenModifiers: [] },
+  REGISTER_DEF: { tokenType: SemanticTokenTypes.interface, tokenModifiers: [] },
+  REGISTER: { tokenType: SemanticTokenTypes.interface, tokenModifiers: [] },
+  STATE: { tokenType: SemanticTokenTypes.property, tokenModifiers: [] },
+  STREAM: { tokenType: SemanticTokenTypes.typeParameter, tokenModifiers: [] },
+  INSTANCE: { tokenType: SemanticTokenTypes.variable, tokenModifiers: [] },
+  MEMORY_SPACE: { tokenType: SemanticTokenTypes.namespace, tokenModifiers: [] },
+  MEMORY_REGION: { tokenType: SemanticTokenTypes.namespace, tokenModifiers: [] },
+  MEMORY_CLAIM: { tokenType: SemanticTokenTypes.namespace, tokenModifiers: [] },
+  VARARGS: { tokenType: SemanticTokenTypes.modifier, tokenModifiers: [] }
 };

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { buildAutocompletionBlock } from "../helperFunctions";
+import { buildAutocompletionBlock } from "../providers/autoCompletionProvider";
 import { getAutoCompleteItemsFromFile } from "./ast";
 const file: string = `
 component pss_top {

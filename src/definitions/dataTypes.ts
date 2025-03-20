@@ -29,13 +29,19 @@ export enum objType {
   NONE = 'NONE',
   COMPONENT = 'COMPONENT',
   ACTION = 'ACTION',
+  ACTIVITY = 'ACTION',
   FUNCTION = 'FUNCTION',
   PROCEDURAL_FUNCTION = 'PROCEDURAL_FUNCTION',
   ENUM = 'ENUM',
-  REGISTER_NAME = 'REGISTER_NAME',
+  REGISTER_BODY_ITEM = 'REGISTER_BODY_ITEM',
   REGISTER_GROUP = 'REGISTER_GROUP',
+  REGISTER_COMP = 'REGISTER_COMP',
+  REGISTER_DEF = 'REGISTER_DEF',
+  REGISTER = 'REGISTER',
   BUFFER = 'BUFFER',
   STRUCT = 'STRUCT',
+  STATE = 'STATE',
+  STREAM = 'STREAM',
   RESOURCE_OBJECT = 'RESOURCE_OBJECT',
   PACKAGE = 'PACKAGE',
   MONITOR = 'MONITOR',
@@ -54,7 +60,17 @@ export enum objType {
   LIST = 'LIST',
   MAP = 'MAP',
   SET = 'SET',
+  INSTANCE = 'INSTANCE',
+  MEMORY_SPACE = 'MEMORY_SPACE',
+  MEMORY_REGION = 'MEMORY_REGION',
+  MEMORY_CLAIM = 'MEMORY_CLAIM',
+  VARARGS = "VARARGS",
   UNKNOWN = 'UNKNOWN'
+}
+
+export type enumItems = {
+  name: string;
+  value: integer;
 }
 
 export type commentDocs = {
@@ -81,12 +97,28 @@ type usedOn = {
   lineNumber: integer;
 }
 
+/* Tells what are the traits of a memory object */
+export type traits = {
+  traitType: string;
+  traitValue: string;
+}
+
 /* Holds info on parameters */
 export type params = {
-  paramType: objType;
+  paramType: objType | string;
   paramName: string;
   paramDefault: any | undefined;
 }
+
+/* Interface to hold info on each traversed PSS Grammar node */
+export interface PSSNode {
+  type: objType;
+  name: string;
+  definedOn: definedOn | undefined;
+  usedOn: usedOn[];
+  children: PSSNode[]; /* Array of child nodes - defined in ds file */
+}
+
 
 /* Holds some meta info on the object(s) */
 export type metaInfo = {

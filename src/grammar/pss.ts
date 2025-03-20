@@ -12747,6 +12747,7 @@ export default class pss extends Parser {
 			case 2:
 				this.enterOuterAlt(localctx, 2);
 				{
+				{
 				this.state = 2939;
 				this.identifier();
 				this.state = 2944;
@@ -12764,6 +12765,7 @@ export default class pss extends Parser {
 					this.state = 2946;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
+				}
 				}
 				}
 				break;
