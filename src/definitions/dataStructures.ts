@@ -27,17 +27,18 @@ interface CompNode extends PSSNode {
 interface ActionNode extends PSSNode {
   type: objType.ACTION;
   isAbstract: boolean;
-  isPure: boolean;
   templateParams: params[] | undefined;
   superSpec: string;
 }
 
 interface InstanceNode extends PSSNode {
   type: objType.INSTANCE;
+  accessModifier: string;
   instanceType: objType | string;
-  instanceName: string;
-  instanceDefaultValue: any | undefined; /* name of spec in register instances */
-  instanceArrayCount: integer;
+  instanceDefaultValue: string | undefined; /* name of spec in register instances */
+  instanceArrayCount: number | string;
+  isRandom: boolean;
+  isStaticConst: boolean;
 }
 
 interface MemorySpaceNode extends PSSNode {
@@ -100,6 +101,6 @@ interface FunctionNode extends PSSNode {
   parameters: params[];
 }
 
-type PSSLangObjects = CompNode | ActionNode | InstanceNode | MemorySpaceNode | MemoryRegionNode | RegisterCompNode | RegisterGroupNode | RegisterBodyNode | RegisterDefNode | ActivityNode | EnumNode | StructNode | FunctionNode;
+type PSSLangObjects = PSSNode | CompNode | ActionNode | InstanceNode | MemorySpaceNode | MemoryRegionNode | RegisterCompNode | RegisterGroupNode | RegisterBodyNode | RegisterDefNode | ActivityNode | EnumNode | StructNode | FunctionNode;
 
 export { PSSLangObjects, CompNode, ActionNode, InstanceNode, MemorySpaceNode, MemoryRegionNode, RegisterCompNode, RegisterGroupNode, RegisterBodyNode, RegisterDefNode, ActivityNode, EnumNode, StructNode, FunctionNode };
