@@ -106,10 +106,7 @@ object_ref_field
 
 action_handle_declaration
 	: action_type_identifier 
-	  action_instantiation 
-	  ( TOKEN_COMMA 
-	  	action_instantiation
-	  )*
+	  action_instantiation
 	;
 
 action_instantiation
