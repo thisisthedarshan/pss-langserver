@@ -101,7 +101,7 @@ resource_object_type
 	;
 
 object_ref_field
-	: array_dim?
+	: identifier array_dim?
 	;
 
 action_handle_declaration
