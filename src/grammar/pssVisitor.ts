@@ -37,7 +37,6 @@ import { Action_handle_declarationContext } from "./pss.js";
 import { Action_instantiationContext } from "./pss.js";
 import { Activity_data_fieldContext } from "./pss.js";
 import { Activity_scheduling_constraintContext } from "./pss.js";
-import { Inout_dataContext } from "./pss.js";
 import { Activity_declarationContext } from "./pss.js";
 import { Activity_stmtContext } from "./pss.js";
 import { Labeled_activity_stmtContext } from "./pss.js";
@@ -358,11 +357,10 @@ import { Trait_propertyContext } from "./pss.js";
 import { Number_identifierContext } from "./pss.js";
 import { Bool_identifierContext } from "./pss.js";
 import { Contiguous_addr_space_defContext } from "./pss.js";
-import { Addr_region_settingContext } from "./pss.js";
 import { Addr_claimContext } from "./pss.js";
 import { Transparent_addr_space_defContext } from "./pss.js";
 import { Transparent_addr_region_defContext } from "./pss.js";
-import { Transparent_addr_region_settingContext } from "./pss.js";
+import { Addr_region_settingContext } from "./pss.js";
 import { Transparent_addr_claimContext } from "./pss.js";
 import { Add_addr_region_nonallocatableContext } from "./pss.js";
 import { Add_addr_regionContext } from "./pss.js";
@@ -558,12 +556,6 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitActivity_scheduling_constraint?: (ctx: Activity_scheduling_constraintContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.inout_data`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitInout_data?: (ctx: Inout_dataContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.activity_declaration`.
 	 * @param ctx the parse tree
@@ -2485,12 +2477,6 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 */
 	visitContiguous_addr_space_def?: (ctx: Contiguous_addr_space_defContext) => Result;
 	/**
-	 * Visit a parse tree produced by `pss.addr_region_setting`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitAddr_region_setting?: (ctx: Addr_region_settingContext) => Result;
-	/**
 	 * Visit a parse tree produced by `pss.addr_claim`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -2509,11 +2495,11 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 */
 	visitTransparent_addr_region_def?: (ctx: Transparent_addr_region_defContext) => Result;
 	/**
-	 * Visit a parse tree produced by `pss.transparent_addr_region_setting`.
+	 * Visit a parse tree produced by `pss.addr_region_setting`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitTransparent_addr_region_setting?: (ctx: Transparent_addr_region_settingContext) => Result;
+	visitAddr_region_setting?: (ctx: Addr_region_settingContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.transparent_addr_claim`.
 	 * @param ctx the parse tree

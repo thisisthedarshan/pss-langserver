@@ -71,12 +71,6 @@ contiguous_addr_space_def
     addr_space_identifier (TOKEN_COMMA addr_space_identifier)*
     TOKEN_SEMICOLON;
 
-addr_region_setting 
- :  addr_region_identifier TOKEN_DOT 
-    TOKEN_SIZE TOKEN_EQUALS 
-    (integer_number  | expression )
-    TOKEN_SEMICOLON;
-
 addr_claim
   : TOKEN_RAND? TOKEN_ADDRESS_CLAIM 
     TOKEN_LT 
@@ -100,12 +94,12 @@ transparent_addr_region_def
     TOKEN_GT
     addr_region_identifier;
 
-transparent_addr_region_setting
+addr_region_setting
   : addr_region_identifier TOKEN_DOT
     (
-        (TOKEN_SIZE TOKEN_EQUALS (integer_number | expression))
-      | (TOKEN_ADDR TOKEN_EQUALS (integer_number | expression))
-      | (TOKEN_TRAIT TOKEN_DOT trait_identifier TOKEN_EQUALS trait_property)
+        (TOKEN_SIZE TOKEN_EQUALS (size_i=integer_number | size_e=expression))
+      | (TOKEN_ADDR TOKEN_EQUALS (addr_i=integer_number | addr_e=expression))
+      | (TOKEN_TRAIT TOKEN_DOT trait_id=trait_identifier TOKEN_EQUALS trait=trait_property)
     ) TOKEN_SEMICOLON;
 
 transparent_addr_claim
@@ -184,7 +178,6 @@ addr_value_abs
 /* Memory operations in exec blocks */
 mem_ops 
   : transparent_addr_region_def
-  | transparent_addr_region_setting
   | addr_region_setting
   | add_addr_region
   | add_addr_region_nonallocatable

@@ -54,7 +54,6 @@ action_body_item
 	| action_body_compile_if
 	| transparent_addr_claim
 	| addr_claim
-	| inout_data
 	| stmt_terminator
 	;
 
@@ -134,6 +133,3 @@ activity_scheduling_constraint
 	    hierarchical_id
 	  ) TOKEN_CRBRACE TOKEN_SEMICOLON
 	;
-
-inout_data
-	: (TOKEN_INPUT | TOKEN_OUTPUT) struct_kind identifier;
