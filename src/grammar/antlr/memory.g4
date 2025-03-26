@@ -76,7 +76,8 @@ addr_claim
     TOKEN_LT 
       trait_identifier?
     TOKEN_GT 
-    claim_identifier;
+    claim_identifier
+    (TOKEN_COMMA claim_identifier)*;
 
 /* Transparent Address Space related grammar */
 transparent_addr_space_def
@@ -92,7 +93,8 @@ transparent_addr_region_def
     TOKEN_LT
       (addr_space_traits)? 
     TOKEN_GT
-    addr_region_identifier;
+    addr_region_identifier
+    (TOKEN_COMMA addr_region_identifier)*;
 
 addr_region_setting
   : addr_region_identifier TOKEN_DOT
@@ -107,7 +109,8 @@ transparent_addr_claim
     TOKEN_LT 
       trait_identifier?
     TOKEN_GT 
-    claim_identifier;
+    claim_identifier
+    (TOKEN_COMMA claim_identifier)*;
 
 
 /* Using address regions */
