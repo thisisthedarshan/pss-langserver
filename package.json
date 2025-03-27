@@ -46,6 +46,7 @@
     "clean": "rm -fr ./dist/*",
     "dev": "tsc --watch",
     "prepublishOnly": "make source",
-    "start": "node dist/pss-langserver.js"
+    "start": "node dist/pss-langserver.js",
+    "test-parser": "node dist/parser/test.js"
   }
 }

@@ -21,7 +21,9 @@ Welcome to the **PSS Language Server** project, a dedicated backend service for 
 > Ensure NodeJS is installed on your system.
 > If not, just get it [from here](https://nodejs.org/en/download)
 
-Just run `npm i -g pss-langserver` and start it using `pss-langserver`. To update to latest version (if already installed), run `npm update -g`.
+Just run `npm i -g pss-langserver` and start it using `pss-langserver`.
+
+To update to latest version (if already installed), run `npm update -g pss-langserver`.
 
 ## ✨ Features
 
@@ -52,6 +54,12 @@ Check out the [features](FEATURES.md) page for more information.
 
    ```bash
    npm run dev
+   ```
+
+5. Run the parser on a [test file](src/parser/test.ts):
+
+   ```bash
+   npm run test-parser
    ```
 
 ## 📑 Usage in IDEs
