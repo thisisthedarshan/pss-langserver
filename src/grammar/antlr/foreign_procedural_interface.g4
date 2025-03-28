@@ -29,7 +29,7 @@ TOKEN_FUNCTION function_prototype TOKEN_EQUALS string_literal TOKEN_SEMICOLON;
 
 import_class_decl : TOKEN_IMPORT TOKEN_CLASS import_class_identifier import_class_extends? TOKEN_CLBRACE (import_class_function_decl)* TOKEN_CRBRACE;
 
-import_class_extends : TOKEN_COLON type_identifier (TOKEN_COMMA type_identifier)*;
+import_class_extends : TOKEN_COLON type_identifier (TOKEN_COLON type_identifier)*;
 
 import_class_function_decl : function_prototype ;
 

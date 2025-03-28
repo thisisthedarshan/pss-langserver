@@ -141,8 +141,8 @@ function_params : identifier;
 symbol_call : symbol_identifier function_parameter_list TOKEN_SEMICOLON;
 
 function_parameter_list
-    : TOKEN_FLBRACE TOKEN_FRBRACE                
-    | TOKEN_FLBRACE expression_list TOKEN_FRBRACE
+    : (TOKEN_FLBRACE TOKEN_FRBRACE)             
+    | (TOKEN_FLBRACE expression_list TOKEN_FRBRACE)
     ;
 
 expression_list

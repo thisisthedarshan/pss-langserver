@@ -20,11 +20,13 @@ import action_declarations,activity_statements,behavioral_coverage,component_dec
 
 data_declaration : data_type data_instantiation (TOKEN_COMMA data_instantiation)* TOKEN_SEMICOLON;
 
-data_instantiation : identifier array_dim? (TOKEN_EQUALS constant_expression)? ;
+data_instantiation:
+identifier array_dim? (TOKEN_EQUALS (constant_expression | function_call))?;
 
 array_dim : TOKEN_SLBRACE constant_expression TOKEN_SRBRACE;
 
-attr_field : access_modifier? ( TOKEN_RAND | (TOKEN_STATIC TOKEN_CONST) )? data_declaration;
+attr_field:
+access_modifier? TOKEN_RAND (TOKEN_STATIC TOKEN_CONST)? data_declaration;
 
 access_modifier : TOKEN_PUBLIC | TOKEN_PROTECTED | TOKEN_PRIVATE;
 

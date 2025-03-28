@@ -42,14 +42,14 @@ procedural_sequence_block_stmt:
 procedural_data_declaration:
 	data_type procedural_data_instantiation (
 		TOKEN_COMMA procedural_data_instantiation
-	)*;
+	)* TOKEN_SEMICOLON;
 
 procedural_data_instantiation:
-	identifier array_dim? (TOKEN_EQUALS expression)? TOKEN_SEMICOLON;
+	identifier array_dim? (TOKEN_EQUALS expression)?;
 
 procedural_assignment_stmt
 	:	(ref_path assign_op expression TOKEN_SEMICOLON)
-	|	(data_type assign_op expression TOKEN_SEMICOLON)
+	|	(identifier assign_op expression TOKEN_SEMICOLON)
 	|	(data_type? identifier assign_op function_call TOKEN_SEMICOLON);
 
 procedural_void_function_call_stmt: (

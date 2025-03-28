@@ -23,19 +23,6 @@ TOKEN_QUOTED_STRING
 
 filename_string : TOKEN_QUOTED_STRING;
 
-/* Data Declarations - missing from the LRM */
-data_declaration:
-data_type data_instantiation (TOKEN_COMMA data_instantiation)* TOKEN_SEMICOLON;
-
-data_instantiation:
-identifier array_dim? (TOKEN_EQUALS (constant_expression | function_call))?;
-
-array_dim:
-TOKEN_SLBRACE constant_expression TOKEN_SRBRACE;
-
-attr_field:
-access_modifier? TOKEN_RAND (TOKEN_STATIC TOKEN_CONST)? data_declaration;
-
 /* Proper extend statements re-declared */
 action_extension
   : (
