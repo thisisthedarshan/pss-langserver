@@ -20,8 +20,10 @@ import pss_lexer from "../grammar/pssLex";
 import { visitor } from "./visitors";
 import { metaData } from "../definitions/dataTypes";
 import { PSSErrorListener } from "./listener";
+import { PSSLangObjects } from "../definitions/dataStructures";
+import { advancedVisitor } from "./advancedVisitor";
 
-export function getAutoCompleteItemsFromFile(fileURI: string, fileContents: string): metaData[] {
+export function buildAST(fileURI: string, fileContents: string): metaData[] {
   let inputStream = new CharStream(fileContents);
   let lexer = new pss_lexer(inputStream);
   let tokenStream = new CommonTokenStream(lexer);
@@ -32,4 +34,17 @@ export function getAutoCompleteItemsFromFile(fileURI: string, fileContents: stri
   let myVisitor = new visitor(tokenStream, fileURI);
   tree.accept(myVisitor);
   return [...new Set(myVisitor.getMeta())];
+}
+
+export function buildASTNew(fileURI: string, fileContents: string): PSSLangObjects[] {
+  let inputStream = new CharStream(fileContents);
+  let lexer = new pss_lexer(inputStream);
+  let tokenStream = new CommonTokenStream(lexer);
+  let parser = new pss(tokenStream);
+  parser.removeErrorListeners(); /* No need for error listener for now */
+  /*parser.addErrorListener(new PSSErrorListener())*/
+  let tree = parser.pss_entry();
+  let myVisitor = new advancedVisitor(tokenStream, fileURI);
+  tree.accept(myVisitor);
+  return myVisitor.getAstObjects();
 }

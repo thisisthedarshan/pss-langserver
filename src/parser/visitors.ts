@@ -274,7 +274,7 @@ export class visitor extends pssVisitor<void> {
             return {
               paramType: getObjType(dataType),
               paramName: paramList.identifier()?.getText(),
-              paramDefault: paramList.constant_expression()?.expression()?.getText() || undefined
+              paramDefault: paramList.constant_expression()?.expression()?.getText() ?? ""
             }
           }),
           type: ctx.function_prototype().function_return_type()?.getText(),

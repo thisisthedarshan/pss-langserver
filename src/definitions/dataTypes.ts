@@ -42,6 +42,7 @@ export enum objType {
   STRUCT = 'STRUCT',
   STATE = 'STATE',
   STREAM = 'STREAM',
+  POOLS = 'POOLS',
   RESOURCE_OBJECT = 'RESOURCE_OBJECT',
   PACKAGE = 'PACKAGE',
   MONITOR = 'MONITOR',
@@ -66,12 +67,35 @@ export enum objType {
   MEMORY_CLAIM = 'MEMORY_CLAIM',
   VARARGS = "VARARGS",
   TEMPLATE_ITEM = 'TEMPLATE_ITEM',
+  ACTION_HANDLE = 'ACTION_HANDLE',
+  ADDRESS_SPACE = 'ADDRESS_SPACE',
+  ADDRESS_REGION = 'ADDRESS_REGION',
+  ADDRESS_CLAIM = 'ADDRESS_CLAIM',
+  STRUCT_ITEM = 'STRUCT_ITEM',
+  EXEC_PRESOLVE = 'EXEC_PRESOLVE',
+  EXEC_POSTSOLVE = 'EXEC_POSTSOLVE',
+  EXEC_PREBODY = 'EXEC_PREBODY',
+  EXEC_BODY = 'EXEC_BODY',
+  EXEC_HEADER = 'EXEC_HEADER',
+  EXEC_DECLARATION = 'EXEC_DECLARATION',
+  EXEC_RUNSTART = 'EXEC_RUNSTART',
+  EXEC_RUNEND = 'EXEC_RUNEND',
+  EXEC_INITDOWN = 'EXEC_INITDOWN',
+  EXEC_INITUP = 'EXEC_INITUP',
+  EXEC_INIT = 'EXEC_INIT',
+  EXEC_TARGET = 'EXEC_TARGET',
+  EXEC_FILE = 'EXEC_FILE',
+  CALL_SUPER = 'CALL_SUPER',
+  IMPORT = 'IMPORT',
+  ASSIGNMENT = 'ASSIGNMENT',
+
   UNKNOWN = 'UNKNOWN'
 }
 
 export type enumItems = {
   name: string;
   value: integer;
+  definedOn: definedOn;
 }
 
 export type commentDocs = {
@@ -108,7 +132,7 @@ export type traits = {
 export type params = {
   paramType: objType | string;
   paramName: string;
-  paramDefault: any | undefined;
+  paramDefault: string;
 }
 
 /* Interface to hold info on each traversed PSS Grammar node */
@@ -200,3 +224,12 @@ export const semanticTokensLegend = {
     "defaultLibrary"
   ]
 };
+
+/* Create a mapping for access type */
+export const accessMap: {
+  [key: string]: "READONLY" | "READWRITE" | "WRITEONLY"
+} = {
+  "READONLY": "READONLY",
+  "READWRITE": "READWRITE",
+  "WRITEONLY": "WRITEONLY"
+}

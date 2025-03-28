@@ -17,8 +17,9 @@
 
 import { Position, Range } from "vscode-languageserver/node";
 import { commentDocs, metaData, objType, semanticTokensLegend } from "../definitions/dataTypes";
-import { getAutoCompleteItemsFromFile } from "./ast";
+import { buildAST } from "./ast";
 import { TextDocument } from "vscode-languageserver-textdocument";
+import { InstanceNode, PSSLangObjects, StructNode } from "../definitions/dataStructures";
 const fs = require('fs-extra')
 const path = require('path')
 
@@ -27,83 +28,192 @@ export function isWithinCommentBlock(document: { lineAt: (arg0: any) => { (): an
     const lineText = document.lineAt(i).text.trim();
 
     if ((lineText.startsWith('/*') || lineText.startsWith("/**")) && !lineText.endsWith('*/')) {
-      return true;  // Found the start of an unclosed block comment
+      return true;  /* Found the start of an unclosed block comment */
     }
     if (lineText.endsWith('*/')) {
-      return false;  // Found the end of the block comment
+      return false;  /* Found the end of the block comment */
     }
   }
   return false;
 }
 
 export function getObjType(str: string): objType {
-  switch (str.toLowerCase()) {
-    case "component":
-      return objType.COMPONENT
-      break;
-    case "action":
-      return objType.ACTION
-      break;
-    case "function":
-      return objType.FUNCTION
-      break;
-    case "enum":
-      return objType.ENUM
-      break;
-    case "buffer":
-      return objType.BUFFER
-      break;
-    case "struct":
-      return objType.STRUCT
-      break;
-    case "resource":
-      return objType.RESOURCE_OBJECT
-      break;
-    case "package":
-      return objType.PACKAGE
-      break;
-    case "monitor":
-      return objType.MONITOR
-      break;
-    case "chandle":
-      return objType.CHANDLE
-      break;
-    case "bit":
-      return objType.BIT
-      break;
-    case "int":
-      return objType.INTEGER
-      break;
-    case "string":
-      return objType.STRING
-      break;
-    case "bool":
-      return objType.BOOL
-      break;
-    case "float32":
-      return objType.FLOAT32
-      break;
-    case "float64":
-      return objType.FLOAT64
-      break;
-    case "ref":
-      return objType.REF
-      break;
-    case "array":
-      return objType.ARRAY
-      break;
-    case "list":
-      return objType.LIST
-      break;
-    case "map":
-      return objType.MAP
-      break;
-    case "set":
-      return objType.SET
-      break;
+  switch (str.toUpperCase()) {
+    case "COMPONENT":
+      return objType.COMPONENT;
+    case "ACTION":
+      return objType.ACTION;
+    case "ACTION":
+      return objType.ACTIVITY;
+    case "FUNCTION":
+      return objType.FUNCTION;
+    case "PROCEDURAL_FUNCTION":
+      return objType.PROCEDURAL_FUNCTION;
+    case "ENUM":
+      return objType.ENUM;
+    case "REGISTER_BODY_ITEM":
+      return objType.REGISTER_BODY_ITEM;
+    case "REGISTER_GROUP":
+      return objType.REGISTER_GROUP;
+    case "REGISTER_COMP":
+      return objType.REGISTER_COMP;
+    case "REGISTER_DEF":
+      return objType.REGISTER_DEF;
+    case "REGISTER":
+      return objType.REGISTER;
+    case "BUFFER":
+      return objType.BUFFER;
+    case "STRUCT":
+      return objType.STRUCT;
+    case "STATE":
+      return objType.STATE;
+    case "STREAM":
+      return objType.STREAM;
+    case "RESOURCE_OBJECT":
+      return objType.RESOURCE_OBJECT;
+    case "POOLS":
+      return objType.POOLS;
+    case "PACKAGE":
+      return objType.PACKAGE;
+    case "MONITOR":
+      return objType.MONITOR;
+    case "CONSTRAINT":
+      return objType.CONSTRAINT;
+    case "DATA":
+      return objType.DATA;
+    case "TYPEDEF":
+      return objType.TYPEDEF;
+    case "CHANDLE":
+      return objType.CHANDLE;
+    case "INTEGER":
+      return objType.INTEGER;
+    case "BIT":
+      return objType.BIT;
+    case "STRING":
+      return objType.STRING;
+    case "BOOL":
+      return objType.BOOL;
+    case "FLOAT32":
+      return objType.FLOAT32;
+    case "FLOAT64":
+      return objType.FLOAT64;
+    case "REF":
+      return objType.REF;
+    case "ARRAY":
+      return objType.ARRAY;
+    case "LIST":
+      return objType.LIST;
+    case "MAP":
+      return objType.MAP;
+    case "SET":
+      return objType.SET;
+    case "INSTANCE":
+      return objType.INSTANCE;
+    case "MEMORY_SPACE":
+      return objType.MEMORY_SPACE;
+    case "MEMORY_REGION":
+      return objType.MEMORY_REGION;
+    case "MEMORY_CLAIM":
+      return objType.MEMORY_CLAIM;
+    case "VARARGS":
+      return objType.VARARGS;
+    case "TEMPLATE_ITEM":
+      return objType.TEMPLATE_ITEM;
+    case "ACTION_HANDLE":
+      return objType.ACTION_HANDLE;
+    case "ADDRESS_SPACE":
+      return objType.ADDRESS_SPACE;
+    case "ADDRESS_REGION":
+      return objType.ADDRESS_REGION;
+    case "ADDRESS_CLAIM":
+      return objType.ADDRESS_CLAIM;
+    case "STRUCT_ITEM":
+      return objType.STRUCT_ITEM;
+    case "EXEC_PRESOLVE":
+      return objType.EXEC_PRESOLVE;
+    case "EXEC_POSTSOLVE":
+      return objType.EXEC_POSTSOLVE;
+    case "EXEC_PREBODY":
+      return objType.EXEC_PREBODY;
+    case "EXEC_BODY":
+      return objType.EXEC_BODY;
+    case "EXEC_HEADER":
+      return objType.EXEC_HEADER;
+    case "EXEC_DECLARATION":
+      return objType.EXEC_DECLARATION;
+    case "EXEC_RUNSTART":
+      return objType.EXEC_RUNSTART;
+    case "EXEC_RUNEND":
+      return objType.EXEC_RUNEND;
+    case "EXEC_INITDOWN":
+      return objType.EXEC_INITDOWN;
+    case "EXEC_INITUP":
+      return objType.EXEC_INITUP;
+    case "EXEC_INIT":
+      return objType.EXEC_INIT;
+    case "EXEC_TARGET":
+      return objType.EXEC_TARGET;
+    case "EXEC_FILE":
+      return objType.EXEC_FILE;
+    case "CALL_SUPER":
+      return objType.CALL_SUPER;
     default:
       return objType.UNKNOWN;
-      break;
+  }
+}
+
+export function getFlowObjType(str: string): objType.BUFFER | objType.STREAM | objType.STATE | objType.POOLS {
+  switch (str.toUpperCase()) {
+    case "STREAM":
+      return objType.STREAM;
+    case "STATE":
+      return objType.STATE;
+    case "POOLS":
+      return objType.POOLS;
+    default:
+      return objType.BUFFER;
+  }
+}
+
+export function getExecType(str: string): objType.EXEC_PRESOLVE | objType.EXEC_POSTSOLVE | objType.EXEC_PREBODY | objType.EXEC_BODY | objType.EXEC_HEADER | objType.EXEC_DECLARATION | objType.EXEC_RUNSTART | objType.EXEC_RUNEND | objType.EXEC_INITDOWN | objType.EXEC_INITUP | objType.EXEC_INIT {
+  switch (str.toUpperCase()) {
+    case "EXEC_PRESOLVE":
+      return objType.EXEC_PRESOLVE;
+    case "EXEC_POSTSOLVE":
+      return objType.EXEC_POSTSOLVE;
+    case "EXEC_PREBODY":
+      return objType.EXEC_PREBODY;
+    case "EXEC_BODY":
+      return objType.EXEC_BODY;
+    case "EXEC_HEADER":
+      return objType.EXEC_HEADER;
+    case "EXEC_DECLARATION":
+      return objType.EXEC_DECLARATION;
+    case "EXEC_RUNSTART":
+      return objType.EXEC_RUNSTART;
+    case "EXEC_RUNEND":
+      return objType.EXEC_RUNEND;
+    case "EXEC_INITDOWN":
+      return objType.EXEC_INITDOWN;
+    case "EXEC_INITUP":
+      return objType.EXEC_INITUP;
+    default:
+      return objType.EXEC_INIT
+  }
+}
+
+export function getStructKind(st: string): objType.STRUCT | objType.BUFFER | objType.STATE | objType.STREAM | objType.RESOURCE_OBJECT {
+  switch (st.toUpperCase()) {
+    case "BUFFER":
+      return objType.BUFFER;
+    case "STATE":
+      return objType.STATE;
+    case "STREAM":
+      return objType.STREAM;
+    case "RESOURCE_OBJECT":
+      return objType.RESOURCE_OBJECT;
+    default:
+      return objType.STRUCT;
   }
 }
 
@@ -119,13 +229,13 @@ export function fullRange(document: TextDocument): Range {
   const lastChar = document.getText().split("\n")[lastLine]?.length || 0;
 
   return Range.create(
-    Position.create(0, 0), // Start position at first character
-    Position.create(lastLine, lastChar) // End position at last character
+    Position.create(0, 0), /* Start position at first character */
+    Position.create(lastLine, lastChar) /* End position at last character */
   );
 }
 
 export async function updateAST(fileURI: string, documentText: string): Promise<metaData[]> {
-  var items = getAutoCompleteItemsFromFile(fileURI, documentText);
+  var items = buildAST(fileURI, documentText);
   return items;
 }
 
@@ -156,4 +266,107 @@ export function updateASTMeta(old: metaData[], newData: metaData[]): metaData[] 
   );
 
   return [...newData, ...uniqueArray2];
+}
+
+/** This function returns sizes for known object */
+function getObjectSize(obj: string): number {
+  /* Base type sizes */
+  const baseTypes: { [key: string]: number } = {
+    'int': 32,
+    'bit': 1
+  };
+
+  /* Helper function to recursively calculate type size */
+  function parseTypeSize(type: string): number {
+    /* Check for array type */
+    if (type.startsWith('array<')) {
+      const match = type.match(/array<([^,]+),(\d+)>/);
+      if (match) {
+        const innerType = match[1];
+        const arraySize = parseInt(match[2]);
+        return getObjectSize(innerType) * arraySize;
+      }
+      return 0;
+    }
+
+    /* Check for range notation */
+    const rangeMatch = type.match(/^(int|bit)\[(\d+):(\d+)\]$/);
+    if (rangeMatch) {
+      const baseType = rangeMatch[1];
+      const start = parseInt(rangeMatch[2]);
+      const end = parseInt(rangeMatch[3]);
+      return Math.abs(end - start) + 1;
+    }
+
+    /* Check for single index notation */
+    const indexMatch = type.match(/^(int|bit)\[(\d+)\]$/);
+    if (indexMatch) {
+      return parseInt(indexMatch[2]);
+    }
+
+    /* Base type lookup */
+    return baseTypes[type] || 0;
+  }
+
+  return parseTypeSize(obj);
+}
+
+/** This lambda function finds the next closest byte size for given bit size */
+export const findByteSize: (input: number) => number = (input) => {
+  const remainder = input % 8;
+  return remainder === 0 ? 8 : 8 - remainder;
+};
+
+
+/** This function returns the size of a packed struct - for use with registers */
+export function getPackedStructSize(obj: PSSLangObjects[] | PSSLangObjects, packedStructName: string): number {
+  let packedStructNode: PSSLangObjects | undefined;
+
+  if (Array.isArray(obj)) {
+    /* Iteratively get the packedStruct from each object in pssLangObject array */
+    obj.forEach(arrayItem => {
+      packedStructNode = getNodeFromName(arrayItem, packedStructName);
+      if (typeof (packedStructName) !== 'undefined') {
+        return;
+      }
+    });
+  } else {
+    packedStructNode = getNodeFromName(obj, packedStructName);
+  }
+  if (typeof (packedStructNode) === 'undefined') {
+    return 0;
+  }
+  let size: number = 0;
+  packedStructNode.children.map(structItemNode => {
+    const structItem = structItemNode as InstanceNode;
+    size += getObjectSize(structItem.instanceType);
+  });
+  /* todo */
+  return size;
+}
+
+/** This function goes through a PSS Lang Objects data type and finds the object with given name and returns it */
+export function getNodeFromName(object: PSSLangObjects, name: string, ignore: objType = objType.UNKNOWN): PSSLangObjects | undefined {
+  const stack: PSSLangObjects[] = [object];
+  /* This logic uses an iterative Depth First Search algorithm to find the child */
+  while (stack.length > 0) {
+    const current = stack.pop()!;
+    if (current.name === name && current.type != ignore) {
+      return current;
+    }
+    for (const child of current.children) {
+      stack.push(child);
+    }
+  }
+  return undefined;
+}
+/** This function just iterates through objects and returns the result from getNodeFromName function */
+export function getNodeFromNameArray(objects: PSSLangObjects[], name: string, ignore: objType = objType.UNKNOWN): PSSLangObjects | undefined {
+  objects.forEach(obj => {
+    const node = getNodeFromName(obj, name, ignore);
+    if (typeof (node) !== 'undefined') {
+      return node;
+    }
+  });
+  return undefined;
 }

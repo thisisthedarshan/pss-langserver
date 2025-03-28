@@ -15,10 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { buildAutocompletionBlock } from "../providers/autoCompletionProvider";
-import { getAutoCompleteItemsFromFile } from "./ast";
+import { buildAST, buildASTNew } from "./ast";
+import { writeFileSync } from "fs-extra";
 const file: string = `
 component pss_top {
-    action stress_xfer {
+    action stress_x__filenamefer {
         activity {
             schedule {
                 do my_mem_ops_c ::write_data;
@@ -37,7 +38,7 @@ component pss_top {
     }
 }
 `;
-let out = getAutoCompleteItemsFromFile("", file);
+let out = buildAST("", file);
 out.map(astObj => {
   Object.entries(astObj).map(([keyword, info]) => {
     console.log(keyword, info)
@@ -48,4 +49,7 @@ let autocompletion = buildAutocompletionBlock(out)
 
 autocompletion.map(astObj => {
   console.log(astObj)
-})
+});
+
+const newObjs = buildASTNew(__filename, file);
+writeFileSync(__filename + '.json', JSON.stringify(newObjs, null, 4), 'utf-8');
