@@ -68,3 +68,7 @@ The generated header includes:
 
 ---
 This header is either added to new files or updated on subsequent file modifications, ensuring that the file's metadata remains current
+
+### Enum item declaration
+
+From the official Portable Stimulus Standard v3.0 LRM, the enum item value is defined as a constant expression. But for most cases, we just assign them as numbers. So, in the current LSP implementation, the parser assumes that when we set an enum value, we are always using an integer type.
