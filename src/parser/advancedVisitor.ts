@@ -21,7 +21,7 @@ import pss_lexer from "../grammar/pssLex";
 import { getExecType, getFlowObjType, getNodeFromName, getNodeFromNameArray, getObjType, getPackedStructSize, getStructKind } from "./helpers";
 import { accessMap, commentDocs, definedOn, enumItems, metaData, objType, params, PSSNode } from "../definitions/dataTypes";
 import { ActionNode, AddressNode, AssignmentNode, CompNode, EnumNode, ExecNode, FlowReferenceFieldNode, FunctionNode, ImportsNode, InstanceNode, PackageNode, PSSLangObjects, RegisterBodyNode, RegisterCompNode, RegisterDefNode, RegisterGroupNode, ResourceReferenceFieldNode, StructNode, TypedefDeclNode } from "../definitions/dataStructures";
-import { Abstract_action_declarationContext, Access_typeContext, Action_declarationContext, Action_extensionContext, Action_handle_declarationContext, Activity_declarationContext, Add_addr_region_nonallocatableContext, Add_addr_regionContext, Addr_claimContext, Addr_region_settingContext, Attr_fieldContext, Component_data_declarationContext, Component_declarationContext, Component_pool_declarationContext, Contiguous_addr_space_defContext, Data_declarationContext, Enum_declarationContext, Enum_itemContext, Exec_block_stmtContext, Exec_blockContext, Extend_stmtContext, Flow_ref_field_declarationContext, Function_declContext, Function_parameter_list_prototypeContext, Function_parameterContext, Function_prototypeContext, Import_class_declContext, Import_class_function_declContext, Import_functionContext, Import_stmtContext, Package_declarationContext, Procedural_assignment_stmtContext, Procedural_data_declarationContext, Procedural_functionContext, Pss_entryContext, Register_body_definitionContext, Register_comp_definitionContext, Register_comp_instanceContext, Register_definitionContext, Register_group_definitionContext, Resource_ref_field_declarationContext, Struct_declarationContext, Template_param_decl_listContext, Transparent_addr_claimContext, Transparent_addr_region_defContext, Transparent_addr_space_defContext, Typedef_declarationContext } from "../grammar/pss";
+import { Abstract_action_declarationContext, Access_typeContext, Action_declarationContext, Action_extensionContext, Action_handle_declarationContext, Activity_declarationContext, Add_addr_region_nonallocatableContext, Add_addr_regionContext, Addr_claimContext, Addr_region_settingContext, Attr_fieldContext, Component_data_declarationContext, Component_declarationContext, Component_pool_declarationContext, Contiguous_addr_space_defContext, Data_declarationContext, Enum_declarationContext, Enum_itemContext, Exec_block_stmtContext, Exec_blockContext, Extend_stmtContext, Flow_ref_field_declarationContext, Function_declContext, Function_parameter_list_prototypeContext, Function_parameterContext, Function_prototypeContext, Import_class_declContext, Import_class_function_declContext, Import_functionContext, Import_stmtContext, Package_declarationContext, Procedural_assignment_stmtContext, Procedural_data_declarationContext, Procedural_functionContext, Pss_entryContext, Register_body_definitionContext, Register_comp_definitionContext, Register_comp_instanceContext, Register_definitionContext, Register_group_definitionContext, Resource_ref_field_declarationContext, Struct_body_itemContext, Struct_declarationContext, Template_param_decl_listContext, Transparent_addr_claimContext, Transparent_addr_region_defContext, Transparent_addr_space_defContext, Typedef_declarationContext } from "../grammar/pss";
 import doxygenLexer from "../grammar/doxygenLexer";
 import doxygenParser from "../grammar/doxygenParser";
 import { doxygen_visitor } from "./visitors";
@@ -426,7 +426,6 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
     }
 
     /** Future plans - use reg_set_handle to obtain base addresses */
-
 
     /** Address space related crawlers */
     /** Contiguous address space definition */
@@ -1155,17 +1154,19 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
           this.visit(enumItem);
           enumItems.push(this.sharedData as enumItems);
         });
+      } else {
+        /* This is essentially extending the struct */
+        const identifier:string = d.struct_kind_identifier().getText();
+        const rootNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], identifier);
+        if (rootNode){
+          const baseNode:StructNode = rootNode as StructNode;
+          this.currentASTHierarchy.push(baseNode);
+          this.visitChildren(d);
+          this.currentASTHierarchy.pop();
+        }
       }
     }
-
-
-
-
-
-
-
-
-
+    
   } /** End Super */
 
 }
