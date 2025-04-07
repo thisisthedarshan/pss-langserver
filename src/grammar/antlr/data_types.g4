@@ -42,6 +42,7 @@ integer_type
 chandle_type : TOKEN_CHANDLE;
 
 integer_type : integer_atom_type
+(TOKEN_SLBRACE constant_expression (TOKEN_COLON constant_expression)? TOKEN_SRBRACE)?
 (TOKEN_IN TOKEN_SLBRACE domain_open_range_list TOKEN_SRBRACE)?;
 
 integer_atom_type 
