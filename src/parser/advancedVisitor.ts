@@ -1053,18 +1053,20 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
 
       const refPath = d.ref_path();
       const identifier = d.identifier();
+      const expression = d.expression();
+      const funcCall = d.function_call();
 
       if (refPath) {
         node.name = refPath.getText();
         node.value = d.expression().getText();
         node.dataType = "ref";
-      } else if (identifier) {
+      } else if (identifier && expression) {
         node.name = d.identifier().getText();
         node.value = d.expression().getText();
         const result = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], node.name);
         const nodeParent = (result) ? result as InstanceNode : undefined
-        node.dataType = nodeParent?.instanceType ?? "";
-      } else {
+        node.dataType = nodeParent?.instanceType ?? d.data_type()?.getText() ?? "";
+      } else if (identifier && funcCall) {
         node.name = d.identifier().getText();
         node.value = d.function_call().function_identifier().getText();
         const result = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], node.name);
