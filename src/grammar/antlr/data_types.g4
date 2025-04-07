@@ -48,7 +48,11 @@ integer_atom_type
 
 integer_atom_type 
   : TOKEN_INT
-  | TOKEN_BIT;
+  | (TOKEN_BIT 
+    TOKEN_SLBRACE 
+    ((constant_expression TOKEN_COLON constant_expression) 
+    | constant_expression) 
+    TOKEN_SRBRACE);
 
 domain_open_range_list :
 domain_open_range_value (TOKEN_COMMA domain_open_range_value)?;
