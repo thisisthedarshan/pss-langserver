@@ -65,6 +65,9 @@ conditional_expression
     : logical_expression (TOKEN_QUESTION expression TOKEN_COLON expression)?
     ;
 
+itemCall:
+    identifier? TOKEN_DOT expression;
+
 primary
     : number
     | aggregate_literal
@@ -76,6 +79,7 @@ primary
     | compile_has_expr
     | parenthesis_expressions
     | identifier
+    | itemCall
     ;
 
 unary_operator : TOKEN_MINUS | TOKEN_EXCLAMATION | TOKEN_TILDA | TOKEN_AND | TOKEN_OR | TOKEN_CARET;

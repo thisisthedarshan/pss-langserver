@@ -201,6 +201,7 @@ import { Multiplicative_expressionContext } from "./pss.js";
 import { Power_expressionContext } from "./pss.js";
 import { Unary_expressionContext } from "./pss.js";
 import { Conditional_expressionContext } from "./pss.js";
+import { ItemCallContext } from "./pss.js";
 import { PrimaryContext } from "./pss.js";
 import { Unary_operatorContext } from "./pss.js";
 import { Power_opContext } from "./pss.js";
@@ -1549,6 +1550,12 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitConditional_expression?: (ctx: Conditional_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.itemCall`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitItemCall?: (ctx: ItemCallContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.primary`.
 	 * @param ctx the parse tree

@@ -201,6 +201,7 @@ import { Multiplicative_expressionContext } from "./pss.js";
 import { Power_expressionContext } from "./pss.js";
 import { Unary_expressionContext } from "./pss.js";
 import { Conditional_expressionContext } from "./pss.js";
+import { ItemCallContext } from "./pss.js";
 import { PrimaryContext } from "./pss.js";
 import { Unary_operatorContext } from "./pss.js";
 import { Power_opContext } from "./pss.js";
@@ -2274,6 +2275,16 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitConditional_expression?: (ctx: Conditional_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.itemCall`.
+	 * @param ctx the parse tree
+	 */
+	enterItemCall?: (ctx: ItemCallContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.itemCall`.
+	 * @param ctx the parse tree
+	 */
+	exitItemCall?: (ctx: ItemCallContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.primary`.
 	 * @param ctx the parse tree
