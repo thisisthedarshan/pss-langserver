@@ -26,7 +26,7 @@ identifier array_dim? (TOKEN_EQUALS (constant_expression | function_call))?;
 array_dim : TOKEN_SLBRACE constant_expression TOKEN_SRBRACE;
 
 attr_field:
-access_modifier? TOKEN_RAND (TOKEN_STATIC TOKEN_CONST)? data_declaration;
+access_modifier? TOKEN_RAND? (TOKEN_STATIC TOKEN_CONST)? data_declaration;
 
 access_modifier : TOKEN_PUBLIC | TOKEN_PROTECTED | TOKEN_PRIVATE;
 

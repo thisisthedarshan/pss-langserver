@@ -30,7 +30,7 @@ object_kind : TOKEN_BUFFER
 
 struct_super_spec: TOKEN_COLON type_identifier;
 
-  struct_body_item
+struct_body_item
 	: comments
 	|	constraint_declaration
 	| attr_field

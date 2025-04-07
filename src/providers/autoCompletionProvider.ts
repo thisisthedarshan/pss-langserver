@@ -71,21 +71,21 @@ export function buildAutocompletionBlock(ast: metaData[]): CompletionItem[] {
   return items;
 }
 
-export function buildAutocompletionBlockAdvanced(ast: PSSLangObjects[]):CompletionItem[] {
+export function buildAutocompletionBlockAdvanced(ast: PSSLangObjects[]): CompletionItem[] {
   let items: CompletionItem[] = [];
   ast.forEach(item => {
     /** Get data from each node */
     items.push({
       label: item.name,
       kind: getCompletionKind(item.type),
-      documentation: (typeof item.comments === 'string') ? item.comments :{
+      documentation: (typeof item.comments === 'string') ? item.comments : {
         kind: 'markdown',
         value: buildMarkdownComment(item.comments)
       },
       data: item.name
     });
-    if (item.children.length > 0){
-      const childItems:CompletionItem[] = buildAutocompletionBlockAdvanced(item.children);
+    if (item.children.length > 0) {
+      const childItems: CompletionItem[] = buildAutocompletionBlockAdvanced(item.children);
       items = [...items, ...childItems];
     }
   });

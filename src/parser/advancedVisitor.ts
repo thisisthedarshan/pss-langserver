@@ -787,10 +787,10 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
 
     /** Visit package statements */
     this.visitPackage_declaration = (ctx: Package_declarationContext): PSSLangObjects => {
-      const identifier: string = ctx.package_id_path().package_identifier(0).getText();
+      const identifier: string = ctx.package_identifier().getText();
       let path: string = "";
-      for (let idx = 1; idx < ctx.package_id_path().package_identifier_list().length; idx++) {
-        path += `:: ${ctx.package_id_path().package_identifier(idx).getText()}`;
+      for (let idx = 1; idx < ctx.package_id_path_list().length; idx++) {
+        path += `:: ${ctx.package_id_path(idx).getText()}`;
       }
       const node: PackageNode = {
         type: objType.PACKAGE,
@@ -798,8 +798,8 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         name: identifier,
         definedOn: {
           file: fileURI,
-          lineNumber: ctx.package_id_path().package_identifier(0).start.line,
-          columnNumber: ctx.package_id_path().package_identifier(0).start.column
+          lineNumber: ctx.package_identifier().start.line,
+          columnNumber: ctx.package_identifier().start.column
         },
         comments: "",
         children: []

@@ -19,12 +19,11 @@ options {tokenVocab=pssLex;}
 import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,identifiers,numbers_and_literals,overrides,procedural_statements,struct_declaration,template_types,memory,registers;
 
 package_declaration
-	: TOKEN_PACKAGE package_id_path TOKEN_CLBRACE 
+	: TOKEN_PACKAGE package_identifier (TOKEN_SCOPE package_id_path)* TOKEN_CLBRACE 
 		(package_body_item*) 
 		TOKEN_CRBRACE;
 
-package_id_path
-	: package_identifier (TOKEN_SCOPE package_identifier)*;
+package_id_path : package_identifier ;
 
 package_body_item
 	:	comments
