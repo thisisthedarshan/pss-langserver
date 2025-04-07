@@ -139,7 +139,7 @@ export type params = {
 export interface PSSNode {
   type: objType;
   name: string;
-  definedOn: definedOn | undefined;
+  definedOn: definedOn;
   /*usedOn: usedOn[];*/ /* Not used for now */
   comments: string | commentDocs;
   children: PSSNode[]; /* Array of child nodes - defined in ds file */

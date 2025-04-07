@@ -20,6 +20,7 @@ import { KeywordInfo, metaData, objType, SemanticToken } from "../definitions/da
 import { mapTokenModifiers, mapTokenTypes } from "../parser/helpers";
 
 import { semanticTokensBuiltin, semanticTokenTypes } from "../definitions/semanticTokenDefinitions";
+import { PSSLangObjects } from "../definitions/dataStructures";
 
 
 function getSemanticTokenInfo(type: keyof typeof objType) {
@@ -80,6 +81,51 @@ export function generateSemanticTokens(file: string, ast: metaData[]): SemanticT
 
   });
 
+  return semTokensFromMeta.build();
+}
+
+function getTokensForNode(pssNode: PSSLangObjects): { line: number, char: number, length: number, tokenType: number, tokenModifiers: number }[] {
+  const returnval: { line: number, char: number, length: number, tokenType: number, tokenModifiers: number }[] = [];
+
+  const objectType = pssNode.type;
+  const semanticTokensForAstObj = semanticTokenTypes[objectType] || { tokenType: 0, tokenModifiers: 0 }; // Fallback
+  const onInfo = pssNode.definedOn || { lineNumber: 0, columnNumber: 0 }; // Fallback
+
+  let modifiers = 0;
+  if (Array.isArray(semanticTokensForAstObj.tokenModifiers)) {
+    modifiers = semanticTokensForAstObj.tokenModifiers.reduce((sum, token) => sum + mapTokenModifiers(token.toString()), 0);
+  } else {
+    modifiers = typeof semanticTokensForAstObj.tokenModifiers === "number"
+      ? semanticTokensForAstObj.tokenModifiers
+      : mapTokenModifiers(semanticTokensForAstObj.tokenModifiers.toString());
+  }
+
+  returnval.push({
+    line: onInfo.lineNumber,
+    char: onInfo.columnNumber,
+    length: pssNode.name.length,
+    tokenType: typeof semanticTokensForAstObj.tokenType === "number"
+      ? semanticTokensForAstObj.tokenType
+      : mapTokenTypes(semanticTokensForAstObj.tokenType.toString()),
+    tokenModifiers: modifiers,
+  });
+
+  pssNode.children.forEach(child => {
+    returnval.push(...getTokensForNode(child));
+  });
+
+  return returnval;
+}
+
+export function generateSemanticTokensAdvanced(file: string, ast: PSSLangObjects[]): SemanticTokens {
+  let semTokensFromMeta = new SemanticTokensBuilder();
+  findSemanticTokens(file, semanticTokensBuiltin, semTokensFromMeta);
+  ast.forEach(item => {
+    const sematicDataArray = getTokensForNode(item);
+    sematicDataArray.forEach(sematicData => {
+      semTokensFromMeta.push(sematicData.line, sematicData.char, sematicData.length, sematicData.tokenType, sematicData.tokenModifiers);
+    });
+  });
   return semTokensFromMeta.build();
 }
 

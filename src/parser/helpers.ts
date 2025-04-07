@@ -17,7 +17,7 @@
 
 import { Position, Range } from "vscode-languageserver/node";
 import { commentDocs, metaData, objType, semanticTokensLegend } from "../definitions/dataTypes";
-import { buildAST } from "./ast";
+import { buildAST, buildASTNew } from "./ast";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { InstanceNode, PSSLangObjects, StructNode } from "../definitions/dataStructures";
 const fs = require('fs-extra')
@@ -220,8 +220,38 @@ export function getStructKind(st: string): objType.STRUCT | objType.BUFFER | obj
 export const mapTokenTypes = ((arr: string[]) => (str: string) => arr.indexOf(str))(semanticTokensLegend.tokenTypes);
 export const mapTokenModifiers = ((arr) => (str: string) => str in arr ? 1 << arr.indexOf(str) : 0)(semanticTokensLegend.tokenModifiers);
 
-export function buildMarkdownComment(docComment: commentDocs): string {
-  return '';
+export function buildMarkdownComment(docs: commentDocs): string {
+  let markdown = `## ${docs.name}\n\n`;
+
+  // Brief
+  markdown += `${docs.brief}\n\n`;
+
+  // Details
+  if (docs.details) markdown += `${docs.details}\n\n`;
+
+  // Parameters
+  if (docs.paramNames.length > 0) {
+    markdown += "### Parameters\n";
+    docs.paramNames.forEach((name, i) => {
+      const desc = docs.paramDescriptions[i] || "No description";
+      markdown += `- **${name}** : ${desc}\n`;
+    });
+    markdown += "\n";
+  }
+
+  // See Also
+  if (docs.sees.length > 0) {
+    markdown += "### See Also\n";
+    markdown += docs.sees.map(see => `- ${see}`).join("\n") + "\n\n";
+  }
+
+  // Returns
+  if (docs.returns) {
+    markdown += "### Returns\n";
+    markdown += `${docs.returns}\n\n`;
+  }
+
+  return markdown;
 }
 
 export function fullRange(document: TextDocument): Range {
@@ -236,6 +266,11 @@ export function fullRange(document: TextDocument): Range {
 
 export async function updateAST(fileURI: string, documentText: string): Promise<metaData[]> {
   var items = buildAST(fileURI, documentText);
+  return items;
+}
+
+export async function updateASTNew(fileURI: string, documentText: string): Promise<PSSLangObjects[]> {
+  var items = buildASTNew(fileURI, documentText);
   return items;
 }
 
@@ -282,7 +317,7 @@ function mergePSSNodes(oldNode: PSSLangObjects, newNode: PSSLangObjects): PSSLan
   return merged;
 }
 
-export function updateASTNew(oldArray: PSSLangObjects[], newArray: PSSLangObjects[]): PSSLangObjects[] {
+export function updateASTNewMeta(oldArray: PSSLangObjects[], newArray: PSSLangObjects[]): PSSLangObjects[] {
   const mergedMap = new Map<string, PSSLangObjects>();
 
   oldArray.forEach(item => mergedMap.set(item.name, { ...item }));

@@ -51,12 +51,12 @@ import { version } from './version';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { notify } from './helpers';
-import { fullRange, scanDirectory, updateAST, updateASTMeta } from './parser/helpers';
-import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
-import { generateSemanticTokens } from './providers/semanticTokenProvider';
-import { getGoToDefinition } from './providers/gotoProvider';
+import { buildMarkdownComment, fullRange, getNodeFromNameArray, scanDirectory, updateAST, updateASTMeta, updateASTNew, updateASTNewMeta } from './parser/helpers';
+import { buildAutocompletionBlock, buildAutocompletionBlockAdvanced, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
+import { generateSemanticTokens, generateSemanticTokensAdvanced } from './providers/semanticTokenProvider';
+import { getGoToDefinition, getGoToDefinitionAdvanced } from './providers/gotoProvider';
 import { getHoverFor } from './providers/hoverProvider';
-import { PSSLangObjects } from './definitions/dataStructures';
+import { FunctionNode, PSSLangObjects } from './definitions/dataStructures';
 
 /* To make the process act like an actual executable */
 const args = process.argv.slice(2);
@@ -99,8 +99,11 @@ connection.onInitialize((params: InitializeParams) => {
     const content: string = fs.readFileSync(file, 'utf8');
     const filePath: string = "file://" + file;
     const fileURI: string = encodeURI(filePath);
-    updateAST(fileURI, content).then(vars => {
-      globalAST = updateASTMeta(globalAST, vars);
+    // updateAST(fileURI, content).then(vars => {
+    //   globalAST = updateASTMeta(globalAST, vars);
+    // });
+    updateASTNew(fileURI, content).then(vars => {
+      newAST = updateASTNewMeta(newAST, vars);
     });
   }
 
@@ -246,9 +249,15 @@ connection.onDidOpenTextDocument((params) => {
         // Convert it back to URI so that it can be used in goto info
         const fileURI: string = encodeURI("file://" + file);
         // Process file content here
-        updateAST(fileURI, content).then(vars => {
-          globalAST = updateASTMeta(globalAST, vars);
+        // updateAST(fileURI, content).then(vars => {
+        //   globalAST = updateASTMeta(globalAST, vars);
+        // });
+
+        /* New function */
+        updateASTNew(fileURI, content).then(vars => {
+          newAST = updateASTNewMeta(newAST, vars);
         });
+
       }
       isFirst = false;
 
@@ -263,8 +272,13 @@ connection.onDidOpenTextDocument((params) => {
 /* Event when a document is changed or first opened */
 documents.onDidChangeContent(change => {
   /* Call async file processor */
-  updateAST(change.document.uri.toString(), change.document.getText().toString()).then(result => {
-    globalAST = updateASTMeta(globalAST, result);
+  // updateAST(change.document.uri.toString(), change.document.getText().toString()).then(result => {
+  //   globalAST = updateASTMeta(globalAST, result);
+  // });
+
+  /* New function */
+  updateASTNew(change.document.uri.toString(), change.document.getText().toString()).then(result => {
+    newAST = updateASTNewMeta(newAST, result);
   });
 
 });
@@ -282,7 +296,8 @@ connection.onDidChangeWatchedFiles(_change => {
 /* Completions provider */
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    let completions = [...builtInCompletions, ...buildAutocompletionBlock(globalAST)]
+    // let completions = [...builtInCompletions, ...buildAutocompletionBlock(globalAST)];
+    let completions = [...builtInCompletions, ...buildAutocompletionBlockAdvanced(newAST)]
     return [...new Set(completions)];
   }
 );
@@ -312,11 +327,43 @@ connection.onSignatureHelp(
     if (!match) return null;
 
     const funcName = match[1];
-    const funcInfo = builtInSignatures[funcName as keyof typeof builtInSignatures];
-    if (!funcInfo) return null;
 
     // Count commas to determine active parameter
     var activeParameter = (match[2].match(/,/g) || []).length;
+
+    const refNode = getNodeFromNameArray(newAST, funcName);
+    if (refNode) {
+      const functionInfo: FunctionNode = refNode as FunctionNode;
+
+      const parameters = functionInfo.parameters.map(p =>
+        ParameterInformation.create(p.paramName, `Function parameter of type ${p.paramType}`)
+      );
+
+      if ((parameters[parameters.length - 1].label === "...args" || parameters[parameters.length - 1].label?.toString().includes("...")) && activeParameter > parameters.length - 1) {
+        activeParameter = parameters.length - 1;
+      }
+
+      const params: string = functionInfo.parameters
+        .map(param => `${param.paramType} ${param.paramName}`)
+        .join(", ");
+
+      const document: string = (typeof functionInfo.comments === 'string') ? functionInfo.comments : buildMarkdownComment(functionInfo.comments);
+
+      const signature = SignatureInformation.create(
+        `${functionInfo.platformQualifier} function ${functionInfo.returnType} ${functionInfo.name} (${params})`,
+        document,
+        ...parameters
+      );
+
+      return {
+        signatures: [signature],
+        activeSignature: 0,
+        activeParameter
+      };
+    }
+
+    const funcInfo = builtInSignatures[funcName];
+    if (!funcInfo) return null;
 
     const parameters = funcInfo.parameters.map(p =>
       ParameterInformation.create(p.label, p.documentation)
@@ -348,8 +395,10 @@ connection.languages.semanticTokens.on(async (params: SemanticTokensParams): Pro
 
   if (!document) return { data: [] };
 
-  const ast = await updateAST(uri, document.getText());
-  return generateSemanticTokens(document.getText(), ast);
+  // const ast = await updateAST(uri, document.getText());
+  const ast = await updateASTNew(uri, document.getText());
+  // return generateSemanticTokens(document.getText(), ast);
+  return generateSemanticTokensAdvanced(document.getText(), ast);
 });
 
 
@@ -392,7 +441,8 @@ connection.onDefinition((params: DefinitionParams): Definition | null => {
   if (!doc) { return null }
   const content = doc.getText()
   const offset = doc.offsetAt(position);
-  const loc = getGoToDefinition(content, offset, globalAST);
+  // const loc = getGoToDefinition(content, offset, globalAST);
+  const loc = getGoToDefinitionAdvanced(content, offset, newAST);
   return loc;
 }
 );
