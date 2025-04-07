@@ -194,6 +194,12 @@ import { ExpressionContext } from "./pss.js";
 import { Logical_expressionContext } from "./pss.js";
 import { Equality_expressionContext } from "./pss.js";
 import { Relational_expressionContext } from "./pss.js";
+import { Bitwise_expressionContext } from "./pss.js";
+import { Shift_expressionContext } from "./pss.js";
+import { Additive_expressionContext } from "./pss.js";
+import { Multiplicative_expressionContext } from "./pss.js";
+import { Power_expressionContext } from "./pss.js";
+import { Unary_expressionContext } from "./pss.js";
 import { Conditional_expressionContext } from "./pss.js";
 import { PrimaryContext } from "./pss.js";
 import { Unary_operatorContext } from "./pss.js";
@@ -1501,6 +1507,42 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitRelational_expression?: (ctx: Relational_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.bitwise_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitBitwise_expression?: (ctx: Bitwise_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.shift_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitShift_expression?: (ctx: Shift_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.additive_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitAdditive_expression?: (ctx: Additive_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.multiplicative_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitMultiplicative_expression?: (ctx: Multiplicative_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.power_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPower_expression?: (ctx: Power_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.unary_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitUnary_expression?: (ctx: Unary_expressionContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.conditional_expression`.
 	 * @param ctx the parse tree

@@ -194,6 +194,12 @@ import { ExpressionContext } from "./pss.js";
 import { Logical_expressionContext } from "./pss.js";
 import { Equality_expressionContext } from "./pss.js";
 import { Relational_expressionContext } from "./pss.js";
+import { Bitwise_expressionContext } from "./pss.js";
+import { Shift_expressionContext } from "./pss.js";
+import { Additive_expressionContext } from "./pss.js";
+import { Multiplicative_expressionContext } from "./pss.js";
+import { Power_expressionContext } from "./pss.js";
+import { Unary_expressionContext } from "./pss.js";
 import { Conditional_expressionContext } from "./pss.js";
 import { PrimaryContext } from "./pss.js";
 import { Unary_operatorContext } from "./pss.js";
@@ -2198,6 +2204,66 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitRelational_expression?: (ctx: Relational_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.bitwise_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterBitwise_expression?: (ctx: Bitwise_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.bitwise_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitBitwise_expression?: (ctx: Bitwise_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.shift_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterShift_expression?: (ctx: Shift_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.shift_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitShift_expression?: (ctx: Shift_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.additive_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterAdditive_expression?: (ctx: Additive_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.additive_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitAdditive_expression?: (ctx: Additive_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.multiplicative_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterMultiplicative_expression?: (ctx: Multiplicative_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.multiplicative_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitMultiplicative_expression?: (ctx: Multiplicative_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.power_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterPower_expression?: (ctx: Power_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.power_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitPower_expression?: (ctx: Power_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.unary_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterUnary_expression?: (ctx: Unary_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.unary_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitUnary_expression?: (ctx: Unary_expressionContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.conditional_expression`.
 	 * @param ctx the parse tree
