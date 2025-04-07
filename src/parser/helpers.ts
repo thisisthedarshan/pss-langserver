@@ -268,6 +268,32 @@ export function updateASTMeta(old: metaData[], newData: metaData[]): metaData[] 
   return [...newData, ...uniqueArray2];
 }
 
+function mergePSSNodes(oldNode: PSSLangObjects, newNode: PSSLangObjects): PSSLangObjects {
+  const merged = { ...oldNode, ...newNode };
+  if (newNode.children && oldNode.children) {
+    const childMap = new Map<string, PSSLangObjects>();
+    oldNode.children.forEach(child => childMap.set(child.name, child));
+    newNode.children.forEach(child => {
+      const oldChild = childMap.get(child.name);
+      childMap.set(child.name, oldChild ? mergePSSNodes(oldChild, child) : { ...child });
+    });
+    merged.children = Array.from(childMap.values());
+  }
+  return merged;
+}
+
+export function updateASTNew(oldArray: PSSLangObjects[], newArray: PSSLangObjects[]): PSSLangObjects[] {
+  const mergedMap = new Map<string, PSSLangObjects>();
+
+  oldArray.forEach(item => mergedMap.set(item.name, { ...item }));
+  newArray.forEach(item => {
+    const oldItem = mergedMap.get(item.name);
+    mergedMap.set(item.name, oldItem ? mergePSSNodes(oldItem, item) : { ...item });
+  });
+
+  return Array.from(mergedMap.values());
+}
+
 /** This function returns sizes for known object */
 function getObjectSize(obj: string): number {
   /* Base type sizes */
