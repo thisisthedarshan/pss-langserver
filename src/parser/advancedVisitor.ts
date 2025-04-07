@@ -1038,7 +1038,7 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
     this.visitProcedural_assignment_stmt = (d: Procedural_assignment_stmtContext): void => {
       let node: AssignmentNode = {
         type: objType.ASSIGNMENT,
-        operation: d.assign_op().getText(),
+        operation: "=",
         value: "",
         name: "",
         dataType: "",
