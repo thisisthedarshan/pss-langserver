@@ -50,6 +50,7 @@ procedural_data_instantiation:
 procedural_assignment_stmt
 	:	(ref_path assign_op expression TOKEN_SEMICOLON)
 	|	(data_type? identifier assign_op expression TOKEN_SEMICOLON)
+	|	(data_type? identifier assign_op TOKEN_FLBRACE+ expression TOKEN_FRBRACE+ TOKEN_SEMICOLON)
 	|	(data_type? identifier assign_op function_call TOKEN_SEMICOLON);
 
 procedural_void_function_call_stmt: (
