@@ -14,8 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+interface FunctionInfo {
+  signature: string;
+  documentation: string;
+  parameters: {
+    label: string;
+    documentation: string;
+  }[];
+  package: string;
+}
 
-export const builtInSignatures = {
+// Define the object type with an index signature
+export interface FunctionDictionary {
+  [key: string]: FunctionInfo;
+}
+
+export const builtInSignatures: FunctionDictionary = {
   /* std_pkg Functions (Annex C.1) */
   "format": {
     signature: "solve function string format(string format_str, type... args)",
