@@ -47,7 +47,7 @@ integer_type : integer_atom_type
 integer_atom_type 
   : TOKEN_INT
   | (TOKEN_BIT TOKEN_SLBRACE 
-    (constant_expression | TOKEN_64) (TOKEN_COLON constant_expression)?
+    (constant_expression) (TOKEN_COLON constant_expression)?
     TOKEN_SRBRACE);
 
 domain_open_range_list :

@@ -306,7 +306,6 @@ TOKEN_FILENAME_STRING: TOKEN_QUOTED_STRING;
 
 /* Specific tokens */
 TOKEN_M1 : '-1';
-TOKEN_64 : '64';
 
 /* identifier */
 ID: [a-zA-Z_] [a-zA-Z_0-9]*;
