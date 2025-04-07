@@ -191,6 +191,10 @@ import { Target_code_exec_blockContext } from "./pss.js";
 import { Target_file_exec_blockContext } from "./pss.js";
 import { Constant_expressionContext } from "./pss.js";
 import { ExpressionContext } from "./pss.js";
+import { Logical_expressionContext } from "./pss.js";
+import { Equality_expressionContext } from "./pss.js";
+import { Relational_expressionContext } from "./pss.js";
+import { Conditional_expressionContext } from "./pss.js";
 import { PrimaryContext } from "./pss.js";
 import { Unary_operatorContext } from "./pss.js";
 import { Power_opContext } from "./pss.js";
@@ -209,7 +213,6 @@ import { Bitwise_orContext } from "./pss.js";
 import { Logical_andContext } from "./pss.js";
 import { Logical_orContext } from "./pss.js";
 import { Open_range_valueContext } from "./pss.js";
-import { Conditional_expressionContext } from "./pss.js";
 import { In_expressionContext } from "./pss.js";
 import { Open_range_listContext } from "./pss.js";
 import { Collection_expressionContext } from "./pss.js";
@@ -1481,6 +1484,30 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 */
 	visitExpression?: (ctx: ExpressionContext) => Result;
 	/**
+	 * Visit a parse tree produced by `pss.logical_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitLogical_expression?: (ctx: Logical_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.equality_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitEquality_expression?: (ctx: Equality_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.relational_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitRelational_expression?: (ctx: Relational_expressionContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.conditional_expression`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitConditional_expression?: (ctx: Conditional_expressionContext) => Result;
+	/**
 	 * Visit a parse tree produced by `pss.primary`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1588,12 +1615,6 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitOpen_range_value?: (ctx: Open_range_valueContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.conditional_expression`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitConditional_expression?: (ctx: Conditional_expressionContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.in_expression`.
 	 * @param ctx the parse tree

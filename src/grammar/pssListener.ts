@@ -191,6 +191,10 @@ import { Target_code_exec_blockContext } from "./pss.js";
 import { Target_file_exec_blockContext } from "./pss.js";
 import { Constant_expressionContext } from "./pss.js";
 import { ExpressionContext } from "./pss.js";
+import { Logical_expressionContext } from "./pss.js";
+import { Equality_expressionContext } from "./pss.js";
+import { Relational_expressionContext } from "./pss.js";
+import { Conditional_expressionContext } from "./pss.js";
 import { PrimaryContext } from "./pss.js";
 import { Unary_operatorContext } from "./pss.js";
 import { Power_opContext } from "./pss.js";
@@ -209,7 +213,6 @@ import { Bitwise_orContext } from "./pss.js";
 import { Logical_andContext } from "./pss.js";
 import { Logical_orContext } from "./pss.js";
 import { Open_range_valueContext } from "./pss.js";
-import { Conditional_expressionContext } from "./pss.js";
 import { In_expressionContext } from "./pss.js";
 import { Open_range_listContext } from "./pss.js";
 import { Collection_expressionContext } from "./pss.js";
@@ -2166,6 +2169,46 @@ export default class pssListener extends ParseTreeListener {
 	 */
 	exitExpression?: (ctx: ExpressionContext) => void;
 	/**
+	 * Enter a parse tree produced by `pss.logical_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterLogical_expression?: (ctx: Logical_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.logical_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitLogical_expression?: (ctx: Logical_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.equality_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterEquality_expression?: (ctx: Equality_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.equality_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitEquality_expression?: (ctx: Equality_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.relational_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterRelational_expression?: (ctx: Relational_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.relational_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitRelational_expression?: (ctx: Relational_expressionContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.conditional_expression`.
+	 * @param ctx the parse tree
+	 */
+	enterConditional_expression?: (ctx: Conditional_expressionContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.conditional_expression`.
+	 * @param ctx the parse tree
+	 */
+	exitConditional_expression?: (ctx: Conditional_expressionContext) => void;
+	/**
 	 * Enter a parse tree produced by `pss.primary`.
 	 * @param ctx the parse tree
 	 */
@@ -2345,16 +2388,6 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitOpen_range_value?: (ctx: Open_range_valueContext) => void;
-	/**
-	 * Enter a parse tree produced by `pss.conditional_expression`.
-	 * @param ctx the parse tree
-	 */
-	enterConditional_expression?: (ctx: Conditional_expressionContext) => void;
-	/**
-	 * Exit a parse tree produced by `pss.conditional_expression`.
-	 * @param ctx the parse tree
-	 */
-	exitConditional_expression?: (ctx: Conditional_expressionContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.in_expression`.
 	 * @param ctx the parse tree

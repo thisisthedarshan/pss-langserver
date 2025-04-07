@@ -19,24 +19,26 @@ import action_declarations,activity_statements,behavioral_coverage,component_dec
 
 constant_expression : primary expression;
 
-expression 
-: primary?
-  ((unary_operator expression)
-| (power_op expression)
-| (mul_div expression)
-| (add_sub expression)
-| (shifting expression)
-| (in_statements expression)
-| (logical_compare expression)
-| (equality_compare expression)
-| (bitwise_and expression)
-| (bitwise_xor expression)
-| (bitwise_or expression)
-| (logical_and expression)
-| (logical_or expression)
-| (binary_operator expression)
-| (conditional_expression))
-| primary;
+expression
+    : conditional_expression
+    | logical_expression
+    ;
+
+logical_expression
+    : equality_expression (logical_and equality_expression | logical_or equality_expression)*
+    ;
+
+equality_expression
+    : relational_expression (equality_compare relational_expression)*
+    ;
+
+relational_expression
+    : primary (logical_compare primary)*
+    ;
+
+conditional_expression
+    : logical_expression (TOKEN_QUESTION expression TOKEN_COLON expression)?
+    ;
 
 primary:
   number
