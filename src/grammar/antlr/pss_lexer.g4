@@ -41,7 +41,6 @@ TOKEN_MOD: '%';
 TOKEN_ADD: '+';
 TOKEN_QUESTION: '?';
 TOKEN_UNDERSCORE: '_';
-TOKEN_ZERO: '0';
 TOKEN_QUOTES : '"';
 
 /* Comparison and Shift */
