@@ -340,7 +340,11 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         registerLength: regLength,
         basedOnStruct: registerStruct,
         name: ctx.register_comp_identifier().getText(),
-        definedOn: undefined,
+        definedOn: {
+          file: fileURI,
+          lineNumber: ctx.start.line,
+          columnNumber: ctx.start.column
+        },
         comments: "",
         children: []
       }
@@ -415,7 +419,11 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         basedOnStruct: regStruct,
         instanceArrayCount: arraySize,
         name: instanceName,
-        definedOn: undefined,
+        definedOn: {
+          file: fileURI,
+          lineNumber: ctx.start.line,
+          columnNumber: ctx.start.column
+        },
         comments: "",
         children: []
       }
@@ -814,7 +822,11 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         type: getStructKind(ctd.struct_kind().getText()),
         superSpec: ctd.struct_super_spec()?.getText() ?? "",
         name: ctd.struct_identifier().getText(),
-        definedOn: undefined,
+        definedOn: {
+          file: fileURI,
+          lineNumber: ctd.start.line,
+          columnNumber: ctd.start.column
+        },
         comments: "",
         templateParams: templateParams,
         children: []
@@ -1030,7 +1042,11 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         value: "",
         name: "",
         dataType: "",
-        definedOn: undefined,
+        definedOn: {
+          file: fileURI,
+          lineNumber: d.start.line,
+          columnNumber: d.start.column
+        },
         comments: "",
         children: []
       };
@@ -1118,7 +1134,7 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
     this.visitAction_extension = (d: Action_extensionContext): void => {
       const actionIdentifier: string = d.action_identifier().getText();
       const baseNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], actionIdentifier);
-      let node:ActionNode;
+      let node: ActionNode;
       if (baseNode) {
         /** This basically  */
         node = baseNode as ActionNode;
@@ -1129,20 +1145,20 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
     }
 
     /** Extend statement visitor */
-    this.visitExtend_stmt = (d:Extend_stmtContext):void => {
-      if (d.action_extension()){
+    this.visitExtend_stmt = (d: Extend_stmtContext): void => {
+      if (d.action_extension()) {
         this.visit(d.action_extension());
-      } else if (d.TOKEN_COMPONENT()){
+      } else if (d.TOKEN_COMPONENT()) {
         /** This means the visitor is looking at an extend component statement */
-        const identifier:string = d.component_identifier().getText();
+        const identifier: string = d.component_identifier().getText();
         const baseNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], identifier);
-        if (baseNode){
-          const compNode:CompNode = baseNode as CompNode;
+        if (baseNode) {
+          const compNode: CompNode = baseNode as CompNode;
           this.currentASTHierarchy.push(compNode);
           this.visitChildren(d);
           this.currentASTHierarchy.pop();
         }
-      } else if (d.TOKEN_ENUM()){
+      } else if (d.TOKEN_ENUM()) {
         /** We are looking at enum extension */
         let enumItems: enumItems[] = [];
         d.enum_item_list()?.forEach((enumItem, idx) => {
@@ -1156,17 +1172,17 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         });
       } else {
         /* This is essentially extending the struct */
-        const identifier:string = d.struct_kind_identifier().getText();
+        const identifier: string = d.struct_kind_identifier().getText();
         const rootNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], identifier);
-        if (rootNode){
-          const baseNode:StructNode = rootNode as StructNode;
+        if (rootNode) {
+          const baseNode: StructNode = rootNode as StructNode;
           this.currentASTHierarchy.push(baseNode);
           this.visitChildren(d);
           this.currentASTHierarchy.pop();
         }
       }
     }
-    
+
   } /** End Super */
 
 }
