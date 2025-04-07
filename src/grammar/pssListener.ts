@@ -168,6 +168,7 @@ import { Data_typeContext } from "./pss.js";
 import { Scalar_data_typeContext } from "./pss.js";
 import { Casting_typeContext } from "./pss.js";
 import { Chandle_typeContext } from "./pss.js";
+import { User_typeContext } from "./pss.js";
 import { Integer_typeContext } from "./pss.js";
 import { Integer_atom_typeContext } from "./pss.js";
 import { Domain_open_range_listContext } from "./pss.js";
@@ -1945,6 +1946,16 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitChandle_type?: (ctx: Chandle_typeContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.user_type`.
+	 * @param ctx the parse tree
+	 */
+	enterUser_type?: (ctx: User_typeContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.user_type`.
+	 * @param ctx the parse tree
+	 */
+	exitUser_type?: (ctx: User_typeContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.integer_type`.
 	 * @param ctx the parse tree

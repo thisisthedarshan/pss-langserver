@@ -21,7 +21,8 @@ data_type :
 scalar_data_type
 | collection_type
 | reference_type
-| type_identifier;
+| type_identifier
+| user_type;
 
 scalar_data_type :
 chandle_type
@@ -40,6 +41,7 @@ integer_type
 | type_identifier;
 
 chandle_type : TOKEN_CHANDLE;
+user_type : identifier;
 
 integer_type : 
 integer_atom_type

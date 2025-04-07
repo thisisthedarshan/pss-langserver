@@ -168,6 +168,7 @@ import { Data_typeContext } from "./pss.js";
 import { Scalar_data_typeContext } from "./pss.js";
 import { Casting_typeContext } from "./pss.js";
 import { Chandle_typeContext } from "./pss.js";
+import { User_typeContext } from "./pss.js";
 import { Integer_typeContext } from "./pss.js";
 import { Integer_atom_typeContext } from "./pss.js";
 import { Domain_open_range_listContext } from "./pss.js";
@@ -1352,6 +1353,12 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitChandle_type?: (ctx: Chandle_typeContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.user_type`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitUser_type?: (ctx: User_typeContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.integer_type`.
 	 * @param ctx the parse tree
