@@ -42,13 +42,12 @@ integer_type
 chandle_type : TOKEN_CHANDLE;
 
 integer_type : integer_atom_type
-( TOKEN_SLBRACE constant_expression (TOKEN_COLON constant_expression)? TOKEN_SRBRACE )?
 (TOKEN_IN TOKEN_SLBRACE domain_open_range_list TOKEN_SRBRACE)?;
 
 integer_atom_type 
   : TOKEN_INT
   | (TOKEN_BIT TOKEN_SLBRACE 
-    ((integer_number TOKEN_COLON integer_number) | integer_number) 
+    (constant_expression | TOKEN_64) (TOKEN_COLON constant_expression)?
     TOKEN_SRBRACE);
 
 domain_open_range_list :
