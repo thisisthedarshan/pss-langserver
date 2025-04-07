@@ -40,15 +40,10 @@ export function getHoverFor(ast: PSSLangObjects[], content: string, pos: number)
   const funcInfo = builtInSignatures[keyword];
   if (funcInfo) {
     let documentation: string =
-      `\`\`\`pss
-    ${funcInfo.signature}
-    \`\`\`
-    \n
-    *${keyword}* is a part of the **${funcInfo.package}**
-    \n
-    #### Parameters
-    \n
-    `;
+      `\`\`\`pss\n${funcInfo.signature}\`\`\`\n`;
+
+    documentation += `*${keyword}* is a part of the **${funcInfo.package}**\n`;
+    documentation += `#### Parameters\n`;
     funcInfo.parameters.forEach(param => {
       documentation += `- **${param.label}**: ${param.documentation}\n`;
     });
