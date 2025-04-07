@@ -17,6 +17,8 @@
 
 import { Location, Position, Range } from "vscode-languageserver/node";
 import { metaData } from "../definitions/dataTypes";
+import { PSSLangObjects } from "../definitions/dataStructures";
+import { getNodeFromNameArray } from "../parser/helpers";
 
 export function getGoToDefinition(document: string, pos: number, ast: metaData[]): Location | null {
   const keyword = wordAt(document, pos);
@@ -46,7 +48,29 @@ export function getGoToDefinition(document: string, pos: number, ast: metaData[]
   return location;
 }
 
-function wordAt(text: string, offset: number): string | null {
+export function getGoToDefinitionAdvanced(document: string, pos: number, ast: PSSLangObjects[]): Location | null {
+  const keyword = wordAt(document, pos);
+  let location: Location | null = null;
+  if (keyword === null) {
+    return null;
+  }
+
+  const node = getNodeFromNameArray(ast,keyword);
+  if (node) {
+    if (node.definedOn) {
+      let start_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber)
+      let end_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber + keyword.length)
+      location = Location.create(
+        node.definedOn.file,
+        Range.create(start_range, end_range)
+      );
+    }
+  }
+
+  return location;
+}
+
+export function wordAt(text: string, offset: number): string | null {
   const wordRegex = /\b[a-zA-Z_][a-zA-Z0-9_]*\b/g;
   let match;
 

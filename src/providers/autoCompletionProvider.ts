@@ -18,8 +18,10 @@
 import { CompletionItem, CompletionItemKind } from "vscode-languageserver/node";
 import { builtInSignatures } from "../definitions/builtinFunctions";
 import { keywords } from "../definitions/keywords";
-import { metaData } from "../definitions/dataTypes";
+import { metaData, objType } from "../definitions/dataTypes";
 import { getCompletionKind } from "./autoCompletionHelpers";
+import { PSSLangObjects } from "../definitions/dataStructures";
+import { buildMarkdownComment } from "../parser/helpers";
 
 export function buildAutocompletionBuiltinsBlock(): CompletionItem[] {
   let items: CompletionItem[] = [];
@@ -66,5 +68,26 @@ export function buildAutocompletionBlock(ast: metaData[]): CompletionItem[] {
     })
   });
 
+  return items;
+}
+
+export function buildAutocompletionBlockAdvanced(ast: PSSLangObjects[]):CompletionItem[] {
+  let items: CompletionItem[] = [];
+  ast.forEach(item => {
+    /** Get data from each node */
+    items.push({
+      label: item.name,
+      kind: getCompletionKind(item.type),
+      documentation: (typeof item.comments === 'string') ? item.comments :{
+        kind: 'markdown',
+        value: buildMarkdownComment(item.comments)
+      },
+      data: item.name
+    });
+    if (item.children.length > 0){
+      const childItems:CompletionItem[] = buildAutocompletionBlockAdvanced(item.children);
+      items = [...items, ...childItems];
+    }
+  });
   return items;
 }
