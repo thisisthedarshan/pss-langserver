@@ -34,9 +34,10 @@ import {
   SignatureHelp,
   SemanticTokensParams,
   DefinitionParams,
-  Location,
   Definition,
   SemanticTokens,
+  HoverParams,
+  Hover,
 } from 'vscode-languageserver/node';
 
 import {
@@ -54,6 +55,8 @@ import { fullRange, scanDirectory, updateAST, updateASTMeta } from './parser/hel
 import { buildAutocompletionBlock, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
 import { generateSemanticTokens } from './providers/semanticTokenProvider';
 import { getGoToDefinition } from './providers/gotoProvider';
+import { getHoverFor } from './providers/hoverProvider';
+import { PSSLangObjects } from './definitions/dataStructures';
 
 /* To make the process act like an actual executable */
 const args = process.argv.slice(2);
@@ -70,6 +73,7 @@ const connection = createConnection(ProposedFeatures.all);
 const documents = new TextDocuments(TextDocument);
 
 var globalAST: metaData[] = []; /* Holds all metaData on all files */
+var newAST: PSSLangObjects[] = [];
 var builtInCompletions: CompletionItem[]; /* Holds all autocompletion items */
 var isFirst = true; /* To check if an ast has already been built or not */
 
@@ -148,6 +152,7 @@ connection.onInitialize((params: InitializeParams) => {
       },
       definitionProvider: true,
       declarationProvider: false,
+      hoverProvider: true,
       /* End Capabilities */
     }
   };
@@ -324,7 +329,7 @@ connection.onSignatureHelp(
 
     const signature = SignatureInformation.create(
       funcInfo.signature,
-      funcInfo.documentation,
+      funcInfo.documentation + `\nPart of \`${funcInfo.package}\``,
       ...parameters
     );
 
@@ -369,6 +374,16 @@ connection.onDocumentFormatting((params, tokens) => {
     return [TextEdit.replace(fullRange(sourceDocument), formattedText)];
   });
 });
+
+/* Provide hover features */
+connection.onHover(async (params: HoverParams): Promise<Hover | null> => {
+  const document = documents.get(params.textDocument.uri);
+  if (!document) {
+    return null;
+  }
+  return getHoverFor(newAST, document.getText(), document.offsetAt(params.position));
+}
+);
 
 /* Provide go-to functionality */
 connection.onDefinition((params: DefinitionParams): Definition | null => {
