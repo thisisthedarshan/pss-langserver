@@ -689,6 +689,7 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
     this.visitComponent_data_declaration = (ctx: Component_data_declarationContext): void => {
       const accessModifier: string = ctx.access_modifier()?.getText() ?? "public";
       const isStatic: boolean = Boolean(ctx.TOKEN_STATIC());
+      this.sharedData = [];
       this.sharedData[0] = isStatic;
       this.sharedData[1] = false;
       this.sharedData[2] = accessModifier;
@@ -928,16 +929,16 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
     /** Visitor for function parameter */
     this.visitFunction_parameter = (d: Function_parameterContext): void => {
       let param: params = {
-        paramType: `${d.function_parameter_dir()?.getText() ?? d.TOKEN_CONST()?.getText() ?? ""}`,
+        paramType: `${d.function_parameter_dir()?.getText() ?? d.TOKEN_CONST()?.getText() ?? ''}`,
         paramName: d.identifier()?.getText() ?? d.user_type().getText().trim().split(/\s+/)[1],
         paramDefault: d.constant_expression()?.getText() ?? ""
       }
       if (d.data_type()) {
         /** First scenario - data type is given */
-        param.paramType += `${d.data_type().getText()}`;
+        param.paramType = `${param.paramType} ${d.data_type().getText()}`;
       } else if (d.user_type()) {
         /* 2nd scenario - user defined data type */
-        param.paramType += `${d.user_type().getText().trim().split(/\s+/)[0]}`;
+        param.paramType = `${param.paramType} ${d.user_type().getText().trim().split(/\s+/)[0]}`;
       }
       else {
         /** 3rd scenario */
@@ -962,6 +963,7 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
           paramDefault: dataType /** This is just for reference */
         });
       }
+      this.sharedData = [];
       this.sharedData = params;
     }
 
@@ -976,6 +978,7 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       }
       this.visit(d.function_parameter_list_prototype());
       const params: params[] = this.sharedData as params[];
+      this.sharedData = [];
       this.sharedData[0] = returnType;
       this.sharedData[1] = identifier;
       this.sharedData[2] = params;
