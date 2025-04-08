@@ -50,8 +50,8 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       //   const parent = this.currentASTHierarchy[this.currentASTHierarchy.length - 1];
       //   parent.children.push(node);
       // } else {
-        // Top-level node
-        this.astObjects.push(node);
+      // Top-level node
+      this.astObjects.push(node);
       // }
     };
 
@@ -213,6 +213,15 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         comments: "",
         children: []
       };
+
+      const baseNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], actionName);
+      if (baseNode) {
+        node = baseNode as ActionNode;
+        node.isAbstract = isAbstract;
+        node.templateParams = templateParams;
+        node.superSpec = superSpec;
+        node.definedOn = definedOn;
+      }
 
       addNodeToParent(node);
       this.currentASTHierarchy.push(node);
@@ -640,19 +649,34 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         params = this.sharedData as params[];
       }
       const superSpec: string = ctx.component_super_spec()?.type_identifier()?.getText() || "";
-      const node: CompNode = {
-        type: objType.COMPONENT,
-        isPure: isPure,
-        templateParams: params,
-        superSpec: superSpec,
-        name: name,
-        definedOn: {
+      const baseNode = getNodeFromNameArray([...this.currentASTHierarchy, ...this.astObjects], name);
+      let node: CompNode;
+      if (baseNode) {
+        node = baseNode as CompNode;
+        node.isPure = isPure;
+        node.templateParams = params;
+        node.superSpec = superSpec;
+        node.definedOn = {
           file: fileURI,
           lineNumber: ctx.component_identifier().start.line,
           columnNumber: ctx.component_identifier().start.column
-        },
-        comments: "",
-        children: []
+        };
+        node.comments = "";
+      } else {
+        node = {
+          type: objType.COMPONENT,
+          isPure: isPure,
+          templateParams: params,
+          superSpec: superSpec,
+          name: name,
+          definedOn: {
+            file: fileURI,
+            lineNumber: ctx.component_identifier().start.line,
+            columnNumber: ctx.component_identifier().start.column
+          },
+          comments: "",
+          children: []
+        }
       }
       addNodeToParent(node);
       this.currentASTHierarchy.push(node);
@@ -788,15 +812,16 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
 
     /** Visit struct declaration */
     this.visitStruct_declaration = (ctd: Struct_declarationContext): PSSLangObjects => {
+      const identifier = ctd.struct_identifier().getText();
       let templateParams: params[] = [];
       if (ctd.template_param_decl_list()) {
         this.visit(ctd.template_param_decl_list());
         templateParams = this.sharedData as params[];
       }
-      const node: StructNode = {
+      let node: StructNode = {
         type: getStructKind(ctd.struct_kind().getText()),
         superSpec: ctd.struct_super_spec()?.getText() ?? "",
-        name: ctd.struct_identifier().getText(),
+        name: identifier,
         definedOn: {
           file: fileURI,
           lineNumber: ctd.start.line,
@@ -805,6 +830,19 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         comments: "",
         templateParams: templateParams,
         children: []
+      }
+      const rootNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], identifier);
+      if (rootNode) {
+        node = rootNode as StructNode;
+        node.type = getStructKind(ctd.struct_kind().getText());
+        node.superSpec = ctd.struct_super_spec()?.getText() ?? "";
+        node.definedOn = {
+          file: fileURI,
+          lineNumber: ctd.start.line,
+          columnNumber: ctd.start.column
+        };
+        node.comments = "";
+        node.templateParams = templateParams;
       }
       addNodeToParent(node);
       this.currentASTHierarchy.push(node);
@@ -844,7 +882,8 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         this.visit(enumItem);
         enumItems.push(this.sharedData as enumItems);
       });
-      const node: EnumNode = {
+      const baseNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], identifier);
+      let node: EnumNode = {
         type: objType.ENUM,
         dataType: dataType,
         enumItems: enumItems,
@@ -857,6 +896,17 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         comments: "",
         children: []
       };
+      if (baseNode) {
+        node = baseNode as EnumNode;
+        node.definedOn = {
+          file: fileURI,
+          lineNumber: d.enum_identifier().start.line,
+          columnNumber: d.enum_identifier().start.column
+        };
+        node.dataType = dataType;
+        node.enumItems = [...node.enumItems, ...enumItems];
+      }
+
       addNodeToParent(node);
 
     }
@@ -885,10 +935,10 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       if (d.data_type()) {
         /** First scenario - data type is given */
         param.paramType += `${d.data_type().getText()}`;
-      } else if (d.user_type()){
+      } else if (d.user_type()) {
         /* 2nd scenario - user defined data type */
         param.paramType += `${d.user_type().getText().trim().split(/\s+/)[0]}`;
-      } 
+      }
       else {
         /** 3rd scenario */
         param.paramType = `${d.TOKEN_CONST()?.getText() ?? ""} ${d.TOKEN_TYPE()?.getText() ?? d.type_category()?.getText() ?? d.TOKEN_STRUCT()?.getText() ?? ""}`
@@ -989,14 +1039,14 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
 
     /** Visit procedural data declaration */
     this.visitProcedural_data_declaration = (d: Procedural_data_declarationContext): void => {
-      let dataType:string;
-      if (d.data_type()){
+      let dataType: string;
+      if (d.data_type()) {
         dataType = d.data_type().getText();
       }
       else if (d.user_type()) {
         const dataInfo: string[] = d.user_type().getText().trim().split(/\s+/);
         dataType = dataInfo[0];
-        const dataID:string = dataInfo[1];
+        const dataID: string = dataInfo[1];
         const trimmed = d.user_type().getText().trimStart();
         const firstSpace = trimmed.indexOf(' ');
         const offsetOfDataID: number = (firstSpace === -1) ? 0 : firstSpace + 1 + (d.user_type().getText().length - trimmed.length);
@@ -1150,10 +1200,26 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       if (baseNode) {
         /** This basically  */
         node = baseNode as ActionNode;
-        this.currentASTHierarchy.push(node);
-        this.visitChildren(d);
-        this.currentASTHierarchy.pop();
-      } /** There is no alternative for else... I may come-up with it later? */
+      } else {
+        node = {
+          type: objType.ACTION,
+          isAbstract: false,
+          templateParams: [],
+          superSpec: "",
+          name: actionIdentifier,
+          definedOn: {
+            file: fileURI,
+            lineNumber: d.action_identifier().start.line,
+            columnNumber: d.action_identifier().start.column
+          },
+          comments: "",
+          children: []
+        };
+        addNodeToParent(node);
+      }
+      this.currentASTHierarchy.push(node);
+      this.visitChildren(d);
+      this.currentASTHierarchy.pop();
     }
 
     /** Extend statement visitor */
@@ -1164,12 +1230,30 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         /** This means the visitor is looking at an extend component statement */
         const identifier: string = d.component_identifier().getText();
         const baseNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], identifier);
+        let compNode: CompNode;
         if (baseNode) {
-          const compNode: CompNode = baseNode as CompNode;
-          this.currentASTHierarchy.push(compNode);
-          this.visitChildren(d);
-          this.currentASTHierarchy.pop();
+          compNode = baseNode as CompNode;
+        } else {
+          compNode = {
+            type: objType.COMPONENT,
+            isPure: false,
+            templateParams: [],
+            superSpec: "",
+            name: identifier,
+            definedOn: {
+              file: fileURI,
+              lineNumber: d.component_identifier().start.line,
+              columnNumber: d.component_identifier().start.column
+            },
+            comments: "",
+            children: []
+          }
+          addNodeToParent(compNode);
         }
+        this.currentASTHierarchy.push(compNode);
+        this.visitChildren(d);
+        this.currentASTHierarchy.pop();
+
       } else if (d.TOKEN_ENUM()) {
         /** We are looking at enum extension */
         let enumItems: enumItems[] = [];
@@ -1182,16 +1266,53 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
           this.visit(enumItem);
           enumItems.push(this.sharedData as enumItems);
         });
+        const identifier = d.enum_identifier().getText();
+        const baseNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], identifier);
+        let node: EnumNode;
+        if (baseNode) {
+          node = baseNode as EnumNode;
+        } else {
+          node = {
+            type: objType.ENUM,
+            dataType: "",
+            enumItems: enumItems,
+            name: identifier,
+            definedOn: {
+              file: fileURI,
+              lineNumber: d.enum_identifier().start.line,
+              columnNumber: d.enum_identifier().start.column
+            },
+            comments: "",
+            children: []
+          }
+        }
+        addNodeToParent(node);
       } else {
         /* This is essentially extending the struct */
         const identifier: string = d.struct_kind_identifier().getText();
         const rootNode = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], identifier);
+        let baseNode: StructNode;
         if (rootNode) {
-          const baseNode: StructNode = rootNode as StructNode;
-          this.currentASTHierarchy.push(baseNode);
-          this.visitChildren(d);
-          this.currentASTHierarchy.pop();
+          baseNode = rootNode as StructNode;
+        } else {
+          baseNode = {
+            type: getStructKind(identifier),
+            templateParams: [],
+            superSpec: "",
+            name: identifier,
+            definedOn: {
+              file: fileURI,
+              lineNumber: d.struct_kind_identifier().start.line,
+              columnNumber: d.struct_kind_identifier().start.column
+            },
+            comments: "",
+            children: []
+          }
+          addNodeToParent(baseNode);
         }
+        this.currentASTHierarchy.push(baseNode);
+        this.visitChildren(d);
+        this.currentASTHierarchy.pop();
       }
     }
 
