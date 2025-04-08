@@ -45,14 +45,14 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
 
     /* Define function to use internally */
     const addNodeToParent = (node: PSSLangObjects): void => {
-      if (this.currentASTHierarchy.length > 0) {
-        // Add to the current parent's children
-        const parent = this.currentASTHierarchy[this.currentASTHierarchy.length - 1];
-        parent.children.push(node);
-      } else {
+      // if (this.currentASTHierarchy.length > 0) {
+      //   // Add to the current parent's children
+      //   const parent = this.currentASTHierarchy[this.currentASTHierarchy.length - 1];
+      //   parent.children.push(node);
+      // } else {
         // Top-level node
         this.astObjects.push(node);
-      }
+      // }
     };
 
     /* Visit the start of the file */
