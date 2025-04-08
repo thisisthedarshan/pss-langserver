@@ -37,6 +37,8 @@ function_parameter_list_prototype
 function_parameter 
 : ((function_parameter_dir | TOKEN_CONST)?
   data_type identifier (TOKEN_EQUALS constant_expression)?)
+| ((function_parameter_dir | TOKEN_CONST)?
+  user_type (TOKEN_EQUALS constant_expression)?)
 | (TOKEN_CONST? ( TOKEN_TYPE | TOKEN_REF type_category | TOKEN_STRUCT ) identifier);
 
 function_parameter_dir 
@@ -46,6 +48,8 @@ function_parameter_dir
 
 varargs_parameter :
 (data_type | TOKEN_TYPE | TOKEN_REF type_category | TOKEN_STRUCT ) TOKEN_ELLIPSIS identifier;
+
+user_type : identifier;
 
 /* Out-of-spec grammar for detecting function calls */
 /* Example -> comp.function_identifier(function_parameter);*/

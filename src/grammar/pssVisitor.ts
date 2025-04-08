@@ -168,7 +168,6 @@ import { Data_typeContext } from "./pss.js";
 import { Scalar_data_typeContext } from "./pss.js";
 import { Casting_typeContext } from "./pss.js";
 import { Chandle_typeContext } from "./pss.js";
-import { User_typeContext } from "./pss.js";
 import { Integer_typeContext } from "./pss.js";
 import { Integer_atom_typeContext } from "./pss.js";
 import { Domain_open_range_listContext } from "./pss.js";
@@ -255,6 +254,7 @@ import { Function_parameter_list_prototypeContext } from "./pss.js";
 import { Function_parameterContext } from "./pss.js";
 import { Function_parameter_dirContext } from "./pss.js";
 import { Varargs_parameterContext } from "./pss.js";
+import { User_typeContext } from "./pss.js";
 import { Function_call_paramsContext } from "./pss.js";
 import { IdentifierContext } from "./pss.js";
 import { Hierarchical_id_listContext } from "./pss.js";
@@ -1354,12 +1354,6 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 */
 	visitChandle_type?: (ctx: Chandle_typeContext) => Result;
 	/**
-	 * Visit a parse tree produced by `pss.user_type`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitUser_type?: (ctx: User_typeContext) => Result;
-	/**
 	 * Visit a parse tree produced by `pss.integer_type`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1875,6 +1869,12 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitVarargs_parameter?: (ctx: Varargs_parameterContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.user_type`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitUser_type?: (ctx: User_typeContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.function_call_params`.
 	 * @param ctx the parse tree

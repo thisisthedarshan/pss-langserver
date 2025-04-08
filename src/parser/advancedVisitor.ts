@@ -903,16 +903,19 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
     /** Visitor for function parameter */
     this.visitFunction_parameter = (d: Function_parameterContext): void => {
       let param: params = {
-        paramType: "",
-        paramName: d.identifier().getText(),
-        paramDefault: ""
+        paramType: `${d.function_parameter_dir()?.getText() ?? d.TOKEN_CONST()?.getText() ?? ""}`,
+        paramName: d.identifier()?.getText() ?? d.user_type().getText().trim().split(/\s+/)[1],
+        paramDefault: d.constant_expression()?.getText() ?? ""
       }
       if (d.data_type()) {
         /** First scenario - data type is given */
-        param.paramType = `${d.function_parameter_dir()?.getText() ?? d.TOKEN_CONST()?.getText() ?? ""} ${d.data_type().getText()}`;
-        param.paramDefault = d.constant_expression()?.getText() ?? "";
-      } else {
-        /** 2nd scenario */
+        param.paramType += `${d.data_type().getText()}`;
+      } else if (d.user_type()){
+        /* 2nd scenario - user defined data type */
+        param.paramType += `${d.user_type().getText().trim().split(/\s+/)[0]}`;
+      } 
+      else {
+        /** 3rd scenario */
         param.paramType = `${d.TOKEN_CONST()?.getText() ?? ""} ${d.TOKEN_TYPE()?.getText() ?? d.type_category()?.getText() ?? d.TOKEN_STRUCT()?.getText() ?? ""}`
       }
       this.sharedData = param;
