@@ -39,13 +39,18 @@ procedural_stmt
 procedural_sequence_block_stmt:
 	TOKEN_SEQUENCE? TOKEN_CLBRACE procedural_stmt* TOKEN_CRBRACE;
 
-procedural_data_declaration:
-	data_type procedural_data_instantiation (
-		TOKEN_COMMA procedural_data_instantiation
-	)* TOKEN_SEMICOLON;
+procedural_data_declaration
+	: (data_type procedural_data_instantiation 
+			(TOKEN_COMMA procedural_data_instantiation)* 
+		TOKEN_SEMICOLON)
+	| (user_type array_dim? (TOKEN_EQUALS constant_expression)?
+			(TOKEN COMMA procedural_data_instantiation)*
+		TOKEN_SEMICOLON)
+	;
+
 
 procedural_data_instantiation:
-	identifier array_dim? (TOKEN_EQUALS expression)?;
+	identifier array_dim? (TOKEN_EQUALS constant_expression)?;
 
 procedural_assignment_stmt
 	:	(ref_path assign_op expression TOKEN_SEMICOLON)

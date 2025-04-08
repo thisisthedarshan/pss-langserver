@@ -760,31 +760,6 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       this.currentASTHierarchy.pop();
     }
 
-    /** Visit procedural data declaration to get instances */
-    this.visitProcedural_data_declaration = (c: Procedural_data_declarationContext): void => {
-      const dataType: string = c.data_type().getText();
-      c.procedural_data_instantiation_list().forEach(dataInstance => {
-        const node: InstanceNode = {
-          type: objType.INSTANCE,
-          accessModifier: "private",
-          instanceType: dataType,
-          instanceDefaultValue: dataInstance.expression()?.getText() ?? "",
-          instanceArrayCount: dataInstance.array_dim()?.constant_expression().getText() ?? "0",
-          isRandom: false,
-          isStaticConst: false,
-          name: dataInstance.identifier().getText(),
-          definedOn: {
-            file: fileURI,
-            lineNumber: dataInstance.start.line,
-            columnNumber: dataInstance.start.column
-          },
-          comments: "",
-          children: []
-        }
-        addNodeToParent(node);
-      });
-    }
-
     /** Visit package statements */
     this.visitPackage_declaration = (ctx: Package_declarationContext): PSSLangObjects => {
       const identifier: string = ctx.package_identifier().getText();
@@ -1014,13 +989,45 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
 
     /** Visit procedural data declaration */
     this.visitProcedural_data_declaration = (d: Procedural_data_declarationContext): void => {
-      const dataType: string = d.data_type().getText();
-      d.procedural_data_instantiation_list().forEach(inst => {
+      let dataType:string;
+      if (d.data_type()){
+        dataType = d.data_type().getText();
+      }
+      else if (d.user_type()) {
+        const dataInfo: string[] = d.user_type().getText().trim().split(/\s+/);
+        dataType = dataInfo[0];
+        const dataID:string = dataInfo[1];
+        const trimmed = d.user_type().getText().trimStart();
+        const firstSpace = trimmed.indexOf(' ');
+        const offsetOfDataID: number = (firstSpace === -1) ? 0 : firstSpace + 1 + (d.user_type().getText().length - trimmed.length);
         const node: InstanceNode = {
           type: objType.INSTANCE,
           accessModifier: "",
           instanceType: dataType,
-          instanceDefaultValue: inst.expression()?.getText() ?? "",
+          instanceDefaultValue: d.constant_expression()?.getText() ?? "",
+          instanceArrayCount: d.array_dim()?.constant_expression()?.getText() ?? "",
+          isRandom: false,
+          isStaticConst: false,
+          name: dataID,
+          definedOn: {
+            file: fileURI,
+            lineNumber: d.user_type().start.line,
+            columnNumber: d.user_type().start.column + offsetOfDataID /** Adjusting to start from data type + space */
+          },
+          comments: "",
+          children: []
+        };
+        addNodeToParent(node);
+      } else {
+        dataType = "unknown";
+      }
+
+      d.procedural_data_instantiation_list()?.forEach(inst => {
+        const node: InstanceNode = {
+          type: objType.INSTANCE,
+          accessModifier: "",
+          instanceType: dataType,
+          instanceDefaultValue: inst.constant_expression()?.getText() ?? "",
           instanceArrayCount: inst.array_dim()?.constant_expression()?.getText() ?? "",
           isRandom: false,
           isStaticConst: false,
