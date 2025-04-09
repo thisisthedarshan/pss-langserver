@@ -45,14 +45,14 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
 
     /* Define function to use internally */
     const addNodeToParent = (node: PSSLangObjects): void => {
-      // if (this.currentASTHierarchy.length > 0) {
-      //   // Add to the current parent's children
-      //   const parent = this.currentASTHierarchy[this.currentASTHierarchy.length - 1];
-      //   parent.children.push(node);
-      // } else {
-      // Top-level node
-      this.astObjects.push(node);
-      // }
+      if (this.currentASTHierarchy.length > 0) {
+        /* Add to the current parent's children */
+        const parent = this.currentASTHierarchy[this.currentASTHierarchy.length - 1];
+        parent.children.push(node);
+      } else {
+        /* Top-level node */
+        this.astObjects.push(node);
+      }
     };
 
     /* Visit the start of the file */
@@ -944,6 +944,7 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         /** 3rd scenario */
         param.paramType = `${d.TOKEN_CONST()?.getText() ?? ""} ${d.TOKEN_TYPE()?.getText() ?? d.type_category()?.getText() ?? d.TOKEN_STRUCT()?.getText() ?? ""}`
       }
+      param.paramType = param.paramType.trim();
       this.sharedData = param;
     }
 
@@ -1118,7 +1119,6 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       const identifier = d.identifier();
       const expression = d.expression();
       const funcCall = d.function_call();
-
       if (refPath) {
         node.name = refPath.getText();
         node.value = d.expression().getText();
@@ -1136,8 +1136,28 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         const nodeParent = (result) ? result as InstanceNode : undefined
         node.dataType = d.data_type()?.getText() ?? nodeParent?.instanceType ?? "";
       }
+      const nameSplit = node.name.split(/\s+/);
+      if (identifier && nameSplit.length > 1) {
+        /* This is the case where we might have accidentally detected 
+           a user-defined data type instance creation */
+        const instanceNode:InstanceNode=  {
+          type: objType.INSTANCE,
+          accessModifier: "",
+          instanceType: nameSplit[0],
+          instanceDefaultValue: node.value,
+          instanceArrayCount: 0,
+          isRandom: false,
+          isStaticConst: false,
+          name: nameSplit[1],
+          definedOn: node.definedOn,
+          comments: "",
+          children: []
+        };
+        addNodeToParent(instanceNode);
+      } else {
+        addNodeToParent(node);
+      }
 
-      addNodeToParent(node);
     }
 
     /** Import statement visitors */
