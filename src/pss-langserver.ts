@@ -268,6 +268,9 @@ connection.onDidOpenTextDocument((params) => {
 
 /* Handle updating AST using debounce */
 const debouncedASTBuilder = debounce((uri: string, content: string) => {
+  if (content.length === 0){
+    return;
+  }
   const result = updateASTNew(uri, content).then(result => {
     pssAST = updateASTNewMeta(pssAST, result);
     autoCompletions = buildAutocompletions(pssAST);
@@ -290,6 +293,7 @@ documents.onDidChangeContent(change => {
 /* Refresh semantic tokens on document saves */
 connection.onDidSaveTextDocument(save => {
   connection.languages.semanticTokens.refresh();
+  debouncedASTBuilder(save.textDocument.uri, save.text || "");
 });
 
 /* See if monitored files have changed */
