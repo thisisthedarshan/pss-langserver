@@ -24,7 +24,8 @@ constant_expression
     | (expression primary);
 
 expression
-    : conditional_expression
+    : primary
+    | conditional_expression
     | logical_expression
     ;
 

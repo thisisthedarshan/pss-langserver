@@ -21,8 +21,8 @@ import action_declarations,activity_statements,behavioral_coverage,component_dec
 procedural_stmt
 	: comments
 	| procedural_sequence_block_stmt
-	| procedural_data_declaration
 	| procedural_assignment_stmt
+	| procedural_data_declaration
 	| procedural_void_function_call_stmt
 	| procedural_return_stmt
 	| procedural_repeat_stmt
