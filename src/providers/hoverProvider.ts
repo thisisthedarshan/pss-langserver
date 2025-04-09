@@ -20,63 +20,82 @@ import { wordAt } from "./gotoProvider";
 import { PSSLangObjects } from "../definitions/dataStructures";
 import { keywords } from "../definitions/keywords";
 import { builtInSignatures } from "../definitions/builtinFunctions";
-import { buildMarkdownComment, getNodeFromNameArray } from "../parser/helpers";
+import { buildMarkdownComment } from "../parser/helpers";
 
-export function getHoverFor(ast: PSSLangObjects[], content: string, pos: number): Hover | null {
-  const keyword = wordAt(content, pos);
-  if (keyword == null) {
+function getHoverFor(hoverRecords: Record<string, Hover>[], content: string, pos: number): Hover | null {
+  const key = wordAt(content, pos);
+  if (key == null) {
     return null;
   }
-  interface FunctionInfo {
-    signature: string;
-    documentation: string;
-    parameters: {
-      label: string;
-      documentation: string;
-    }[];
-    package: string;
-  }
+  const hover = hoverRecords.find(record => key in record)?.[key] ?? null;
+  return hover;
+}
 
-  const funcInfo = builtInSignatures[keyword];
-  if (funcInfo) {
+function getHoverData(item: PSSLangObjects): Record<string, Hover>[] {
+  let hoverInfo: Record<string, Hover>[] = [];
+  const comments = (typeof item.comments === 'string') ? item.comments : buildMarkdownComment(item.comments);
+  if (comments.length != 0) {
+    const hoverData: Hover = {
+      contents: {
+        kind: MarkupKind.Markdown,
+        value: comments
+      }
+    }
+    hoverInfo.push({ [item.name]: hoverData });
+  }
+  item.children.forEach(child => {
+    hoverInfo = [...hoverInfo, ...getHoverData(child)];
+  });
+  return hoverInfo
+}
+
+function buildHoverItems(ast: PSSLangObjects[]): Record<string, Hover>[] {
+  let hoverRecords: Record<string, Hover>[] = [];
+  ast.forEach(object => {
+    hoverRecords = [...hoverRecords, ...getHoverData(object)];
+  });
+  return hoverRecords;
+}
+
+function createBuiltinHoverCache(): Record<string, Hover>[] {
+  let hoverRecords: Record<string, Hover>[] = [];
+  keywords.list.forEach((key, index) => {
+    const hoverData: Hover = {
+      contents: {
+        kind: MarkupKind.Markdown,
+        value: `*${key}*\n${keywords.descriptions[index]}`
+      }
+    }
+    hoverRecords.push({ [key]: hoverData });
+  });
+
+  for (const [keyword, funcInfo] of Object.entries(builtInSignatures)) {
     let documentation: string =
-      "```pss\n"+funcInfo.signature+"\n```\n";
+      "```pss\n" + funcInfo.signature + "\n```\n";
 
     documentation += `*${keyword}* is a part of the **${funcInfo.package}**\n`;
     documentation += `#### Parameters\n`;
     funcInfo.parameters.forEach(param => {
       documentation += `- **${param.label}**: ${param.documentation}\n`;
     });
-    return {
+
+    const hoverData: Hover = {
       contents: {
         kind: MarkupKind.Markdown,
         value: documentation
       }
     };
+
+    const index = hoverRecords.findIndex(record => keyword in record);
+    if (index >= 0) hoverRecords[index][keyword] = hoverData; /* Overwrite */
+    else hoverRecords.push({ [keyword]: hoverData }); /* Add new */
   }
 
-  const index = keywords.list.findIndex(item => item === keyword);
-  if (index != -1) {
-    return {
-      contents: {
-        kind: MarkupKind.Markdown,
-        value: `\`${keyword}\`\n${keywords.descriptions[index]}`
-      }
-    }
-  }
-
-  const nodeInfo = getNodeFromNameArray(ast, keyword);
-  if (nodeInfo) {
-    const comments = (typeof nodeInfo.comments === 'string') ? nodeInfo.comments : buildMarkdownComment(nodeInfo.comments);
-    if (comments.length == 0) {
-      return null;
-    }
-    return {
-      contents: {
-        kind: MarkupKind.Markdown,
-        value: comments
-      }
-    };
-  }
-  return null;
+  return hoverRecords;
 }
+
+export {
+  getHoverFor,
+  buildHoverItems,
+  createBuiltinHoverCache,
+};

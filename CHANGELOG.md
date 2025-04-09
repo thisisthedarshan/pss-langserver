@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - An advanced parser to parse and gather more information about a pss source file.
 - There are new functions to use the advanced parser. These include a new goto definition provider, and an autocompletion provider.
 - There is a new hover provider to provide basic information about a hovered object.
+- Caching to speed-up the process of providing auto-completions and hover info for user.
 
 ### Fixed
 

@@ -44,18 +44,17 @@ import {
   TextDocument
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
-import fs from 'fs-extra';
 import { builtInSignatures } from './definitions/builtinFunctions';
-import { metaData, PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
+import { PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
 import { version } from './version';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { notify } from './helpers';
+import { buildASTForFiles, notify } from './helpers';
 import { buildMarkdownComment, fullRange, getNodeFromNameArray, scanDirectory, updateAST, updateASTMeta, updateASTNew, updateASTNewMeta } from './parser/helpers';
-import { buildAutocompletionBlock, buildAutocompletionBlockAdvanced, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
-import { generateSemanticTokens, generateSemanticTokensAdvanced } from './providers/semanticTokenProvider';
-import { getGoToDefinition, getGoToDefinitionAdvanced } from './providers/gotoProvider';
-import { getHoverFor } from './providers/hoverProvider';
+import { buildAutocompletions, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
+import { generateSemanticTokensAdvanced } from './providers/semanticTokenProvider';
+import { getGoToDefinitionAdvanced } from './providers/gotoProvider';
+import { buildHoverItems, createBuiltinHoverCache, getHoverFor } from './providers/hoverProvider';
 import { FunctionNode, PSSLangObjects } from './definitions/dataStructures';
 
 /* To make the process act like an actual executable */
@@ -72,10 +71,18 @@ const connection = createConnection(ProposedFeatures.all);
 /* Documents manager */
 const documents = new TextDocuments(TextDocument);
 
-var globalAST: metaData[] = []; /* Holds all metaData on all files */
-var newAST: PSSLangObjects[] = [];
-var builtInCompletions: CompletionItem[]; /* Holds all autocompletion items */
+/* Boolean to track the first scan of files. */
 var isFirst = true; /* To check if an ast has already been built or not */
+
+/* Caches */
+/*var globalAST: metaData[] = []; /* Holds all metaData on all files */
+var pssAST: PSSLangObjects[] = [];
+var autoCompletions: CompletionItem[] = [];
+var hoverCache: Record<string, Hover>[] = [];
+
+/* Caches for built-in objects - like keywords and functions */
+var hoverCacheBuiltin: Record<string, Hover>[] = [];
+var builtInCompletions: CompletionItem[]; /* Holds all autocompletion items */
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = true;
@@ -95,16 +102,11 @@ connection.onInitialize((params: InitializeParams) => {
   }
 
   /* Process found files */
-  for (const file of pssFiles) {
-    const content: string = fs.readFileSync(file, 'utf8');
-    const filePath: string = "file://" + file;
-    const fileURI: string = encodeURI(filePath);
-    // updateAST(fileURI, content).then(vars => {
-    //   globalAST = updateASTMeta(globalAST, vars);
-    // });
-    updateASTNew(fileURI, content).then(vars => {
-      newAST = updateASTNewMeta(newAST, vars);
-    });
+  pssAST = buildASTForFiles(pssFiles);
+  if (pssAST.length > 0) { 
+    isFirst = false;
+    autoCompletions = buildAutocompletions(pssAST);
+    hoverCache = buildHoverItems(pssAST);
   }
 
   /* Does the client support the `workspace/configuration` request? */
@@ -175,10 +177,12 @@ connection.onInitialized(() => {
     });
   }
 
-  /* Create auto-completion suggestions for built-in functionality */
+  /* Build Caches for hover and auto-completions to speed-up the delivery */
+  hoverCacheBuiltin = createBuiltinHoverCache();
   builtInCompletions = buildAutocompletionBuiltinsBlock();
-  connection.languages.semanticTokens.refresh();
 
+  /* Ask the client to get new sematic tokens */
+  connection.languages.semanticTokens.refresh();
 });
 
 /* Default settings - in case config not supported */
@@ -244,21 +248,9 @@ connection.onDidOpenTextDocument((params) => {
       notify(connection, `Scanning local folder (${folderPath}) for pss files`)
 
       scanDirectory(folderPath, pssFiles);
-      for (const file of pssFiles) {
-        const content: string = fs.readFileSync(file, 'utf8');
-        // Convert it back to URI so that it can be used in goto info
-        const fileURI: string = encodeURI("file://" + file);
-        // Process file content here
-        // updateAST(fileURI, content).then(vars => {
-        //   globalAST = updateASTMeta(globalAST, vars);
-        // });
-
-        /* New function */
-        updateASTNew(fileURI, content).then(vars => {
-          newAST = updateASTNewMeta(newAST, vars);
-        });
-
-      }
+      pssAST = buildASTForFiles(pssFiles);
+      autoCompletions = buildAutocompletions(pssAST);
+      hoverCache = buildHoverItems(pssAST);
       isFirst = false;
 
       // Continue with the rest of your handler...
@@ -278,7 +270,9 @@ documents.onDidChangeContent(change => {
 
   /* New function */
   updateASTNew(change.document.uri.toString(), change.document.getText().toString()).then(result => {
-    newAST = updateASTNewMeta(newAST, result);
+    pssAST = updateASTNewMeta(pssAST, result);
+    autoCompletions = buildAutocompletions(pssAST);
+    hoverCache = buildHoverItems(pssAST);
   });
 
 });
@@ -297,7 +291,8 @@ connection.onDidChangeWatchedFiles(_change => {
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
     // let completions = [...builtInCompletions, ...buildAutocompletionBlock(globalAST)];
-    let completions = [...builtInCompletions, ...buildAutocompletionBlockAdvanced(newAST)]
+    // let completions = [...builtInCompletions, ...buildAutocompletionBlockAdvanced(pssAST)]
+    let completions = [...builtInCompletions, ...autoCompletions]
     return [...new Set(completions)];
   }
 );
@@ -331,7 +326,7 @@ connection.onSignatureHelp(
     // Count commas to determine active parameter
     var activeParameter = (match[2].match(/,/g) || []).length;
 
-    const refNode = getNodeFromNameArray(newAST, funcName);
+    const refNode = getNodeFromNameArray(pssAST, funcName);
     if (refNode) {
       const functionInfo: FunctionNode = refNode as FunctionNode;
 
@@ -430,7 +425,7 @@ connection.onHover(async (params: HoverParams): Promise<Hover | null> => {
   if (!document) {
     return null;
   }
-  return getHoverFor(newAST, document.getText(), document.offsetAt(params.position));
+  return getHoverFor([...hoverCache, ...hoverCacheBuiltin], document.getText(), document.offsetAt(params.position));
 }
 );
 
@@ -442,7 +437,7 @@ connection.onDefinition((params: DefinitionParams): Definition | null => {
   const content = doc.getText()
   const offset = doc.offsetAt(position);
   // const loc = getGoToDefinition(content, offset, globalAST);
-  const loc = getGoToDefinitionAdvanced(content, offset, newAST);
+  const loc = getGoToDefinitionAdvanced(content, offset, pssAST);
   return loc;
 }
 );
