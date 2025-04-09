@@ -52,10 +52,11 @@ import { fileURLToPath } from 'url';
 import { buildASTForFiles, notify } from './helpers';
 import { buildMarkdownComment, fullRange, getNodeFromNameArray, scanDirectory, updateAST, updateASTMeta, updateASTNew, updateASTNewMeta } from './parser/helpers';
 import { buildAutocompletions, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
-import { generateSemanticTokensAdvanced } from './providers/semanticTokenProvider';
+import { createSemanticTokensFor, generateSemanticTokensAdvanced } from './providers/semanticTokenProvider';
 import { getGoToDefinitionAdvanced } from './providers/gotoProvider';
 import { buildHoverItems, createBuiltinHoverCache, getHoverFor } from './providers/hoverProvider';
 import { FunctionNode, PSSLangObjects } from './definitions/dataStructures';
+import debounce from 'lodash.debounce';
 
 /* To make the process act like an actual executable */
 const args = process.argv.slice(2);
@@ -83,6 +84,7 @@ var hoverCache: Record<string, Hover>[] = [];
 /* Caches for built-in objects - like keywords and functions */
 var hoverCacheBuiltin: Record<string, Hover>[] = [];
 var builtInCompletions: CompletionItem[]; /* Holds all autocompletion items */
+var semanticTokenCache: SemanticTokens | undefined = undefined;
 
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = true;
@@ -101,10 +103,11 @@ connection.onInitialize((params: InitializeParams) => {
 
   /* Process found files */
   pssAST = buildASTForFiles(pssFiles);
-  if (pssAST.length > 0) { 
+  if (pssAST.length > 0) {
     isFirst = false;
     autoCompletions = buildAutocompletions(pssAST);
     hoverCache = buildHoverItems(pssAST);
+    semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
   }
 
   /* Does the client support the `workspace/configuration` request? */
@@ -127,7 +130,8 @@ connection.onInitialize((params: InitializeParams) => {
       textDocumentSync: TextDocumentSyncKind.Full,
       /* Tell the client that this server supports code completion. */
       completionProvider: {
-        resolveProvider: true
+        resolveProvider: true,
+        triggerCharacters: ['.', ':', ' '],
       },
       /* Our language has inter-file dependencies */
       /* For now, we will not support diagnostics */
@@ -251,6 +255,7 @@ connection.onDidOpenTextDocument((params) => {
       pssAST = buildASTForFiles(pssFiles);
       autoCompletions = buildAutocompletions(pssAST);
       hoverCache = buildHoverItems(pssAST);
+      semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
       isFirst = false;
 
       // Continue with the rest of your handler...
@@ -261,6 +266,16 @@ connection.onDidOpenTextDocument((params) => {
   }
 });
 
+/* Handle updating AST using debounce */
+const debouncedASTBuilder = debounce((uri: string, content: string) => {
+  const result = updateASTNew(uri, content).then(result => {
+    pssAST = updateASTNewMeta(pssAST, result);
+    autoCompletions = buildAutocompletions(pssAST);
+    hoverCache = buildHoverItems(pssAST);
+    semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
+  });
+}, 300);
+
 /* Event when a document is changed or first opened */
 documents.onDidChangeContent(change => {
   /* Call async file processor */
@@ -269,12 +284,7 @@ documents.onDidChangeContent(change => {
   // });
 
   /* New function */
-  updateASTNew(change.document.uri.toString(), change.document.getText().toString()).then(result => {
-    pssAST = updateASTNewMeta(pssAST, result);
-    autoCompletions = buildAutocompletions(pssAST);
-    hoverCache = buildHoverItems(pssAST);
-  });
-
+  debouncedASTBuilder(change.document.uri.toString(), change.document.getText().toString());
 });
 
 /* Refresh semantic tokens on document saves */
@@ -309,7 +319,7 @@ connection.onCompletionResolve(
 connection.onSignatureHelp(
   (params: SignatureHelpParams): SignatureHelp | null => {
     const document = documents.get(params.textDocument.uri);
-    if (!document) return null;
+    if (!document) { return null; }
 
     const position = params.position;
     const line = document.getText({
@@ -319,7 +329,7 @@ connection.onSignatureHelp(
 
     // Updated regex to match function name with parameters
     const match = line.match(/(\w+)\((.*)/);
-    if (!match) return null;
+    if (!match) { return null; }
 
     const funcName = match[1];
 
@@ -358,7 +368,7 @@ connection.onSignatureHelp(
     }
 
     const funcInfo = builtInSignatures[funcName];
-    if (!funcInfo) return null;
+    if (!funcInfo) { return null; }
 
     const parameters = funcInfo.parameters.map(p =>
       ParameterInformation.create(p.label, p.documentation)
@@ -384,16 +394,16 @@ connection.onSignatureHelp(
 );
 
 /* Provide semantic tokens to the client */
-connection.languages.semanticTokens.on(async (params: SemanticTokensParams): Promise<SemanticTokens> => {
+connection.languages.semanticTokens.on((params: SemanticTokensParams): SemanticTokens => {
   const uri = params.textDocument.uri;
   const document = documents.get(uri);
 
-  if (!document) return { data: [] };
-
-  // const ast = await updateAST(uri, document.getText());
-  const ast = await updateASTNew(uri, document.getText());
-  // return generateSemanticTokens(document.getText(), ast);
-  return generateSemanticTokensAdvanced(document.getText(), ast);
+  if (!document) { return { data: [] }; }
+  let semanticTokens: SemanticTokens = createSemanticTokensFor(document.getText());
+  if (semanticTokenCache) {
+    semanticTokens.data = [...semanticTokens.data, ...semanticTokenCache.data];
+  }
+  return semanticTokens;
 });
 
 
@@ -402,7 +412,7 @@ connection.onDocumentFormatting((params, tokens) => {
   const { textDocument, options } = params;
 
   const sourceDocument = documents.get(textDocument.uri);
-  if (!sourceDocument) return []; /* File doesn't exist */
+  if (!sourceDocument) { return []; } /* File doesn't exist */
 
   /* Get contents of the document */
   const documentContents = sourceDocument.getText();
@@ -425,7 +435,7 @@ connection.onHover(async (params: HoverParams): Promise<Hover | null> => {
   if (!document) {
     return null;
   }
-  return getHoverFor([...hoverCache, ...hoverCacheBuiltin], document.getText(), document.offsetAt(params.position));
+  return getHoverFor([...hoverCacheBuiltin, ...hoverCache], document.getText(), document.offsetAt(params.position));
 }
 );
 

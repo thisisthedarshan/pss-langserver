@@ -117,9 +117,14 @@ function getTokensForNode(pssNode: PSSLangObjects): { line: number, char: number
   return returnval;
 }
 
-export function generateSemanticTokensAdvanced(file: string, ast: PSSLangObjects[]): SemanticTokens {
+export function createSemanticTokensFor(file: string): SemanticTokens {
   let semTokensFromMeta = new SemanticTokensBuilder();
   findSemanticTokens(file, semanticTokensBuiltin, semTokensFromMeta);
+  return semTokensFromMeta.build();
+}
+
+export function generateSemanticTokensAdvanced(ast: PSSLangObjects[]): SemanticTokens {
+  let semTokensFromMeta = new SemanticTokensBuilder();
   ast.forEach(item => {
     const sematicDataArray = getTokensForNode(item);
     sematicDataArray.forEach(sematicData => {
