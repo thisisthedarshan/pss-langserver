@@ -75,7 +75,7 @@ export function buildAutocompletions(ast: PSSLangObjects[]): CompletionItem[] {
   let items: CompletionItem[] = [];
   ast.forEach(item => {
     /** Get data from each node */
-    items.push({
+    let completionItem:CompletionItem = {
       label: item.name,
       kind: getCompletionKind(item.type),
       documentation: (typeof item.comments === 'string') ? item.comments : {
@@ -83,7 +83,13 @@ export function buildAutocompletions(ast: PSSLangObjects[]): CompletionItem[] {
         value: buildMarkdownComment(item.comments)
       },
       data: item.name
-    });
+    };
+    const existingItem = items.find(i => i.label === item.name);
+    if (!existingItem) {
+      // No duplicate, add to items
+      items.push(completionItem);
+    }
+    
     if (item.children.length > 0) {
       const childItems: CompletionItem[] = buildAutocompletions(item.children);
       items = [...items, ...childItems];

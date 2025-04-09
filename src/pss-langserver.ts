@@ -271,7 +271,7 @@ const debouncedASTBuilder = debounce((uri: string, content: string) => {
   if (content.length === 0){
     return;
   }
-  const result = updateASTNew(uri, content).then(result => {
+  updateASTNew(uri, content).then(result => {
     pssAST = updateASTNewMeta(pssAST, result);
     autoCompletions = buildAutocompletions(pssAST);
     hoverCache = buildHoverItems(pssAST);
