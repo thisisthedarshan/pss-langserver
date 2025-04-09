@@ -30,7 +30,7 @@ export const keywords = {
     "resource", "return", "run_end", "run_start", "schedule", "select", "sequence", "set", "share",
     "solve", "state", "static", "stream", "string", "struct", "super", "symbol", "target", "this",
     "true", "type", "typedef", "unique", "void", "while", "with", "yield",
-    "addr_handle_t", "class", "overpoint", "packed", "solveonly", "targetonly", 
+    "addr_handle_t", "packed", "solveonly", "targetonly",
 
     /* Core Library Functions (Annex C) */
     "format", "print", "message", "file_open", "file_close", "file_exists", "file_write", "file_read",
@@ -42,12 +42,12 @@ export const keywords = {
     "write16", "write32", "write64", "read_bytes", "write_bytes", "read_struct", "write_struct", "read",
     "write", "read_val", "write_val", "write_masked", "write_val_masked", "write_field", "write_fields",
     "get_offset_of_instance", "get_offset_of_instance_array", "get_offset_of_path", "set_handle",
+
     /* Packages (Annex C) */
     "std_pkg", "executor_pkg", "addr_reg_pkg"
   ],
   descriptions: [
     /* Core PSS Keywords */
-    "Type definition for an address handle (chandle), used in address-related operations (Annex C.3).",
     "Marks an action or component as abstract, preventing direct instantiation (Section 10.2.3).",
     "Defines an executable unit with inputs, outputs, and resource dependencies (Section 10).",
     "Specifies a sequence of action traversals within an action (Section 12).",
@@ -160,10 +160,12 @@ export const keywords = {
     "Declares a function with no return value (Section 22.2).",
     "Executes a block while a condition holds (Section 12.4.2).",
     "Scopes a block with constraints or conditions (Section 12.9).",
-    "Yields control in cooperative multitasking (Section 22.7.14)",
+    "Yields control in cooperative multitasking (Section 22.7.14).",
+    "Type definition for an address handle (chandle), used in address-related operations (Annex C.3).",
     "Declares a packed struct with specific endianness (Section 7.8).",
     "Restricts a function to the solve platform only (implied in Section 22.3).",
     "Restricts a function to the target platform only (implied in Section 22.3).",
+
     /* Core Library Functions (Annex C) */
     "Formats a string with arguments (solve platform only, Annex C.1).",
     "Prints a formatted string (solve platform only, Annex C.1).",
@@ -230,10 +232,12 @@ export const keywords = {
     "Writes a masked value to a register (target, Annex C.3).",
     "Writes a masked bit vector to a register (target, Annex C.3).",
     "Writes a field in a register by name (target, Annex C.3).",
-    "Writes multiple fields in a register (target, Annex C.3).",
+    "Writes multiple fields in a register (target, Annex sapeva).",
+    "Gets the offset of an instance (Annex C.3).",
     "Gets the offset of an array instance (Annex C.3).",
     "Gets the offset along a path (Annex C.3).",
     "Sets the address handle for a register group (Annex C.3).",
+
     /* Packages */
     "Standard package with utility types and functions (Annex C.1).",
     "Package for scenario execution and resource management (Annex C.2).",
