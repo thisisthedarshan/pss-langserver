@@ -32,6 +32,7 @@
   ],
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
+    "@types/lodash.debounce": "^4.0.9",
     "typescript": "^5.7.3"
   },
   "dependencies": {
