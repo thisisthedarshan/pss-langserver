@@ -41,10 +41,18 @@ export function buildASTNew(fileURI: string, fileContents: string): PSSLangObjec
   let lexer = new pss_lexer(inputStream);
   let tokenStream = new CommonTokenStream(lexer);
   let parser = new pss(tokenStream);
+  let myVisitor = new advancedVisitor(tokenStream, fileURI);
+
   parser.removeErrorListeners(); /* No need for error listener for now */
   /*parser.addErrorListener(new PSSErrorListener())*/
-  let tree = parser.pss_entry();
-  let myVisitor = new advancedVisitor(tokenStream, fileURI);
-  tree.accept(myVisitor);
+
+  try {
+    parser.pss_entry().accept(myVisitor);
+  } catch (e) {
+    /* console.warn("Parsing failed for file: ", fileURI.substring(fileURI.lastIndexOf("/") + 1)); */
+    /* const msg = e as Error; */
+    /* console.warn(msg.message); */
+    return [];
+  }
   return myVisitor.getAstObjects();
 }

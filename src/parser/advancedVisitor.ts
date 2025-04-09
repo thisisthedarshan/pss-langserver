@@ -1337,7 +1337,14 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         this.visitChildren(d);
         this.currentASTHierarchy.pop();
       }
-    }
+    };
+
+    /* This node is visited when our visitor encounters an error */
+    this.visitErrorNode = (e: ErrorNode) => {
+      const name = e.parentCtx.getText();
+      throw new Error(`Error encountered at line ${e.symbol.line}:${e.symbol.column} for ${name}.\n${e.getText()}`);
+    };
+
 
   } /** End Super */
 

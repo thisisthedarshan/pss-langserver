@@ -318,6 +318,7 @@ function mergePSSNodes(oldNode: PSSLangObjects, newNode: PSSLangObjects): PSSLan
 }
 
 export function updateASTNewMeta(oldArray: PSSLangObjects[], newArray: PSSLangObjects[]): PSSLangObjects[] {
+  if (newArray.length === 0) { return oldArray; }
   const mergedMap = new Map<string, PSSLangObjects>();
 
   oldArray.forEach(item => mergedMap.set(item.name, { ...item }));

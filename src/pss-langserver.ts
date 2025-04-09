@@ -94,8 +94,6 @@ connection.onInitialize((params: InitializeParams) => {
   const workspaceFolders = params.workspaceFolders || [];
   const pssFiles: string[] = [];
 
-  notify(connection, "PSS Language Server Started");
-
   for (const folder of workspaceFolders) {
     let dir = decodeURIComponent(folder.uri.replace('file://', ''));
     scanDirectory(dir, pssFiles);
@@ -180,6 +178,8 @@ connection.onInitialized(() => {
   /* Build Caches for hover and auto-completions to speed-up the delivery */
   hoverCacheBuiltin = createBuiltinHoverCache();
   builtInCompletions = buildAutocompletionBuiltinsBlock();
+
+  notify(connection, "PSS Language Server Started :D");
 
   /* Ask the client to get new sematic tokens */
   connection.languages.semanticTokens.refresh();
