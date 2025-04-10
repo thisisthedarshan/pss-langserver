@@ -422,13 +422,73 @@ export function getNodeFromName(object: PSSLangObjects, name: string, ignore: ob
   }
   return undefined;
 }
+
 /** This function just iterates through objects and returns the result from getNodeFromName function */
 export function getNodeFromNameArray(objects: PSSLangObjects[], name: string, ignore: objType = objType.UNKNOWN): PSSLangObjects | undefined {
-  objects.forEach(obj => {
+  for (const obj of objects) {
     const node = getNodeFromName(obj, name, ignore);
     if (typeof (node) !== 'undefined') {
       return node;
     }
-  });
+  }
   return undefined;
+}
+
+/**
+ * Collects nodes from PSSLangObjects arrays that match the given criteria.
+ * If multiple criteria are provided, nodes must match all of them.
+ */
+export function collectAllPSSNodes(
+  objects: PSSLangObjects[],
+  options: {
+    name?: string,
+    type?: objType,
+    fileURI?: string
+  } = {}
+): PSSLangObjects[] {
+  const { name, type, fileURI } = options;
+  const results: PSSLangObjects[] = [];
+
+  /* If no filtering criteria provided, return empty array */
+  if (!name && type === undefined && !fileURI) {
+    return results;
+  }
+
+  /* Process each root object */
+  for (const object of objects) {
+    /* Use iterative DFS to traverse the tree */
+    const stack: PSSLangObjects[] = [object];
+
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+
+      /* Check if current node matches all specified criteria */
+      let isMatch = true;
+
+      if (name !== undefined && current.name !== name) {
+        isMatch = false;
+      }
+
+      if (type !== undefined && current.type !== type) {
+        isMatch = false;
+      }
+
+      if (fileURI !== undefined &&
+        (!current.definedOn || current.definedOn.file !== fileURI)) {
+        isMatch = false;
+      }
+
+      /* If all criteria matched, add to results */
+      if (isMatch) {
+        results.push(current);
+      }
+
+      /* Add all children to stack for processing */
+      for (const child of current.children) {
+        stack.push(child);
+      }
+    }
+  }
+
+  return results;
 }

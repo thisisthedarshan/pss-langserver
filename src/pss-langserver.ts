@@ -45,7 +45,7 @@ import {
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
 import { builtInSignatures } from './definitions/builtinFunctions';
-import { PSS_Config, semanticTokensLegend } from './definitions/dataTypes';
+import { DoxygenGenerationRequest, DoxygenGenerationResponse, PSS_Config, RequestDoxygenGeneration, semanticTokensLegend } from './definitions/dataTypes';
 import { version } from './version';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -57,6 +57,8 @@ import { getGoToDefinitionAdvanced } from './providers/gotoProvider';
 import { buildHoverItems, createBuiltinHoverCache, getHoverFor } from './providers/hoverProvider';
 import { FunctionNode, PSSLangObjects } from './definitions/dataStructures';
 import debounce from 'lodash.debounce';
+import { keywords } from './definitions/keywords';
+import { createCommentsFromNode } from './providers/objectCommentsProvider';
 
 /* To make the process act like an actual executable */
 const args = process.argv.slice(2);
@@ -268,7 +270,7 @@ connection.onDidOpenTextDocument((params) => {
 
 /* Handle updating AST using debounce */
 const debouncedASTBuilder = debounce((uri: string, content: string) => {
-  if (content.length === 0){
+  if (content.length === 0) {
     return;
   }
   updateASTNew(uri, content).then(result => {
@@ -455,6 +457,39 @@ connection.onDefinition((params: DefinitionParams): Definition | null => {
   return loc;
 }
 );
+
+/* Handle custom requests */
+
+/* This request is for server to create doxygen comments when requested by server */
+
+connection.onRequest(RequestDoxygenGeneration, async (params: DoxygenGenerationRequest) => {
+
+  const { line, lineNumber, fileURI } = params;
+
+  let response: DoxygenGenerationResponse = {
+    content: '',
+    keyword: '' /* Default response */
+  };
+
+  const words = line.split(/\s+/);
+
+  for (const word of words) {
+    const trimmedWord = word.trim();
+
+    /* Check if word is NOT in either keywords.list or builtInSignatures */
+    if (!(trimmedWord in keywords.list) && !(trimmedWord in builtInSignatures)) {
+      const objNode = getNodeFromNameArray(pssAST, trimmedWord);
+      if (objNode) {
+        /* We got our result. Update the response and send it */
+        response.keyword = objNode.name;
+        response.content = createCommentsFromNode(objNode);
+        return response;
+      }
+    }
+  }
+
+  return response;
+});
 
 /* Prepare to listen */
 documents.listen(connection);

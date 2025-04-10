@@ -28,7 +28,7 @@ export function notify(conn: _Connection, message: string, err: boolean = false)
   }
 }
 
-export function buildASTForFiles(files: string[]): PSSLangObjects[]{
+export function buildASTForFiles(files: string[]): PSSLangObjects[] {
   let pssAST: PSSLangObjects[] = [];
   for (const file of files) {
     const content: string = fs.readFileSync(file, 'utf8');
