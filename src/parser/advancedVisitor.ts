@@ -1128,19 +1128,19 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         node.value = d.expression().getText();
         const result = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], node.name);
         const nodeParent = (result) ? result as InstanceNode : undefined
-        node.dataType = nodeParent?.instanceType ?? d.data_type()?.getText() ?? "";
+        node.dataType = nodeParent?.instanceType ?? "unknown";
       } else if (identifier && funcCall) {
         node.name = d.identifier().getText();
         node.value = d.function_call().function_identifier().getText();
         const result = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], node.name);
         const nodeParent = (result) ? result as InstanceNode : undefined
-        node.dataType = d.data_type()?.getText() ?? nodeParent?.instanceType ?? "";
+        node.dataType = nodeParent?.instanceType ?? "unknown";
       }
       const nameSplit = node.name.split(/\s+/);
       if (identifier && nameSplit.length > 1) {
-        /* This is the case where we might have accidentally detected 
+        /* This is the case where we might d.data_type()?.getText() ?? have accidentally detected
            a user-defined data type instance creation */
-        const instanceNode:InstanceNode=  {
+        const instanceNode: InstanceNode = {
           type: objType.INSTANCE,
           accessModifier: "",
           instanceType: nameSplit[0],
