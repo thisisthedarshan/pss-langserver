@@ -1,74 +1,128 @@
-# PSS language server
+# PSS Language Server
 
-The implementation of the PSS Language Support server was done due to my need to speed-up my programming when it came to PSS language. So, most of the server support is based on my own custom tweaks, requirements, style etc.
+The PSS Language Server was crafted to accelerate programming in the PSS language, tailored to specific needs and styles. Below, you’ll find a detailed overview of its features, settings, and behaviors, designed to enhance your coding experience.
 
-So, here are some things that you might be interested in -
+---
+
+## Table of Contents
+
+- [Settings](#settings)
+- [Behavior](#behavior)
+  - [Doxygen Comment Parsing](#doxygen-comment-parsing)
+  - [Variable, Function, Statement Information Comments](#variable-function-statement-information-comments)
+  - [Goto Definition and Declaration](#goto-definition-and-declaration)
+  - [Semantic Highlighting](#semantic-highlighting)
+  - [Scopes](#scopes)
+  - [Automatic File Header](#automatic-file-header)
+  - [Enum Item Declaration](#enum-item-declaration)
+- [Custom Requests](#custom-requests)
+  - [1. `dsp/RequestDoxygenGeneration`](#1-dsprequestdoxygengeneration)
+
+---
 
 ## Settings
 
-The language server expects some settings, which when not given will be assumed as default.
+The language server relies on specific settings to function optimally. If not provided, default values are applied. Here’s a summary of these settings, their purposes, and expected input types:
 
-Below is a summary of the settings, their purposes, and the expected input types:
+| Setting                | Description                                                                 | Expected Input Type        | Default Value |
+|------------------------|-----------------------------------------------------------------------------|----------------------------|---------------|
+| `PSS.tabspaces`        | Number of spaces to use instead of tabs during formatting                   | `number` (1-9)             | `4`           |
+| `PSS.fileAuthor`       | Name of the code author for automatic file headers                          | `string` (e.g., "Darshan") | `""`          |
+| `PSS.formatPatterns`   | Patterns to align neatly when formatting PSS code                           | `string[]` (e.g., ["=", "//"]) | `["=", "//"]` |
+| `PSS.autoFormatHeader` | Automatically add a [file header](#automatic-file-header) to processed files | `boolean`                  | `false`       |
 
-| Setting                | Description                                                                         | Expected Input Type           | Default Value |
-|------------------------|-------------------------------------------------------------------------------------|-------------------------------|---------------|
-| `PSS.tabspaces`        | Defines the amount of spaces to be used instead of tabs during formatting           | `number` (between 1 and 9)    | `4`           |
-| `PSS.fileAuthor`       | Set the name of the code author when generating automatic file header               | `string` (e.g., "Darshan")    | `""`          |
-| `PSS.formatPatterns`   | Patterns to align neatly when formatting PSS Code                                   | `string[]` (e.g., ["=","//"]) | `["=", "//"]` |
-| `PSS.autoFormatHeader` | To automatically add [file header](#automatic-file-header) to processed file header | `boolean`                     | `false`       |
+---
 
 ## Behavior
 
-### Doxygen comment parsing
->
+### Doxygen Comment Parsing
+
 > [!NOTE]  
-> The implementation is minimal for now - i.e. parsing logic is written but not used.
-> In later versions, I plan to collect these comments and then generate information messages for autocompletion provisions, hover, etc.
+> Current parsing logic for Doxygen comments is minimal. Comments are collected but not yet leveraged for features like autocompletion or hover information. Stay tuned for future updates that will put these comments to work!
 
-### Variable, Function, Statement information comments
+### Variable, Function, Statement Information Comments
 
-The current parsing logic assumes comments before a statement are the comments which correspond to that statement.
-
-For example, consider this scenario:
+The server assumes that comments immediately preceding a statement describe that statement. For example:
 
 ```pss
 component my_comp_c {
-  /* Comment here is for item below and not for my_comp_c */
+  /* This comment sticks to 'a' like a loyal sidekick, not 'my_comp_c' */
   int a = 69;
 }
 ```
 
-The comment `Comment here is for item below and not for my_comp_c` is used for `a` and not `my_comp_c`.
+> [!TIP]  
+> Think of these comments as little love notes for your code—sometimes they cling to the wrong element, but they mean well!
 
-This is because of the parser grammar logic? I am not sure! But kindly bear with it.
+### Goto Definition and Declaration
 
-### Goto definition and declaration
-
-The language server supports goto declaration and goto definition.
+The language server supports both "Goto Declaration" and "Goto Definition" features, enabling seamless navigation through your PSS code.
 
 ### Semantic Highlighting
 
-The language server supports full semantic highlighting for all keywords, variables, functions etc. used in your PSS code.
+Full semantic highlighting is supported for keywords, variables, functions, and other elements, making your PSS code pop with clarity and readability.
 
 ### Scopes
 
-> [!NOTE]
-> Currently, the extension does collect the code in a scoped-form but the autocompletion is not still smart-enough to provide scope-based suggestions.
+> [!NOTE]  
+> The extension collects code in a scoped format, but autocompletion isn’t yet scope-savvy. Expect smarter suggestions in future releases!
 
-### Automatic file header
+### Automatic File Header
 
-When enabled, this tool automatically generates a Doxygen header for the specified file.
-The generated header includes:
+When enabled, this feature generates a Doxygen header for the specified file, including:
 
-- **@file**: Specifies the file name.
-- **@author**: Specifies the author of the file (from settings).
-- **@brief**: Provides a placeholder for a brief description(initially empty).
-- **@date**: Records the file's creation date.
-- **Last Modified on**: Updates with the last modified date each time the file is modified.
+- **@file**: The file name.
+- **@author**: The author (from settings).
+- **@brief**: A placeholder for a brief description (initially empty).
+- **@date**: The file’s creation date.
+- **Last Modified on**: Updates with each file modification.
+
+> [!TIP]  
+> It’s like having a meticulous librarian who stamps your files with the latest metadata—because who doesn’t love a well-documented masterpiece?
+
+This header is added to new files or refreshed upon modification, keeping your file’s details current.
+
+### Enum Item Declaration
+
+Per the Portable Stimulus Standard v3.0 LRM, enum item values are constant expressions. However, the current LSP assumes these are integers, reflecting the most common use case.
+
+> [!TIP]  
+> Enums: the fancy way to count sheep—or anything else. We’ll handle the numbers; you bring the imagination!
 
 ---
-This header is either added to new files or updated on subsequent file modifications, ensuring that the file's metadata remains current
 
-### Enum item declaration
+## Custom Requests
 
-From the official Portable Stimulus Standard v3.0 LRM, the enum item value is defined as a constant expression. But for most cases, we just assign them as numbers. So, in the current LSP implementation, the parser assumes that when we set an enum value, we are always using an integer type.
+Custom LSP requests are your ticket to a spiced-up IDE, unlocking quirky features like auto-documentation or project-specific magic. Why settle for vanilla when you can have extra flavor? Here’s what’s on the menu:
+
+### 1. `dsp/RequestDoxygenGeneration`
+
+#### Description
+
+The `dsp/RequestDoxygenGeneration` request allows the client to send a code line, line number, and file URI to the server. The server generates a Doxygen comment for the first entity (e.g., variable or function) in the line—excluding keywords—and returns the comment along with the entity’s keyword.
+
+#### Interfaces
+
+##### `DoxygenGenerationRequest`
+
+- **Purpose**: Structures the client’s request.
+- **Fields**:
+  - `line: string` - The code line to analyze.
+  - `lineNumber: number` - The line number for precision.
+  - `fileURI: string` - The file URI for context-aware processing (future-proofing!).
+
+##### `DoxygenGenerationResponse`
+
+- **Purpose**: Structures the server’s response.
+- **Fields**:
+  - `content: string` - The generated Doxygen comment.
+  - `keyword: string` - The entity (e.g., variable or function name) tied to the comment.
+
+#### Client Usage
+
+1. **Send Request**: The client builds a `DoxygenGenerationRequest` with the line, line number, and file URI, then sends it via `dsp/RequestDoxygenGeneration`.
+2. **Receive Response**: The server processes it, identifies the first entity, and returns a `DoxygenGenerationResponse` with the comment and keyword.
+3. **Apply Comment**: The client can insert the `content` above the line and use the `keyword` for validation or display.
+
+> [!TIP]  
+> It’s like having a documentation fairy—just wave your wand (or send a request), and voilà, instant comments!
