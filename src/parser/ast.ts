@@ -22,6 +22,9 @@ import { metaData } from "../definitions/dataTypes";
 import { PSSErrorListener } from "./listener";
 import { PSSLangObjects } from "../definitions/dataStructures";
 import { advancedVisitor } from "./advancedVisitor";
+import { writeFileSync } from "fs-extra";
+import { fileURLToPath } from 'url';
+
 
 export function buildAST(fileURI: string, fileContents: string): metaData[] {
   let inputStream = new CharStream(fileContents);
@@ -54,5 +57,7 @@ export function buildASTNew(fileURI: string, fileContents: string): PSSLangObjec
     /* console.warn(msg.message); */
     return [];
   }
-  return myVisitor.getAstObjects();
+  const res = myVisitor.getAstObjects();
+  // writeFileSync(fileURLToPath(fileURI) + '-lsp.json', JSON.stringify(res, null, 4), 'utf-8');
+  return res;
 }
