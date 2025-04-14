@@ -21,7 +21,7 @@ import { PSSLangObjects } from "../definitions/dataStructures";
 import { keywords } from "../definitions/keywords";
 import { builtInSignatures } from "../definitions/builtinFunctions";
 import { buildMarkdownComment } from "../parser/helpers";
-import { createCommentsFromNode } from "./objectCommentsProvider";
+import { createCommentsFromNode, createCommentsFromNodeMarkdown } from "./objectCommentsProvider";
 import { objType } from "../definitions/dataTypes";
 
 function getHoverFor(hoverRecords: Record<string, Hover>[], content: string, pos: number): Hover | null {
@@ -46,10 +46,7 @@ function getHoverData(item: PSSLangObjects): Record<string, Hover>[] {
     hoverInfo.push({ [item.name]: hoverData });
   } else {
     /* This new logic just shows hover info for basic items */
-    let itemComment = createCommentsFromNode(item);
-    var comment = "";
-    comment += `## ${item.type.toLowerCase()} **${item.name}**\n`;
-    comment += itemComment;
+    const comment = createCommentsFromNodeMarkdown(item);
     const hoverData: Hover = {
       contents: {
         kind: MarkupKind.Markdown,

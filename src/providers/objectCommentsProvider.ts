@@ -17,7 +17,7 @@
 
 import { AssignmentNode, CompNode, FunctionNode, InstanceNode, PSSLangObjects, RegisterCompNode, RegisterDefNode, RegisterGroupNode } from "../definitions/dataStructures";
 import { objType } from "../definitions/dataTypes";
-import { generateComponentComment, generateInstanceComment, generateAssignmentComment, generateRegisterCompComment, generateRegisterGroupComment, generateRegisterDefComment, generateFunctionComment, generateDefaultComment } from "./objectCommentsHelper";
+import { generateComponentComment, generateInstanceComment, generateAssignmentComment, generateRegisterCompComment, generateRegisterGroupComment, generateRegisterDefComment, generateFunctionComment, generateDefaultComment, generateAssignmentCommentMarkdown, generateComponentCommentMarkdown, generateDefaultCommentMarkdown, generateFunctionCommentMarkdown, generateInstanceCommentMarkdown, generateRegisterCompCommentMarkdown, generateRegisterDefCommentMarkdown, generateRegisterGroupCommentMarkdown } from "./objectCommentsHelper";
 
 export function createCommentsFromNode(node: PSSLangObjects): string {
   switch (node.type) {
@@ -37,5 +37,25 @@ export function createCommentsFromNode(node: PSSLangObjects): string {
       return generateFunctionComment(node as FunctionNode);
     default:
       return generateDefaultComment(node);
+  }
+}
+export function createCommentsFromNodeMarkdown(node: PSSLangObjects): string {
+  switch (node.type) {
+    case objType.COMPONENT:
+      return generateComponentCommentMarkdown(node as CompNode);
+    case objType.INSTANCE:
+      return generateInstanceCommentMarkdown(node as InstanceNode);
+    case objType.ASSIGNMENT:
+      return generateAssignmentCommentMarkdown(node as AssignmentNode);
+    case objType.REGISTER_COMP:
+      return generateRegisterCompCommentMarkdown(node as RegisterCompNode);
+    case objType.REGISTER_GROUP:
+      return generateRegisterGroupCommentMarkdown(node as RegisterGroupNode);
+    case objType.REGISTER_DEF:
+      return generateRegisterDefCommentMarkdown(node as RegisterDefNode);
+    case objType.FUNCTION:
+      return generateFunctionCommentMarkdown(node as FunctionNode);
+    default:
+      return generateDefaultCommentMarkdown(node);
   }
 }

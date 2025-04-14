@@ -174,6 +174,178 @@ function generateDefaultComment(node: PSSLangObjects): string {
   return `// ${node.type}: ${node.name || 'Unnamed'}`;
 }
 
+/**
+ * Generates a Markdown-style comment for a component node.
+ * @param node The component node
+ * @returns The formatted Markdown comment string
+ */
+function generateComponentCommentMarkdown(node: CompNode): string {
+  let markdown = `## Component: ${node.name || 'Unnamed'}\n\n`;
+
+  if (node.isPure) {
+    markdown += `- **Pure**: Yes\n`;
+  }
+  if (node.superSpec) {
+    markdown += `- **Extends**: ${node.superSpec}\n`;
+  }
+  if (node.templateParams && node.templateParams.length > 0) {
+    markdown += `### Template Parameters\n`;
+    node.templateParams.forEach((param: params) => {
+      let paramStr = `- **${param.paramName}** : ${param.paramType}`;
+      if (param.paramDefault) {
+        paramStr += ` (default: ${param.paramDefault})`;
+      }
+      paramStr += ` - No description\n`;
+      markdown += paramStr;
+    });
+    markdown += "\n";
+  }
+
+  return markdown;
+}
+
+/**
+ * Generates a Markdown-style comment for an instance node.
+ * @param node The instance node
+ * @returns The formatted Markdown comment string
+ */
+function generateInstanceCommentMarkdown(node: InstanceNode): string {
+  let markdown = `## Instance: ${node.name || 'Unnamed'}\n\n`;
+
+  markdown += `- **Type**: ${node.instanceType || 'unknown type'}\n`;
+  if (node.instanceArrayCount) {
+    markdown += `- **Array Count**: ${node.instanceArrayCount}\n`;
+  }
+  if (node.isRandom) {
+    markdown += `- **Random**: Yes\n`;
+  }
+  if (node.isStaticConst) {
+    markdown += `- **Static Const**: Yes\n`;
+  }
+  if (node.accessModifier) {
+    markdown += `- **Access Modifier**: ${node.accessModifier}\n`;
+  }
+  if (node.instanceDefaultValue) {
+    markdown += `- **Default Value**: ${node.instanceDefaultValue}\n`;
+  }
+
+  return markdown;
+}
+
+/**
+ * Generates a Markdown-style comment for an assignment node.
+ * @param node The assignment node
+ * @returns The formatted Markdown comment string
+ */
+function generateAssignmentCommentMarkdown(node: AssignmentNode): string {
+  let markdown = `## Assignment: ${node.name}\n\n`;
+
+  markdown += `- **Operation**: ${node.operation || 'unknown operation'}\n`;
+  markdown += `- **Value**: ${node.value || 'unknown value'}\n`;
+  if (node.dataType) {
+    markdown += `- **Data Type**: ${node.dataType}\n`;
+  }
+
+  return markdown;
+}
+
+/**
+ * Generates a Markdown-style comment for a register component node.
+ * @param node The register component node
+ * @returns The formatted Markdown comment string
+ */
+function generateRegisterCompCommentMarkdown(node: RegisterCompNode): string {
+  let markdown = `## Register Component: ${node.name || 'Unnamed'}\n\n`;
+
+  markdown += `- **Access Type**: ${node.accessType}\n`;
+  markdown += `- **Register Length**: ${node.registerLength}\n`;
+  if (node.basedOnStruct) {
+    markdown += `- **Based on Struct**: ${node.basedOnStruct}\n`;
+  }
+
+  return markdown;
+}
+
+/**
+ * Generates a Markdown-style comment for a register group node.
+ * @param node The register group node
+ * @returns The formatted Markdown comment string
+ */
+function generateRegisterGroupCommentMarkdown(node: RegisterGroupNode): string {
+  let markdown = `## Register Group: ${node.name || 'Unnamed'}\n\n`;
+
+  if (node.baseAddress) {
+    markdown += `- **Base Address**: ${node.baseAddress}\n`;
+  }
+
+  return markdown;
+}
+
+/**
+ * Generates a Markdown-style comment for a register definition node.
+ * @param node The register definition node
+ * @returns The formatted Markdown comment string
+ */
+function generateRegisterDefCommentMarkdown(node: RegisterDefNode): string {
+  let markdown = `## Register Definition: ${node.name || 'Unnamed'}\n\n`;
+
+  markdown += `- **Access Type**: ${node.accessType}\n`;
+  markdown += `- **Register Length**: ${node.registerLength}\n`;
+  if (node.basedOnStruct) {
+    markdown += `- **Based on Struct**: ${node.basedOnStruct}\n`;
+  }
+  if (node.instanceArrayCount) {
+    markdown += `- **Instance Array Count**: ${node.instanceArrayCount}\n`;
+  }
+
+  return markdown;
+}
+
+/**
+ * Generates a Markdown-style comment for a function node.
+ * @param node The function node
+ * @returns The formatted Markdown comment string
+ */
+function generateFunctionCommentMarkdown(node: FunctionNode): string {
+  let markdown = `## Function: ${node.name || 'Unnamed'}\n\n`;
+
+  if (node.platformQualifier) {
+    markdown += `- **Platform Qualifier**: ${node.platformQualifier}\n`;
+  }
+  if (node.isPure) {
+    markdown += `- **Pure**: Yes\n`;
+  }
+  if (node.isStatic) {
+    markdown += `- **Static**: Yes\n`;
+  }
+  if (node.parameters && node.parameters.length > 0) {
+    markdown += `### Parameters\n`;
+    node.parameters.forEach((param: params) => {
+      let paramStr = `- **${param.paramName}** : ${param.paramType}`;
+      if (param.paramDefault) {
+        paramStr += ` (default: ${param.paramDefault})`;
+      }
+      paramStr += ` - No description\n`;
+      markdown += paramStr;
+    });
+    markdown += "\n";
+  }
+  if (node.returnType) {
+    markdown += `### Returns\n${node.returnType}\n\n`;
+  }
+
+  return markdown;
+}
+
+/**
+ * Generates a default Markdown-style comment for unhandled node types.
+ * @param node The PSS node
+ * @returns The formatted Markdown comment string
+ */
+function generateDefaultCommentMarkdown(node: PSSLangObjects): string {
+  return `### ${node.type}: ${node.name || 'Unnamed'}\n\n`;
+}
+
 export {
   generateComponentComment,
   generateInstanceComment,
@@ -182,5 +354,13 @@ export {
   generateRegisterGroupComment,
   generateRegisterDefComment,
   generateFunctionComment,
-  generateDefaultComment
+  generateDefaultComment,
+  generateComponentCommentMarkdown,
+  generateInstanceCommentMarkdown,
+  generateAssignmentCommentMarkdown,
+  generateRegisterCompCommentMarkdown,
+  generateRegisterGroupCommentMarkdown,
+  generateRegisterDefCommentMarkdown,
+  generateFunctionCommentMarkdown,
+  generateDefaultCommentMarkdown
 };
