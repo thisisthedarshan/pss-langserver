@@ -164,7 +164,8 @@ connection.onInitialize((params: InitializeParams) => {
         },
       },
       definitionProvider: true,
-      declarationProvider: false,
+      declarationProvider: true,
+      referencesProvider: true,
       hoverProvider: true,
       /* End Capabilities */
     }
