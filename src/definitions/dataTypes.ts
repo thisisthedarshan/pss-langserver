@@ -21,7 +21,8 @@ export interface PSS_Config {
   tabspaces: number,
   fileAuthor: string,
   formatPatterns: string[],
-  autoFormatHeader: boolean;
+  autoFormatHeader: boolean,
+  wrapAt: number;
 }
 
 /* This enum defines the types of objects our AST has */

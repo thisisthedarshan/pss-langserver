@@ -24,12 +24,13 @@ The PSS Language Server was crafted to accelerate programming in the PSS languag
 
 The language server relies on specific settings to function optimally. If not provided, default values are applied. Here’s a summary of these settings, their purposes, and expected input types:
 
-| Setting                | Description                                                                 | Expected Input Type        | Default Value |
-|------------------------|-----------------------------------------------------------------------------|----------------------------|---------------|
-| `PSS.tabspaces`        | Number of spaces to use instead of tabs during formatting                   | `number` (1-9)             | `4`           |
-| `PSS.fileAuthor`       | Name of the code author for automatic file headers                          | `string` (e.g., "Darshan") | `""`          |
-| `PSS.formatPatterns`   | Patterns to align neatly when formatting PSS code                           | `string[]` (e.g., ["=", "//"]) | `["=", "//"]` |
-| `PSS.autoFormatHeader` | Automatically add a [file header](#automatic-file-header) to processed files | `boolean`                  | `false`       |
+| Setting                | Description                                                                  | Expected Input Type               | Default Value |
+|------------------------|------------------------------------------------------------------------------|-----------------------------------|---------------|
+| `PSS.tabspaces`        | Number of spaces to use instead of tabs during formatting                    | `number` (1-9)                    | `4`           |
+| `PSS.fileAuthor`       | Name of the code author for automatic file headers                           | `string` (e.g., "Darshan")        | `""`          |
+| `PSS.formatPatterns`   | Patterns to align neatly when formatting PSS code                            | `string[]` (e.g., ["=", "//"])    | `["=", "//"]` |
+| `PSS.autoFormatHeader` | Automatically add a [file header](#automatic-file-header) to processed files | `boolean`                         | `false`       |
+| `PSS.wrapAt`           | Wrap the code for the given number of characters                             | `number` (0 - no wrap; else > 69) | `0`  (no-wrap)|
 
 ---
 

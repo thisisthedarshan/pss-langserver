@@ -203,7 +203,7 @@ connection.onInitialized(() => {
 });
 
 /* Default settings - in case config not supported */
-const defaultSettings: PSS_Config = { tabspaces: 4, fileAuthor: "", formatPatterns: ["=", "//"], autoFormatHeader: false };
+const defaultSettings: PSS_Config = { tabspaces: 4, fileAuthor: "", formatPatterns: ["=", "//"], autoFormatHeader: false, wrapAt: 0 };
 let globalSettings: PSS_Config = defaultSettings;
 
 /* Cache the settings of all open documents */
@@ -232,8 +232,9 @@ function getSettings(connection: Connection, resource: string): Thenable<PSS_Con
       connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.tabspaces' }),
       connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.fileAuthor' }),
       connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.formatPatterns' }),
-      connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.autoFormatHeader' })
-    ]).then(([tabspaces, fileAuthor, formatPatterns, autoFormatHeader]) => {
+      connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.autoFormatHeader' }),
+      connection.workspace.getConfiguration({ scopeUri: resource, section: 'PSS.wrapAt' })
+    ]).then(([tabspaces, fileAuthor, formatPatterns, autoFormatHeader, wrapAt]) => {
       // Validate tabspaces
       const validatedTabspaces = Math.min(Math.max(tabspaces ?? defaultSettings.tabspaces, 1), 9);
       return {
@@ -241,6 +242,7 @@ function getSettings(connection: Connection, resource: string): Thenable<PSS_Con
         fileAuthor: fileAuthor ?? defaultSettings.fileAuthor,
         formatPatterns: formatPatterns ?? [],
         autoFormatHeader: autoFormatHeader ?? false,
+        wrapAt: wrapAt < 69 && wrapAt > 0 ? 69 : 0
       };
     });
 
@@ -452,7 +454,7 @@ connection.onDocumentFormatting((params, tokens) => {
 
   /* Get settings for author name and tabspaces and return formatted text */
   return getSettings(connection, sourceDocument.uri).then((settings) => {
-    const formattedText = formatDocument(filename, documentContents, settings.tabspaces, settings.fileAuthor, settings.formatPatterns, settings.autoFormatHeader);
+    const formattedText = formatDocument(filename, documentContents, settings.tabspaces, settings.fileAuthor, settings.formatPatterns, settings.autoFormatHeader, settings.wrapAt);
     return [TextEdit.replace(fullRange(sourceDocument), formattedText)];
   });
 });
