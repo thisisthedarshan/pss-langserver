@@ -248,6 +248,7 @@ import { Export_actionContext } from "./pss.js";
 import { Procedural_functionContext } from "./pss.js";
 import { Function_declContext } from "./pss.js";
 import { Platform_qualifierContext } from "./pss.js";
+import { Return_itemContext } from "./pss.js";
 import { Function_prototypeContext } from "./pss.js";
 import { Function_return_typeContext } from "./pss.js";
 import { Function_parameter_list_prototypeContext } from "./pss.js";
@@ -1833,6 +1834,12 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitPlatform_qualifier?: (ctx: Platform_qualifierContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.return_item`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitReturn_item?: (ctx: Return_itemContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.function_prototype`.
 	 * @param ctx the parse tree

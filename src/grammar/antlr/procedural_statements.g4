@@ -34,6 +34,7 @@ procedural_stmt
 	| procedural_randomization_stmt
 	| procedural_compile_if
 	| procedural_yield_stmt
+	| function_call
 	| stmt_terminator;
 
 procedural_sequence_block_stmt:
@@ -44,7 +45,7 @@ procedural_data_declaration
 			(TOKEN_COMMA procedural_data_instantiation)* 
 		TOKEN_SEMICOLON)
 	| (user_type array_dim? (TOKEN_EQUALS constant_expression)?
-			(TOKEN COMMA procedural_data_instantiation)*
+			(TOKEN_COMMA procedural_data_instantiation)*
 		TOKEN_SEMICOLON)
 	;
 
@@ -54,17 +55,20 @@ procedural_data_instantiation:
 
 procedural_assignment_stmt
 	:	(ref_path assign_op expression TOKEN_SEMICOLON)
-	|	(identifier assign_op expression TOKEN_SEMICOLON)
-	|	(identifier assign_op TOKEN_FLBRACE+ expression TOKEN_FRBRACE+ TOKEN_SEMICOLON)
-	|	(identifier assign_op function_call TOKEN_SEMICOLON);
+	|	(constant_expression assign_op expression TOKEN_SEMICOLON)
+	|	(constant_expression assign_op TOKEN_FLBRACE+ expression TOKEN_FRBRACE+ TOKEN_SEMICOLON)
+	|	(constant_expression assign_op function_call TOKEN_SEMICOLON);
 
 procedural_void_function_call_stmt: (
 		TOKEN_FLBRACE TOKEN_VOID TOKEN_FRBRACE
 	)? function_call TOKEN_SEMICOLON;
 
 procedural_return_stmt
-    : TOKEN_RETURN TOKEN_SEMICOLON
-    | TOKEN_RETURN expression TOKEN_SEMICOLON
+    : TOKEN_RETURN (
+			  (constant_expression)
+			| (TOKEN_FLBRACE+ constant_expression TOKEN_FRBRACE)
+			)?
+		TOKEN_SEMICOLON
     ;
 
 procedural_repeat_stmt:

@@ -19,12 +19,13 @@ options {tokenVocab=pssLex;}
 import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,identifiers,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types,memory,registers;
 
 procedural_function : platform_qualifier? TOKEN_PURE? TOKEN_STATIC? TOKEN_FUNCTION
-function_prototype  TOKEN_CLBRACE  procedural_stmt* TOKEN_CRBRACE;
+function_prototype  TOKEN_CLBRACE  procedural_stmt* (TOKEN_RETURN return_item)? TOKEN_CRBRACE;
 
 function_decl : platform_qualifier? TOKEN_PURE? TOKEN_STATIC? TOKEN_FUNCTION
 function_prototype TOKEN_SEMICOLON;
 
 platform_qualifier : TOKEN_TARGET | TOKEN_SOLVE;
+return_item : constant_expression | (TOKEN_FLBRACE+ constant_expression TOKEN_FRBRACE+);
 
 function_prototype : function_return_type function_identifier function_parameter_list_prototype;
 
@@ -54,7 +55,7 @@ user_type : identifier;
 /* Out-of-spec grammar for detecting function calls */
 /* Example -> comp.function_identifier(function_parameter);*/
 function_call 
-: TOKEN_COMP TOKEN_DOT 
+: (TOKEN_COMP TOKEN_DOT)? 
   function_identifier 
   TOKEN_FLBRACE
     function_call_params?
@@ -62,5 +63,5 @@ function_call
   TOKEN_SEMICOLON;
 
 function_call_params
-  : identifier?
-  | (identifier (TOKEN_COMMA identifier)*);
+  : (function_call | identifier | constant_expression) 
+    (TOKEN_COMMA function_call_params)* ;
