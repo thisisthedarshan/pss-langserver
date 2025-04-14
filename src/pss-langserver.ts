@@ -508,27 +508,29 @@ connection.onReferences((params: ReferenceParams): Location[] | null | undefined
 /* This request is for server to create doxygen comments when requested by server */
 
 connection.onRequest(RequestDoxygenGeneration, async (params: DoxygenGenerationRequest) => {
-
   const { line, lineNumber, fileURI } = params;
 
   let response: DoxygenGenerationResponse = {
     content: '',
-    keyword: '' /* Default response */
+    keyword: ''
   };
 
-  const words = line.split(/\s+/);
+  const trimmedLine = line.trim();
+  const words = trimmedLine.split(/\s+/);
 
   for (const word of words) {
     const trimmedWord = word.trim();
+    // Split identifiers with dots and process each part
+    const identifiers = trimmedWord.split('.').filter(id => /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(id));
 
-    /* Check if word is NOT in either keywords.list or builtInSignatures */
-    if (!(trimmedWord in keywords.list) && !(trimmedWord in builtInSignatures)) {
-      const objNode = getNodeFromNameArray(pssAST, trimmedWord);
-      if (objNode) {
-        /* We got our result. Update the response and send it */
-        response.keyword = objNode.name;
-        response.content = createCommentsFromNode(objNode);
-        return response;
+    for (const identifier of identifiers) {
+      if (!(identifier in keywords.list) && !(identifier in builtInSignatures)) {
+        const objNode = getNodeFromNameArray(pssAST, identifier);
+        if (objNode) {
+          response.keyword = objNode.name;
+          response.content = createCommentsFromNode(objNode);
+          return response;
+        }
       }
     }
   }
