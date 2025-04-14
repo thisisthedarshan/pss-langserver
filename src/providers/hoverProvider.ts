@@ -52,7 +52,10 @@ function getHoverData(item: PSSLangObjects): Record<string, Hover>[] {
 function buildHoverItems(ast: PSSLangObjects[]): Record<string, Hover>[] {
   let hoverRecords: Record<string, Hover>[] = [];
   ast.forEach(object => {
-    hoverRecords = [...hoverRecords, ...getHoverData(object)];
+    const existingItem = hoverRecords.some(record => object.name in record);
+    if (!existingItem) {
+      hoverRecords = [...hoverRecords, ...getHoverData(object)];
+    }
   });
   return hoverRecords;
 }

@@ -91,7 +91,7 @@ export function getGoToDeclarationsAdvanced(document: string, pos: number, ast: 
 }
 
 export function getReferencesAdvanced(document: string, pos: number, ast: PSSLangObjects[]): Location[] | null | undefined {
-  let definitions: Location[] = [];
+  let references: Location[] = [];
   const keyword = wordAt(document, pos);
 
   if (keyword === null) {
@@ -99,14 +99,17 @@ export function getReferencesAdvanced(document: string, pos: number, ast: PSSLan
   }
 
   const items = collectAllPSSNodes(ast, { name: keyword, type: objType.ASSIGNMENT });
+
   items.forEach(node => {
     let start_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber)
     let end_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber + keyword.length)
-    definitions.push(Location.create(
+    references.push(Location.create(
       node.definedOn.file,
       Range.create(start_range, end_range)
     ));
   });
+
+  return references;
 }
 
 export function wordAt(text: string, offset: number): string | null {

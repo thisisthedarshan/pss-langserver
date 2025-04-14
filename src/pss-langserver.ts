@@ -82,7 +82,7 @@ const documents = new TextDocuments(TextDocument);
 var isFirst = true; /* To check if an ast has already been built or not */
 
 /* Caches */
-/*var globalAST: metaData[] = []; /* Holds all metaData on all files */
+var fileWiseAST: { [fileURI: string]: PSSLangObjects[] } = {}; /* Maybe use it later? */
 var pssAST: PSSLangObjects[] = [];
 var autoCompletions: CompletionItem[] = [];
 var hoverCache: Record<string, Hover>[] = [];
@@ -108,7 +108,13 @@ connection.onInitialize((params: InitializeParams) => {
   }
 
   /* Process found files */
-  pssAST = buildASTForFiles(pssFiles);
+  fileWiseAST = buildASTForFiles(pssFiles);
+  pssAST = [];
+  Object.entries(fileWiseAST).forEach(([uri, ast]) => {
+    pssAST = [...pssAST, ...ast];
+  });
+
+
   if (pssAST.length > 0) {
     isFirst = false;
     autoCompletions = buildAutocompletions(pssAST);
@@ -259,7 +265,11 @@ connection.onDidOpenTextDocument((params) => {
       notify(connection, `Scanning local folder (${folderPath}) for pss files`)
 
       scanDirectory(folderPath, pssFiles);
-      pssAST = buildASTForFiles(pssFiles);
+      fileWiseAST = buildASTForFiles(pssFiles);
+      pssAST = [];
+      Object.entries(fileWiseAST).forEach(([uri, ast]) => {
+        pssAST = [...pssAST, ...ast];
+      });
       autoCompletions = buildAutocompletions(pssAST);
       hoverCache = buildHoverItems(pssAST);
       semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
@@ -279,7 +289,12 @@ const debouncedASTBuilder = debounce((uri: string, content: string) => {
     return;
   }
   updateASTNew(uri, content).then(result => {
-    pssAST = updateASTNewMeta(pssAST, result);
+    // pssAST = updateASTNewMeta(pssAST, result);
+    fileWiseAST[uri] = result;
+    pssAST = [];
+    Object.entries(fileWiseAST).forEach(([uri, ast]) => {
+      pssAST = [...pssAST, ...ast];
+    });
     autoCompletions = buildAutocompletions(pssAST);
     hoverCache = buildHoverItems(pssAST);
     semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
@@ -355,7 +370,7 @@ connection.onSignatureHelp(
         ParameterInformation.create(p.paramName, `Function parameter of type ${p.paramType}`)
       );
 
-      if ((parameters[parameters.length - 1].label === "...args" || parameters[parameters.length - 1].label?.toString().includes("...")) && activeParameter > parameters.length - 1) {
+      if (parameters.length > 0 && (parameters[parameters.length - 1].label === "...args" || parameters[parameters.length - 1].label?.toString().includes("...")) && activeParameter > parameters.length - 1) {
         activeParameter = parameters.length - 1;
       }
 

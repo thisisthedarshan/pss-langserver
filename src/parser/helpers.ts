@@ -318,16 +318,17 @@ function mergePSSNodes(oldNode: PSSLangObjects, newNode: PSSLangObjects): PSSLan
 }
 
 export function updateASTNewMeta(oldArray: PSSLangObjects[], newArray: PSSLangObjects[]): PSSLangObjects[] {
-  if (newArray.length === 0) { return oldArray; }
-  const mergedMap = new Map<string, PSSLangObjects>();
+  // if (newArray.length === 0) { return oldArray; }
+  // const mergedMap = new Map<string, PSSLangObjects>();
 
-  oldArray.forEach(item => mergedMap.set(item.name, { ...item }));
-  newArray.forEach(item => {
-    const oldItem = mergedMap.get(item.name);
-    mergedMap.set(item.name, oldItem ? mergePSSNodes(oldItem, item) : { ...item });
-  });
+  // oldArray.forEach(item => mergedMap.set(item.name, { ...item }));
+  // newArray.forEach(item => {
+  //   const oldItem = mergedMap.get(item.name);
+  //   mergedMap.set(item.name, oldItem ? mergePSSNodes(oldItem, item) : { ...item });
+  // });
 
-  return Array.from(mergedMap.values());
+  // return Array.from(mergedMap.values());
+  return [...oldArray, ...newArray]
 }
 
 /** This function returns sizes for known object */

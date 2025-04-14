@@ -28,8 +28,8 @@ export function notify(conn: _Connection, message: string, err: boolean = false)
   }
 }
 
-export function buildASTForFiles(files: string[]): PSSLangObjects[] {
-  let pssAST: PSSLangObjects[] = [];
+export function buildASTForFiles(files: string[]): { [fileURI: string]: PSSLangObjects[] } {
+  let pssAST: { [fileURI: string]: PSSLangObjects[] } = {};
   for (const file of files) {
     const content: string = fs.readFileSync(file, 'utf8');
     const fileURI: string = encodeURI("file://" + file);
@@ -37,7 +37,7 @@ export function buildASTForFiles(files: string[]): PSSLangObjects[] {
     //   globalAST = updateASTMeta(globalAST, vars);
     // });
     updateASTNew(fileURI, content).then(vars => {
-      pssAST = updateASTNewMeta(pssAST, vars);
+      pssAST[fileURI] = vars;
     });
   }
   return pssAST;
