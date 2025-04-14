@@ -76,7 +76,7 @@ function generateInstanceComment(node: InstanceNode): string {
  * @returns The formatted comment string
  */
 function generateAssignmentComment(node: AssignmentNode): string {
-  let comment = `// Assignment: ${node.operation || 'unknown operation'} = ${node.value || 'unknown value'}`;
+  let comment = `// Assignment: ${node.name} ${node.operation || 'unknown operation'} ${node.value || 'unknown value'} `;
   if (node.dataType) {
     comment += ` (type: ${node.dataType})`;
   }
