@@ -284,7 +284,7 @@ const debouncedASTBuilder = debounce((uri: string, content: string) => {
     hoverCache = buildHoverItems(pssAST);
     semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
   });
-}, 300);
+}, 1800);
 
 /* Event when a document is changed or first opened */
 documents.onDidChangeContent(change => {
