@@ -445,9 +445,15 @@ export function collectAllPSSNodes(
     name?: string,
     type?: objType,
     fileURI?: string
+  } = {},
+  skipOptions: {
+    skipName?: string,
+    skipType?: objType,
+    skipFileURI?: string
   } = {}
 ): PSSLangObjects[] {
   const { name, type, fileURI } = options;
+  const { skipName, skipType, skipFileURI } = skipOptions;
   const results: PSSLangObjects[] = [];
 
   /* If no filtering criteria provided, return empty array */
@@ -476,6 +482,17 @@ export function collectAllPSSNodes(
 
       if (fileURI !== undefined &&
         (!current.definedOn || current.definedOn.file !== fileURI)) {
+        isMatch = false;
+      }
+
+      /* Skip certain files */
+      if (skipName !== undefined && current.name === skipName) {
+        isMatch = false;
+      }
+      if (skipType !== undefined && current.type === skipType) {
+        isMatch = false;
+      }
+      if (skipFileURI !== undefined && (!current.definedOn || current.definedOn.file === skipFileURI)) {
         isMatch = false;
       }
 

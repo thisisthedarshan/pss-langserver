@@ -98,7 +98,7 @@ export function getReferencesAdvanced(document: string, pos: number, ast: PSSLan
     return undefined;
   }
 
-  const items = collectAllPSSNodes(ast, { name: keyword, type: objType.ASSIGNMENT });
+  const items = collectAllPSSNodes(ast, { name: keyword }, { skipType: objType.INSTANCE });
 
   items.forEach(node => {
     let start_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber)
