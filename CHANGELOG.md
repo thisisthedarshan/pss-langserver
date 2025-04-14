@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Get Definitions and get References feature was added to the LSP. Check the [Features](FEATURES.md#go-to-definition-go-to-declaration-references) for more info on these.
 - File-wise AST logic to manage everything efficiently
 - Hover info for objects parsed by Parser
+- Ability to wrap code at given character limit
 
 ### Fixed
 

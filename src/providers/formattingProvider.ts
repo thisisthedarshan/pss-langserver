@@ -18,7 +18,7 @@
 import { integer } from "vscode-languageserver";
 import alignTextElements from "./formattingHelper";
 
-export function formatDocument(fileName: string, text: string, tabspace: integer, author: string, patterns: string[], formatHeader: boolean): string {
+export function formatDocument(fileName: string, text: string, tabspace: integer, author: string, patterns: string[], formatHeader: boolean, maxColumns: integer): string {
   /* First format curly braces */
   let doc = formatCurlyBraces(text);
   /* Then add spaces after commas */
@@ -32,14 +32,12 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
   /* Add spaces when using keywords */
   doc = doc.replace(/\b(if|for|while|repeat)(?=\()/g, '$1 ');
 
-
-  /* The make it process line by line */
+  /* Process line by line */
   let lines = doc.split('\n');
   const formattedLines: string[] = [];
 
   let indentLevel = 0; /* Start with indentLevel of 0 */
   let isInBlockComment = false;
-
 
   for (let line of lines) {
     /* Keep empty newlines as it is */
@@ -79,13 +77,15 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
 
     /* Add indentation */
     const indentedLine = `${' '.repeat(indentLevel)}${line}`;
-    formattedLines.push(indentedLine.trimEnd());
+
+    /* Wrap the line if necessary */
+    const wrappedLines = wrapLine(indentedLine, indentLevel, tabspace, maxColumns);
+    formattedLines.push(...wrappedLines);
 
     /* Handle opening braces */
     if (line.endsWith('{') && !isInBlockComment && !(/\/\/|\/\*/.test(line))) {
       indentLevel += tabspace;
     }
-
   }
 
   let formattedFile = formattedLines.join('\n');
@@ -94,6 +94,41 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
   }
 
   return formattedFile;
+}
+
+function wrapLine(line: string, indentLevel: integer, tabspace: integer, maxColumns: integer): string[] {
+  if (maxColumns === 0 || line.length <= maxColumns) {
+    return [line];
+  }
+
+  const words = line.split(' ');
+  const wrappedLines: string[] = [];
+  let currentLine = '';
+  const baseIndent = ' '.repeat(indentLevel);
+  const doubleIndent = ' '.repeat(indentLevel * 2);
+
+  for (const word of words) {
+    const separator = currentLine ? ' ' : '';
+    if (currentLine.length + separator.length + word.length > maxColumns) {
+      if (currentLine) {
+        wrappedLines.push(currentLine.trimEnd());
+      }
+      currentLine = doubleIndent + word;
+    } else {
+      currentLine += separator + word;
+    }
+  }
+
+  if (currentLine) {
+    wrappedLines.push(currentLine.trimEnd());
+  }
+
+  /* Ensure the first line retains the original indent */
+  if (wrappedLines.length > 0) {
+    wrappedLines[0] = baseIndent + wrappedLines[0].trimStart();
+  }
+
+  return wrappedLines;
 }
 
 function formatCurlyBraces(input: string): string {
@@ -111,7 +146,6 @@ function formatCurlyBraces(input: string): string {
     // Only add newline if there isn't already a newline before the closing brace
     return /\n/.test(match) ? match : p1 + '\n' + p2;
   });
-
 
   // Add a newline after `}` only if there is no newline already
   input = input.replace(/}(?!\n)(?!\s*\n)(?!;)/g, '}\n');
@@ -204,6 +238,9 @@ function formatOperators(input: string): string {
 
   function formatExpression(expression: string): string {
     return expression.replace(operatorRegex, (match, left, ops, right) => {
+      if ((left === '/' && (ops === '*' || ops === '**')) || (ops === '*' && right === '/')) {
+        return match;
+      }
       if (ops.length === 1) {
         return `${left} ${ops} ${right}`;
       } else {
