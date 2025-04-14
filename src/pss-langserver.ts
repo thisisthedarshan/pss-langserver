@@ -290,14 +290,16 @@ const debouncedASTBuilder = debounce((uri: string, content: string) => {
   }
   updateASTNew(uri, content).then(result => {
     // pssAST = updateASTNewMeta(pssAST, result);
-    fileWiseAST[uri] = result;
-    pssAST = [];
-    Object.entries(fileWiseAST).forEach(([uri, ast]) => {
-      pssAST = [...pssAST, ...ast];
-    });
-    autoCompletions = buildAutocompletions(pssAST);
-    hoverCache = buildHoverItems(pssAST);
-    semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
+    if (result.length > 0) {
+      fileWiseAST[uri] = result;
+      pssAST = [];
+      Object.entries(fileWiseAST).forEach(([uri, ast]) => {
+        pssAST = [...pssAST, ...ast];
+      });
+      autoCompletions = buildAutocompletions(pssAST);
+      hoverCache = buildHoverItems(pssAST);
+      semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
+    }
   });
 }, 1800);
 
