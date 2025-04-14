@@ -29,6 +29,8 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
   doc = addNewlinesAfterSemicolons(doc);
   /* Then start by formatting patterns - beautification */
   doc = alignTextElements(doc, patterns);
+  /* Add spaces when using keywords */
+  doc = doc.replace(/\b(if|for|while|repeat)(?=\()/g, '$1 ');
 
 
   /* The make it process line by line */
@@ -77,7 +79,7 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
 
     /* Add indentation */
     const indentedLine = `${' '.repeat(indentLevel)}${line}`;
-    formattedLines.push(indentedLine);
+    formattedLines.push(indentedLine.trimEnd());
 
     /* Handle opening braces */
     if (line.endsWith('{') && !isInBlockComment && !(/\/\/|\/\*/.test(line))) {
@@ -88,7 +90,7 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
 
   let formattedFile = formattedLines.join('\n');
   if (formatHeader) {
-    formatFileHeader(formattedFile, fileName, "sad", "dsa");
+    formatFileHeader(formattedFile, fileName, "sad", "dsa", author);
   }
 
   return formattedFile;
@@ -125,76 +127,88 @@ function addNewlinesAfterSemicolons(input: string): string {
 
 function formatCommas(input: string): string {
   // Add a space after every comma if there isn't already one
-  return input.replace(/,(?!\s)/g, ', ');
+  return input.replace(/,\s*/g, ', ');
 }
 
 function formatMultilineComments(documentText: string): string {
   return documentText.replace(
     /(\/\*\*?)([\s\S]*?)\*\//g,
-    (match, openingBlock, commentBody) => {
-      // Preserve the opening block exactly as it is
+    (match: string, openingBlock: string, commentBody: string) => {
       const opening = openingBlock;
-
-      // If the comment body is empty or just contains stars, return the comment as is
-      if (!commentBody.trim()) {
-        return `${opening} */`;
-      }
-
-      // Check if it's a single-line comment (start and end on the same line)
-      if (!commentBody.includes('\n')) {
-        // Trim the body and return it in the same line
-        return `${opening} ${commentBody.trim()} */`.replace(/\s+/g, ' ');
-      }
-
-      // Otherwise, it's a multi-line comment
-      const lines = commentBody.split('\n');
-
-      // Process each line of the comment
-      const formattedLines = lines.map((line: string) => {
-        const trimmedLine = line.trim();
-
-        // Skip empty or '*' only lines
-        if (trimmedLine === '' || trimmedLine === '*') {
-          return null;
-        }
-
-        // Keep the line as it is, but ensure only one star at the start
-        let formattedLine = trimmedLine;
-
-        // Format spacing after "*" ensuring it is spaced properly
-        if (formattedLine.startsWith('*')) {
-          formattedLine = `* ${formattedLine.slice(1).trim()}`;
-        }
-
-        return formattedLine;
-      });
-
-      // Remove null (empty) lines from the formatted array
-      const cleanedLines = formattedLines.filter((line: null) => line !== null);
-
-      // Reassemble the comment with a newline between each line and properly closed
       const closing = '*/';
-      const body = cleanedLines.join('\n');
-      return `${opening}\n${body}\n${closing}`;
+
+      // Handle single-line comments
+      if (!commentBody.includes('\n')) {
+        return `${opening} ${commentBody.trim()} ${closing}`.replace(/\s+/g, ' ');
+      }
+
+      // Handle multiline comments
+      const newlineIndex = commentBody.indexOf('\n');
+      let firstPart = '';
+      let rest = commentBody;
+
+      // Split into first part (before first newline) and the rest
+      if (newlineIndex !== -1) {
+        firstPart = commentBody.substring(0, newlineIndex).trim();
+        rest = commentBody.substring(newlineIndex + 1);
+      } else {
+        firstPart = commentBody.trim();
+        rest = '';
+      }
+
+      // Check if first part is all asterisks
+      if (/^\*+$/.test(firstPart)) {
+        let formattedComment = `${opening} ${firstPart}`;
+
+        // Process the remaining lines if any
+        if (rest) {
+          const lines = rest.split('\n');
+          const formattedLines = lines.map((line: string) => {
+            const trimmedLine = line.trim();
+            if (trimmedLine === '' || trimmedLine === '*') {
+              return null;
+            } else if (trimmedLine.startsWith('*')) {
+              return `* ${trimmedLine.slice(1).trim()}`;
+            } else {
+              return `* ${trimmedLine}`;
+            }
+          }).filter((line: string | null) => line !== null);
+
+          formattedComment += '\n' + formattedLines.join('\n');
+        }
+
+        formattedComment += '\n' + closing;
+        return formattedComment;
+      } else {
+        // First part is not all asterisks, format with * on each line
+        const lines = commentBody.split('\n');
+        const formattedLines = lines.map((line: string) => {
+          const trimmedLine = line.trim();
+          if (trimmedLine === '' || trimmedLine === '*') {
+            return null;
+          } else if (trimmedLine.startsWith('*')) {
+            return `* ${trimmedLine.slice(1).trim()}`;
+          } else {
+            return `* ${trimmedLine}`;
+          }
+        }).filter((line: string | null) => line !== null);
+
+        return `${opening}\n${formattedLines.join('\n')}\n${closing}`;
+      }
     }
   );
 }
 
-
 function formatOperators(input: string): string {
-  const operatorRegex = /([^\s])([+\-*/%^=<>!&|])([^\s])/g;
-  const excludedOperators = /[+\-*/%^=<>!&|]{2,}/; // Exclude repeated/multiple operators like ++, --, **, etc.
+  const operatorRegex = /([^\s])([\+\-\*\/\%\^=<>!&|]+)([^\s])/g;
 
   function formatExpression(expression: string): string {
-    return expression.replace(operatorRegex, (match, left, op, right) => {
-      // Ignore multiple operators in a row
-      if (excludedOperators.test(op)) {
+    return expression.replace(operatorRegex, (match, left, ops, right) => {
+      if (ops.length === 1) {
+        return `${left} ${ops} ${right}`;
+      } else {
         return match;
       }
-      if (right === ';') {
-        return match;
-      }
-      return `${left} ${op} ${right}`;
     });
   }
 
@@ -205,23 +219,16 @@ function formatOperators(input: string): string {
       content = content.replace(/\(([^()]+)\)/g, (match, innerContent) => {
         return `(${formatExpression(innerContent)})`;
       });
-    } while (content !== previousContent); // Stop when no more changes are made
+    } while (content !== previousContent);
 
-    // Format the remaining expression outside parentheses
     return formatExpression(content);
   }
 
-  return input.replace(/\/[*][\s\S]*?[*]\//g, match => match) // Ignore multiline comments
+  return input.replace(/\/\*[\s\S]*?\*\//g, match => match) // Ignore multiline comments
     .replace(/\/\/[^\n]*/g, match => match) // Ignore single-line comments
     .replace(/['"`][^'"`]*['"`]/g, match => match) // Ignore strings
     .replace(/\bhttps?:\/\/[^\s)]+/g, match => match) // Ignore URLs
-    .replace(/[^\s()]+/g, token => {
-      // Only format valid expressions
-      if (excludedOperators.test(token)) {
-        return token;
-      }
-      return formatNested(token);
-    });
+    .replace(/[^\s()]+/g, formatNested);
 }
 
 function formatSingleLineComments(line: string): string {
@@ -233,7 +240,7 @@ function formatSingleLineComments(line: string): string {
   return line;
 }
 
-export function formatFileHeader(content: string, fileName: string, creationDate: string, lastModifiedDate: string): string {
+export function formatFileHeader(content: string, fileName: string, creationDate: string, lastModifiedDate: string, author: string): string {
   const headerRegex = /^\/\*\*[\s\S]*?\*\/\n?/; // Match the header block only at the top of the file
   const lastModifiedRegex = /(Last Modified on: ).*/;
 
@@ -255,7 +262,7 @@ export function formatFileHeader(content: string, fileName: string, creationDate
   // If no header exists, add a new one at the top
   const newHeader = `/**
  * @file ${fileName}
- * @author 
+ * @author ${author}
  * @brief 
  * @date ${creationDate}
  * Last Modified on: ${lastModifiedDate}
