@@ -1116,7 +1116,7 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       };
 
       const refPath = d.ref_path();
-      const identifier = d.identifier();
+      const identifier = d.constant_expression();
       const expression = d.expression();
       const funcCall = d.function_call();
       if (refPath) {
@@ -1124,13 +1124,13 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         node.value = d.expression().getText();
         node.dataType = "ref";
       } else if (identifier && expression) {
-        node.name = d.identifier().getText();
+        node.name = d.constant_expression().getText();
         node.value = d.expression().getText();
         const result = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], node.name);
         const nodeParent = (result) ? result as InstanceNode : undefined
         node.dataType = nodeParent?.instanceType ?? "unknown";
       } else if (identifier && funcCall) {
-        node.name = d.identifier().getText();
+        node.name = d.constant_expression().getText();
         node.value = d.function_call().function_identifier().getText();
         const result = getNodeFromNameArray([...this.astObjects, ...this.currentASTHierarchy], node.name);
         const nodeParent = (result) ? result as InstanceNode : undefined
