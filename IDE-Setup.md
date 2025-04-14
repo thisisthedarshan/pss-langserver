@@ -39,7 +39,8 @@ This guide is aimed to help you setup the PSS Language server for your favourite
     "PSS.tabspaces": 4,
     "PSS.fileAuthor": "",
     "PSS.formatPatterns": ["=", "//"],
-    "PSS.autoFormatHeader": false
+    "PSS.autoFormatHeader": false,
+    "PSS.wrapAt": 0
   }
   ```
 
@@ -59,7 +60,8 @@ This guide is aimed to help you setup the PSS Language server for your favourite
     \ 'PSS.tabspaces': 4,
     \ 'PSS.fileAuthor': '',
     \ 'PSS.formatPatterns': ['=', '//'],
-    \ 'PSS.autoFormatHeader': v:false
+    \ 'PSS.autoFormatHeader': v:false,
+    \ 'PSS.wrapAt': 0
     \ })
   ```
 
@@ -76,7 +78,8 @@ This guide is aimed to help you setup the PSS Language server for your favourite
       ["PSS.tabspaces"] = 4,
       ["PSS.fileAuthor"] = "",
       ["PSS.formatPatterns"] = {"=", "//"},
-      ["PSS.autoFormatHeader"] = false
+      ["PSS.autoFormatHeader"] = false,
+      ["PSS.wrapAt"] = 0
     }
   })
   vim.filetype.add({extension = {pss = 'pss'}})
@@ -98,7 +101,8 @@ This guide is aimed to help you setup the PSS Language server for your favourite
         `(pss (:settings (("PSS.tabspaces" . 4)
                           ("PSS.fileAuthor" . "")
                           ("PSS.formatPatterns" . ("=" "//"))
-                          ("PSS.autoFormatHeader" . nil)))))
+                          ("PSS.autoFormatHeader" . nil)
+                          ("PSS.wrapAt" . 0)))))
   (add-to-list 'auto-mode-alist '("\\.pss\\'" . pss-mode))
   ```
 
@@ -114,7 +118,8 @@ This guide is aimed to help you setup the PSS Language server for your favourite
       "PSS.tabspaces": 4,
       "PSS.fileAuthor": "",
       "PSS.formatPatterns": ["=", "//"],
-      "PSS.autoFormatHeader": false
+      "PSS.autoFormatHeader": false,
+      "PSS.wrapAt": 0
     }
     ```
 
@@ -133,7 +138,8 @@ This guide is aimed to help you setup the PSS Language server for your favourite
           "PSS.tabspaces": 4,
           "PSS.fileAuthor": "",
           "PSS.formatPatterns": ["=", "//"],
-          "PSS.autoFormatHeader": false
+          "PSS.autoFormatHeader": false,
+          "PSS.wrapAt": 0
         }
       }
     }
