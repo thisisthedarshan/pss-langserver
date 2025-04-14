@@ -180,7 +180,7 @@ function generateDefaultComment(node: PSSLangObjects): string {
  * @returns The formatted Markdown comment string
  */
 function generateComponentCommentMarkdown(node: CompNode): string {
-  let markdown = `## Component: ${node.name || 'Unnamed'}\n\n`;
+  let markdown = '### Component:' + node.name + 'n\n';
 
   if (node.isPure) {
     markdown += `- **Pure**: Yes\n`;
@@ -189,13 +189,13 @@ function generateComponentCommentMarkdown(node: CompNode): string {
     markdown += `- **Extends**: ${node.superSpec}\n`;
   }
   if (node.templateParams && node.templateParams.length > 0) {
-    markdown += `### Template Parameters\n`;
+    markdown += '#### Template Parameters\n';
     node.templateParams.forEach((param: params) => {
       let paramStr = `- **${param.paramName}** : ${param.paramType}`;
       if (param.paramDefault) {
         paramStr += ` (default: ${param.paramDefault})`;
       }
-      paramStr += ` - No description\n`;
+      paramStr += '\n';
       markdown += paramStr;
     });
     markdown += "\n";
@@ -210,7 +210,7 @@ function generateComponentCommentMarkdown(node: CompNode): string {
  * @returns The formatted Markdown comment string
  */
 function generateInstanceCommentMarkdown(node: InstanceNode): string {
-  let markdown = `## Instance: ${node.name || 'Unnamed'}\n\n`;
+  let markdown = '### Instance:' + node.name + '\n\n';
 
   markdown += `- **Type**: ${node.instanceType || 'unknown type'}\n`;
   if (node.instanceArrayCount) {
@@ -238,7 +238,7 @@ function generateInstanceCommentMarkdown(node: InstanceNode): string {
  * @returns The formatted Markdown comment string
  */
 function generateAssignmentCommentMarkdown(node: AssignmentNode): string {
-  let markdown = `## Assignment: ${node.name}\n\n`;
+  let markdown = '### Assignment:' + node.name + '\n\n';
 
   markdown += `- **Operation**: ${node.operation || 'unknown operation'}\n`;
   markdown += `- **Value**: ${node.value || 'unknown value'}\n`;
@@ -255,7 +255,7 @@ function generateAssignmentCommentMarkdown(node: AssignmentNode): string {
  * @returns The formatted Markdown comment string
  */
 function generateRegisterCompCommentMarkdown(node: RegisterCompNode): string {
-  let markdown = `## Register Component: ${node.name || 'Unnamed'}\n\n`;
+  let markdown = '### Register Component:' + node.name + `\n\n`;
 
   markdown += `- **Access Type**: ${node.accessType}\n`;
   markdown += `- **Register Length**: ${node.registerLength}\n`;
@@ -272,7 +272,7 @@ function generateRegisterCompCommentMarkdown(node: RegisterCompNode): string {
  * @returns The formatted Markdown comment string
  */
 function generateRegisterGroupCommentMarkdown(node: RegisterGroupNode): string {
-  let markdown = `## Register Group: ${node.name || 'Unnamed'}\n\n`;
+  let markdown = '### Register Group:' + node.name + '\n\n';
 
   if (node.baseAddress) {
     markdown += `- **Base Address**: ${node.baseAddress}\n`;
@@ -287,7 +287,7 @@ function generateRegisterGroupCommentMarkdown(node: RegisterGroupNode): string {
  * @returns The formatted Markdown comment string
  */
 function generateRegisterDefCommentMarkdown(node: RegisterDefNode): string {
-  let markdown = `## Register Definition: ${node.name || 'Unnamed'}\n\n`;
+  let markdown = '### Register Definition:' + node.name + '\n\n';
 
   markdown += `- **Access Type**: ${node.accessType}\n`;
   markdown += `- **Register Length**: ${node.registerLength}\n`;
@@ -307,10 +307,10 @@ function generateRegisterDefCommentMarkdown(node: RegisterDefNode): string {
  * @returns The formatted Markdown comment string
  */
 function generateFunctionCommentMarkdown(node: FunctionNode): string {
-  let markdown = `## Function: ${node.name || 'Unnamed'}\n\n`;
+  let markdown = '### Function: ' + node.name + '\n\n';
 
   if (node.platformQualifier) {
-    markdown += `- **Platform Qualifier**: ${node.platformQualifier}\n`;
+    markdown += `- **Platform Qualifier**: **${node.platformQualifier}**\n`;
   }
   if (node.isPure) {
     markdown += `- **Pure**: Yes\n`;
@@ -319,19 +319,19 @@ function generateFunctionCommentMarkdown(node: FunctionNode): string {
     markdown += `- **Static**: Yes\n`;
   }
   if (node.parameters && node.parameters.length > 0) {
-    markdown += `### Parameters\n`;
+    markdown += '#### Parameters\n';
     node.parameters.forEach((param: params) => {
       let paramStr = `- **${param.paramName}** : ${param.paramType}`;
       if (param.paramDefault) {
         paramStr += ` (default: ${param.paramDefault})`;
       }
-      paramStr += ` - No description\n`;
+      paramStr += '\n';
       markdown += paramStr;
     });
     markdown += "\n";
   }
   if (node.returnType) {
-    markdown += `### Returns\n${node.returnType}\n\n`;
+    markdown += '#### Returns\n' + node.returnType + '\n\n';
   }
 
   return markdown;
@@ -343,7 +343,7 @@ function generateFunctionCommentMarkdown(node: FunctionNode): string {
  * @returns The formatted Markdown comment string
  */
 function generateDefaultCommentMarkdown(node: PSSLangObjects): string {
-  return `### ${node.type}: ${node.name || 'Unnamed'}\n\n`;
+  return `#### ${node.type}: ${node.name || 'Unnamed'}\n\n`;
 }
 
 export {
