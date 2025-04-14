@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Custom request for client to get comments generated for a given line. This logic simply finds first instance of keyword from a line and create a comment (regular or doxygen style) depending on the type of keyword.
+- Get Definitions and get References feature was added to the LSP. Check the [Features](FEATURES.md#go-to-definition-go-to-declaration-references) for more info on these.
 
 ### Fixed
 

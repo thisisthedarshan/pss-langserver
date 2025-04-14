@@ -38,6 +38,10 @@ import {
   SemanticTokens,
   HoverParams,
   Hover,
+  DeclarationParams,
+  Declaration,
+  ReferenceParams,
+  Location,
 } from 'vscode-languageserver/node';
 
 import {
@@ -53,7 +57,7 @@ import { buildASTForFiles, notify } from './helpers';
 import { buildMarkdownComment, fullRange, getNodeFromNameArray, scanDirectory, updateAST, updateASTMeta, updateASTNew, updateASTNewMeta } from './parser/helpers';
 import { buildAutocompletions, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
 import { createSemanticTokensFor, generateSemanticTokensAdvanced } from './providers/semanticTokenProvider';
-import { getGoToDefinitionAdvanced } from './providers/gotoProvider';
+import { getGoToDeclarationsAdvanced, getGoToDefinitionAdvanced, getReferencesAdvanced } from './providers/gotoProvider';
 import { buildHoverItems, createBuiltinHoverCache, getHoverFor } from './providers/hoverProvider';
 import { FunctionNode, PSSLangObjects } from './definitions/dataStructures';
 import debounce from 'lodash.debounce';
@@ -445,7 +449,7 @@ connection.onHover(async (params: HoverParams): Promise<Hover | null> => {
 }
 );
 
-/* Provide go-to functionality */
+/* Provide go-to definitions functionality */
 connection.onDefinition((params: DefinitionParams): Definition | null => {
   const { textDocument, position } = params;
   const doc = documents.get(textDocument.uri);
@@ -457,6 +461,27 @@ connection.onDefinition((params: DefinitionParams): Definition | null => {
   return loc;
 }
 );
+
+/* Provide go-to declarations functionality */
+connection.onDeclaration((params: DeclarationParams): Declaration | null => {
+  const { textDocument, position } = params;
+  const doc = documents.get(textDocument.uri);
+  if (!doc) { return null }
+  const content = doc.getText()
+  const offset = doc.offsetAt(position);
+  const loc = getGoToDeclarationsAdvanced(content, offset, pssAST);
+  return loc;
+});
+
+connection.onReferences((params: ReferenceParams): Location[] | null | undefined => {
+  const { textDocument, position } = params;
+  const doc = documents.get(textDocument.uri);
+  if (!doc) { return null }
+  const content = doc.getText()
+  const offset = doc.offsetAt(position);
+  const loc = getReferencesAdvanced(content, offset, pssAST);
+  return loc;
+});
 
 /* Handle custom requests */
 

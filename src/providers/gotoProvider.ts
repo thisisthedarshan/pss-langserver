@@ -16,9 +16,9 @@
  */
 
 import { Location, Position, Range } from "vscode-languageserver/node";
-import { metaData } from "../definitions/dataTypes";
+import { metaData, objType } from "../definitions/dataTypes";
 import { PSSLangObjects } from "../definitions/dataStructures";
-import { getNodeFromNameArray } from "../parser/helpers";
+import { collectAllPSSNodes, getNodeFromNameArray } from "../parser/helpers";
 
 export function getGoToDefinition(document: string, pos: number, ast: metaData[]): Location | null {
   const keyword = wordAt(document, pos);
@@ -55,7 +55,7 @@ export function getGoToDefinitionAdvanced(document: string, pos: number, ast: PS
     return null;
   }
 
-  const node = getNodeFromNameArray(ast,keyword);
+  const node = getNodeFromNameArray(ast, keyword, objType.ASSIGNMENT);
   if (node) {
     if (node.definedOn) {
       let start_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber)
@@ -68,6 +68,45 @@ export function getGoToDefinitionAdvanced(document: string, pos: number, ast: PS
   }
 
   return location;
+}
+
+export function getGoToDeclarationsAdvanced(document: string, pos: number, ast: PSSLangObjects[]): Location[] | null {
+  let definitions: Location[] = [];
+  const keyword = wordAt(document, pos);
+
+  if (keyword === null) {
+    return null;
+  }
+
+  const items = collectAllPSSNodes(ast, { name: keyword });
+  items.forEach(node => {
+    let start_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber)
+    let end_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber + keyword.length)
+    definitions.push(Location.create(
+      node.definedOn.file,
+      Range.create(start_range, end_range)
+    ));
+  });
+  return definitions.length > 0 ? definitions : null;
+}
+
+export function getReferencesAdvanced(document: string, pos: number, ast: PSSLangObjects[]): Location[] | null | undefined {
+  let definitions: Location[] = [];
+  const keyword = wordAt(document, pos);
+
+  if (keyword === null) {
+    return undefined;
+  }
+
+  const items = collectAllPSSNodes(ast, { name: keyword, type: objType.ASSIGNMENT });
+  items.forEach(node => {
+    let start_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber)
+    let end_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber + keyword.length)
+    definitions.push(Location.create(
+      node.definedOn.file,
+      Range.create(start_range, end_range)
+    ));
+  });
 }
 
 export function wordAt(text: string, offset: number): string | null {

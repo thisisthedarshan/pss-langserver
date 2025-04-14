@@ -10,7 +10,7 @@ The PSS Language Server was crafted to accelerate programming in the PSS languag
 - [Behavior](#behavior)
   - [Doxygen Comment Parsing](#doxygen-comment-parsing)
   - [Variable, Function, Statement Information Comments](#variable-function-statement-information-comments)
-  - [Goto Definition and Declaration](#goto-definition-and-declaration)
+  - [Goto Definition and Declaration](#go-to-definition-go-to-declaration-references)
   - [Semantic Highlighting](#semantic-highlighting)
   - [Scopes](#scopes)
   - [Automatic File Header](#automatic-file-header)
@@ -54,9 +54,13 @@ component my_comp_c {
 > [!TIP]  
 > Think of these comments as little love notes for your code—sometimes they cling to the wrong element, but they mean well!
 
-### Goto Definition and Declaration
+### Go-To Definition, Go-To Declaration, References
 
-The language server supports both "Goto Declaration" and "Goto Definition" features, enabling seamless navigation through your PSS code.
+The language server provides robust support for "Goto Declaration," "Goto Definition," and "Find References" features, enabling efficient navigation and exploration of PSS v3 codebases. These capabilities allow users to quickly trace variable instances, assignments, and references, streamlining development and debugging workflows.
+
+Goto Declaration: Navigates to the location of the object's instance declaration (e.g., within a component, action, or struct block).
+Goto Definition: Locates all instances and assignments of the object, including its declaration and any assignment statements (e.g., my_var = 42;).
+Get References: Displays all instances of the object across the codebase.
 
 ### Semantic Highlighting
 
