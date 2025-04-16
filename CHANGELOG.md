@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - The formatter is fixed to ensure proper behavior.
+- Fixed a bug which wrongly calculated wrap value.
 
 ## [0.3.2] - 2025-04-14
 

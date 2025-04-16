@@ -69,7 +69,7 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
   return formattedFile;
 }
 
-function wrapLine(line: string, indentLevel: integer, tabspace: integer, maxColumns: integer): string[] {
+function wrapLine(line: string, indentLevel: number, tabspace: number, maxColumns: number): string[] {
   if (maxColumns === 0 || line.length <= maxColumns) {
     return [line];
   }
@@ -82,7 +82,8 @@ function wrapLine(line: string, indentLevel: integer, tabspace: integer, maxColu
   for (const word of words) {
     const separator = currentLine ? ' ' : '';
     const indentLength = isFirstLine ? baseIndent.length : doubleIndent.length;
-    if (indentLength + currentLine.length + separator.length + word.length > maxColumns) {
+    const potentialLength = indentLength + currentLine.length + separator.length + word.length;
+    if (potentialLength > maxColumns) {
       if (currentLine) {
         const lineIndent = isFirstLine ? baseIndent : doubleIndent;
         wrappedLines.push(lineIndent + currentLine.trimStart());
@@ -237,3 +238,4 @@ export function formatFileHeader(content: string, fileName: string, creationDate
 `;
   return newHeader + content;
 }
+

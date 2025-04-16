@@ -116,46 +116,31 @@ function processBlockForAlignment(lines: string[], start: number, end: number, p
 }
 
 function hasPatternOutsideBrackets(line: string, pattern: string): boolean {
-    // Skip if pattern isn't in the line
     if (!line.includes(pattern)) return false;
-
-    // Track bracket nesting and quotes
     let inSingleQuote = false;
     let inDoubleQuote = false;
-    let bracketDepth = 0;  // Tracks all bracket types
-
+    let bracketDepth = 0;
     for (let i = 0; i < line.length; i++) {
         const char = line[i];
-
-        // Handle quotes (toggle state if not escaped)
         if (char === "'" && (i === 0 || line[i - 1] !== '\\')) {
             inSingleQuote = !inSingleQuote;
         } else if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
             inDoubleQuote = !inDoubleQuote;
         }
-
-        // Skip processing if in quotes
         if (inSingleQuote || inDoubleQuote) continue;
-
-        // Track bracket depth
         if (char === '(' || char === '[' || char === '{') {
             bracketDepth++;
         } else if (char === ')' || char === ']' || char === '}') {
             bracketDepth--;
         }
-
-        // Check for pattern at current position, but only if not inside brackets
-        if (bracketDepth === 0 && line.substring(i, i + pattern.length) === pattern) {
-            // Verify it's a standalone pattern (not part of another token)
+        if (bracketDepth === 0 && line.substring(i, i + pattern.length) === pattern && isStandalonePattern(line, i, pattern)) {
             const beforeChar = i > 0 ? line[i - 1] : ' ';
             const afterChar = i + pattern.length < line.length ? line[i + pattern.length] : ' ';
-
             if (/[\s\w]/.test(beforeChar) && /[\s\w=;,)]/.test(afterChar)) {
                 return true;
             }
         }
     }
-
     return false;
 }
 
@@ -195,33 +180,22 @@ function getPatternPosition(line: string, pattern: string): { prefix: string, su
     let inSingleQuote = false;
     let inDoubleQuote = false;
     let bracketDepth = 0;
-
     for (let i = 0; i < line.length; i++) {
         const char = line[i];
-
-        // Handle quotes
         if (char === "'" && (i === 0 || line[i - 1] !== '\\')) {
             inSingleQuote = !inSingleQuote;
         } else if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
             inDoubleQuote = !inDoubleQuote;
         }
-
-        // Skip if in quotes
         if (inSingleQuote || inDoubleQuote) continue;
-
-        // Track bracket depth
         if (char === '(' || char === '[' || char === '{') {
             bracketDepth++;
         } else if (char === ')' || char === ']' || char === '}') {
             bracketDepth--;
         }
-
-        // Found pattern outside brackets
-        if (bracketDepth === 0 && line.substring(i, i + pattern.length) === pattern) {
-            // Verify it's a standalone pattern
+        if (bracketDepth === 0 && line.substring(i, i + pattern.length) === pattern && isStandalonePattern(line, i, pattern)) {
             const beforeChar = i > 0 ? line[i - 1] : ' ';
             const afterChar = i + pattern.length < line.length ? line[i + pattern.length] : ' ';
-
             if (/[\s\w]/.test(beforeChar) && /[\s\w=;,)]/.test(afterChar)) {
                 const prefix = line.substring(0, i).trimEnd();
                 const suffix = line.substring(i);
@@ -229,9 +203,29 @@ function getPatternPosition(line: string, pattern: string): { prefix: string, su
             }
         }
     }
-
-    // Fallback (should not happen if hasPatternOutsideBrackets returned true)
     return { prefix: line, suffix: '' };
 }
 
+function isStandalonePattern(line: string, i: number, pattern: string): boolean {
+    const multiCharOperators = ["==", "===", "!=", "!==", "=>", "<=", ">=", "+=", "-=", "*=", "/=", "&&", "||", "++", "--"];
+    for (const op of multiCharOperators) {
+        if (op.startsWith(pattern) && line.substring(i, i + op.length) === op) {
+            return false;
+        }
+    }
+    // Check if the pattern is not part of a longer sequence of the same character
+    if (pattern.length === 1) {
+        const char = pattern[0];
+        let j = i + 1;
+        while (j < line.length && line[j] === char) {
+            j++;
+        }
+        if (j - i > 1) {
+            return false;
+        }
+    }
+    return true;
+}
+
 export default alignTextElements;
+export { isStandalonePattern };

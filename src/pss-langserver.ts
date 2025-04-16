@@ -242,7 +242,9 @@ function getSettings(connection: Connection, resource: string): Thenable<PSS_Con
         fileAuthor: fileAuthor ?? defaultSettings.fileAuthor,
         formatPatterns: formatPatterns ?? [],
         autoFormatHeader: autoFormatHeader ?? false,
-        wrapAt: wrapAt < 69 && wrapAt > 0 ? 69 : 0
+        wrapAt: (wrapAt !== null && typeof wrapAt === 'number')
+          ? (wrapAt < 69 && wrapAt > 0 ? 69 : wrapAt)
+          : 0
       };
     });
 
