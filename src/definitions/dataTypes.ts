@@ -22,7 +22,7 @@ export interface PSS_Config {
   fileAuthor: string,
   formatPatterns: string[],
   autoFormatHeader: boolean,
-  wrapAt: number;
+  wrapAt: number | null;
 }
 
 /* This enum defines the types of objects our AST has */

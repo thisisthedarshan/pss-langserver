@@ -19,45 +19,28 @@ import { integer } from "vscode-languageserver";
 import alignTextElements from "./formattingHelper";
 
 export function formatDocument(fileName: string, text: string, tabspace: integer, author: string, patterns: string[], formatHeader: boolean, maxColumns: integer): string {
-  /* First format curly braces */
   let doc = formatCurlyBraces(text);
-  /* Then add spaces after commas */
   doc = formatCommas(doc);
-  /* Format multi-line comments: */
   doc = formatMultilineComments(doc);
-  /* Then format semicolons */
   doc = addNewlinesAfterSemicolons(doc);
-  /* Then start by formatting patterns - beautification */
   doc = alignTextElements(doc, patterns);
-  /* Add spaces when using keywords */
   doc = doc.replace(/\b(if|for|while|repeat)(?=\()/g, '$1 ');
-
-  /* Process line by line */
   let lines = doc.split('\n');
   const formattedLines: string[] = [];
-
-  let indentLevel = 0; /* Start with indentLevel of 0 */
+  let indentLevel = 0;
   let isInBlockComment = false;
 
   for (let line of lines) {
-    /* Keep empty newlines as it is */
     if (line.trim() === '') {
-      formattedLines.push(''); // Keep the empty line as-is
+      formattedLines.push('');
       continue;
     }
-
     line = line.trim();
-
-    /* Format specific syntax */
     line = formatOperators(line);
     line = formatSingleLineComments(line);
-
-    /* Handle closing braces */
     if (line.startsWith('}') && !isInBlockComment && !(/\/\//.test(line))) {
       indentLevel = Math.max(indentLevel - tabspace, 0);
     }
-
-    /* Check if comment block is encountered */
     if (line.startsWith("/*")) {
       isInBlockComment = true;
     }
@@ -67,32 +50,22 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
         line = line.replace(/^(?!.*\/\*).*?\*\/$/, (match) => match.replace(/(\*\/)/, ' $1'));
       }
     }
-
-    /* Check if still in comment */
     if (isInBlockComment) {
       if (line.startsWith("*")) {
-        line = ` ${line}`; // Add an extra space
+        line = ` ${line}`;
       }
     }
-
-    /* Add indentation */
     const indentedLine = `${' '.repeat(indentLevel)}${line}`;
-
-    /* Wrap the line if necessary */
     const wrappedLines = wrapLine(indentedLine, indentLevel, tabspace, maxColumns);
     formattedLines.push(...wrappedLines);
-
-    /* Handle opening braces */
     if (line.endsWith('{') && !isInBlockComment && !(/\/\/|\/\*/.test(line))) {
       indentLevel += tabspace;
     }
   }
-
   let formattedFile = formattedLines.join('\n');
   if (formatHeader) {
     formatFileHeader(formattedFile, fileName, "sad", "dsa", author);
   }
-
   return formattedFile;
 }
 
@@ -100,68 +73,51 @@ function wrapLine(line: string, indentLevel: integer, tabspace: integer, maxColu
   if (maxColumns === 0 || line.length <= maxColumns) {
     return [line];
   }
-
   const words = line.split(' ');
   const wrappedLines: string[] = [];
   let currentLine = '';
   const baseIndent = ' '.repeat(indentLevel);
-  const doubleIndent = ' '.repeat(indentLevel * 2);
-
+  const doubleIndent = ' '.repeat(indentLevel + tabspace);
+  let isFirstLine = true;
   for (const word of words) {
     const separator = currentLine ? ' ' : '';
-    if (currentLine.length + separator.length + word.length > maxColumns) {
+    const indentLength = isFirstLine ? baseIndent.length : doubleIndent.length;
+    if (indentLength + currentLine.length + separator.length + word.length > maxColumns) {
       if (currentLine) {
-        wrappedLines.push(currentLine.trimEnd());
+        const lineIndent = isFirstLine ? baseIndent : doubleIndent;
+        wrappedLines.push(lineIndent + currentLine.trimStart());
+        isFirstLine = false;
       }
-      currentLine = doubleIndent + word;
+      currentLine = word;
     } else {
       currentLine += separator + word;
     }
   }
-
   if (currentLine) {
-    wrappedLines.push(currentLine.trimEnd());
+    const lineIndent = isFirstLine ? baseIndent : doubleIndent;
+    wrappedLines.push(lineIndent + currentLine.trimStart());
   }
-
-  /* Ensure the first line retains the original indent */
-  if (wrappedLines.length > 0) {
-    wrappedLines[0] = baseIndent + wrappedLines[0].trimStart();
-  }
-
   return wrappedLines;
 }
 
 function formatCurlyBraces(input: string): string {
-  // Remove newline before `{` and move it back to the previous line
   input = input.replace(/\n\s*{/g, ' {');
-
-  // Ensure there is exactly 1 space before the opening `{`
   input = input.replace(/\s*{/g, ' {');
-
-  // Ensure there is always a newline after the opening `{` without removing existing newlines
   input = input.replace(/({)(?!\n)/g, '$1\n');
-
-  // Ensure `}` is on its own line and add a newline before it if needed
   input = input.replace(/([^\n])(\s*})(?!\n)/g, (match, p1, p2) => {
-    // Only add newline if there isn't already a newline before the closing brace
     return /\n/.test(match) ? match : p1 + '\n' + p2;
   });
-
-  // Add a newline after `}` only if there is no newline already
   input = input.replace(/}(?!\n)(?!\s*\n)(?!;)/g, '}\n');
-
   return input;
 }
 
 function addNewlinesAfterSemicolons(input: string): string {
-  // Step 1: Add newline after semicolon if not followed by newline or comment (single-line or multi-line)
   input = input.replace(/;(?!\s*(?:\n|\/\/|\/\*[^*]*\*\/))(?=\s*(?!\n))(?=\s*(?![^*]*\*\/)[^]*\n)/g, ';\n');
-  return input; // No need for .trim() to avoid stripping empty lines
+  return input;
 }
 
 function formatCommas(input: string): string {
-  // Add a space after every comma if there isn't already one
-  return input.replace(/,\s*/g, ', ');
+  return input.replace(/,(?=\S)/g, ', ');
 }
 
 function formatMultilineComments(documentText: string): string {
@@ -170,18 +126,12 @@ function formatMultilineComments(documentText: string): string {
     (match: string, openingBlock: string, commentBody: string) => {
       const opening = openingBlock;
       const closing = '*/';
-
-      // Handle single-line comments
       if (!commentBody.includes('\n')) {
         return `${opening} ${commentBody.trim()} ${closing}`.replace(/\s+/g, ' ');
       }
-
-      // Handle multiline comments
       const newlineIndex = commentBody.indexOf('\n');
       let firstPart = '';
       let rest = commentBody;
-
-      // Split into first part (before first newline) and the rest
       if (newlineIndex !== -1) {
         firstPart = commentBody.substring(0, newlineIndex).trim();
         rest = commentBody.substring(newlineIndex + 1);
@@ -189,12 +139,8 @@ function formatMultilineComments(documentText: string): string {
         firstPart = commentBody.trim();
         rest = '';
       }
-
-      // Check if first part is all asterisks
       if (/^\*+$/.test(firstPart)) {
         let formattedComment = `${opening} ${firstPart}`;
-
-        // Process the remaining lines if any
         if (rest) {
           const lines = rest.split('\n');
           const formattedLines = lines.map((line: string) => {
@@ -207,14 +153,11 @@ function formatMultilineComments(documentText: string): string {
               return `* ${trimmedLine}`;
             }
           }).filter((line: string | null) => line !== null);
-
           formattedComment += '\n' + formattedLines.join('\n');
         }
-
         formattedComment += '\n' + closing;
         return formattedComment;
       } else {
-        // First part is not all asterisks, format with * on each line
         const lines = commentBody.split('\n');
         const formattedLines = lines.map((line: string) => {
           const trimmedLine = line.trim();
@@ -226,7 +169,6 @@ function formatMultilineComments(documentText: string): string {
             return `* ${trimmedLine}`;
           }
         }).filter((line: string | null) => line !== null);
-
         return `${opening}\n${formattedLines.join('\n')}\n${closing}`;
       }
     }
@@ -235,7 +177,6 @@ function formatMultilineComments(documentText: string): string {
 
 function formatOperators(input: string): string {
   const operatorRegex = /([^\s])([\+\-\*\/\%\^=<>!&|]+)([^\s])/g;
-
   function formatExpression(expression: string): string {
     return expression.replace(operatorRegex, (match, left, ops, right) => {
       if ((left === '/' && (ops === '*' || ops === '**')) || (ops === '*' && right === '/')) {
@@ -248,7 +189,6 @@ function formatOperators(input: string): string {
       }
     });
   }
-
   function formatNested(content: string): string {
     let previousContent;
     do {
@@ -257,46 +197,35 @@ function formatOperators(input: string): string {
         return `(${formatExpression(innerContent)})`;
       });
     } while (content !== previousContent);
-
     return formatExpression(content);
   }
-
-  return input.replace(/\/\*[\s\S]*?\*\//g, match => match) // Ignore multiline comments
-    .replace(/\/\/[^\n]*/g, match => match) // Ignore single-line comments
-    .replace(/['"`][^'"`]*['"`]/g, match => match) // Ignore strings
-    .replace(/\bhttps?:\/\/[^\s)]+/g, match => match) // Ignore URLs
+  return input.replace(/\/\*[\s\S]*?\*\//g, match => match)
+    .replace(/\/\/[^\n]*/g, match => match)
+    .replace(/['"`][^'"`]*['"`]/g, match => match)
+    .replace(/\bhttps?:\/\/[^\s)]+/g, match => match)
     .replace(/[^\s()]+/g, formatNested);
 }
 
 function formatSingleLineComments(line: string): string {
-  // Ensure there is a space before `//`, but ignore URLs starting with `://`
-  line = line.replace(/([^:])\/\/(?! )/g, '$1 // '); // Add a space before `//` if not preceded by a colon
-  // Ensure there is a space after `//`, but ignore if it's part of a URL (contains colon before `//`)
-  line = line.replace(/([^:])\/\/(?! )/g, '$1 // '); // Ensures space after `//` if not already present and not part of a URL
-
+  line = line.replace(/([^:])\/\/(?! )/g, '$1 // ');
+  line = line.replace(/([^:])\/\/(?! )/g, '$1 // ');
   return line;
 }
 
 export function formatFileHeader(content: string, fileName: string, creationDate: string, lastModifiedDate: string, author: string): string {
-  const headerRegex = /^\/\*\*[\s\S]*?\*\/\n?/; // Match the header block only at the top of the file
+  const headerRegex = /^\/\*\*[\s\S]*?\*\/\n?/;
   const lastModifiedRegex = /(Last Modified on: ).*/;
-
-  // If a header already exists, update "Last Modified on:"
   if (headerRegex.test(content)) {
     return content.replace(headerRegex, (header) => {
-      // Update or add the "Last Modified on:" field in the existing header
       if (lastModifiedRegex.test(header)) {
         return header.replace(lastModifiedRegex, `$1${lastModifiedDate}`);
       } else {
-        // Add "Last Modified on:" if it doesn't exist
         const headerLines = header.split('\n');
         headerLines.splice(headerLines.length - 1, 0, ` * Last Modified on: ${lastModifiedDate}`);
         return headerLines.join('\n');
       }
     });
   }
-
-  // If no header exists, add a new one at the top
   const newHeader = `/**
  * @file ${fileName}
  * @author ${author}

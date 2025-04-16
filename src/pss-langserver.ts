@@ -454,7 +454,7 @@ connection.onDocumentFormatting((params, tokens) => {
 
   /* Get settings for author name and tabspaces and return formatted text */
   return getSettings(connection, sourceDocument.uri).then((settings) => {
-    const formattedText = formatDocument(filename, documentContents, settings.tabspaces, settings.fileAuthor, settings.formatPatterns, settings.autoFormatHeader, settings.wrapAt);
+    const formattedText = formatDocument(filename, documentContents, settings.tabspaces, settings.fileAuthor, settings.formatPatterns, settings.autoFormatHeader, (typeof settings.wrapAt === 'number') ? settings.wrapAt : 0);
     return [TextEdit.replace(fullRange(sourceDocument), formattedText)];
   });
 });
