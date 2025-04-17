@@ -451,12 +451,10 @@ connection.onDocumentFormatting((params, tokens) => {
 
   /* Get the filename */
   const filePath = fileURLToPath(textDocument.uri);
-  const filename = path.basename(filePath);
-
 
   /* Get settings for author name and tabspaces and return formatted text */
   return getSettings(connection, sourceDocument.uri).then((settings) => {
-    const formattedText = formatDocument(filename, documentContents, settings.tabspaces, settings.fileAuthor, settings.formatPatterns, settings.autoFormatHeader, (typeof settings.wrapAt === 'number') ? settings.wrapAt : 0);
+    const formattedText = formatDocument(filePath, documentContents, settings.tabspaces, settings.fileAuthor, settings.formatPatterns, settings.autoFormatHeader, (typeof settings.wrapAt === 'number') ? settings.wrapAt : 0);
     return [TextEdit.replace(fullRange(sourceDocument), formattedText)];
   });
 });

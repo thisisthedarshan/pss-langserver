@@ -16,10 +16,19 @@
  */
 
 import { integer } from "vscode-languageserver";
-import alignTextElements from "./formattingHelper";
+import alignTextElements, { formatDate } from "./formattingHelper";
+import { statSync } from "fs-extra";
+import * as path from 'path';
 
-export function formatDocument(fileName: string, text: string, tabspace: integer, author: string, patterns: string[], formatHeader: boolean, maxColumns: integer): string {
-  let doc = formatCurlyBraces(text);
+export function formatDocument(filePath: string, text: string, tabspace: integer, author: string, patterns: string[], formatHeader: boolean, maxColumns: integer): string {
+  const fileName = path.basename(filePath);
+  let doc: string = text;
+  if (formatHeader) {
+    const birthTime = formatDate(statSync(filePath).birthtime);
+    const currentTime = formatDate(new Date());
+    doc = formatFileHeader(text, fileName, birthTime, currentTime, author);
+  }
+  doc = formatCurlyBraces(doc);
   doc = formatCommas(doc);
   doc = formatMultilineComments(doc);
   doc = addNewlinesAfterSemicolons(doc);
@@ -63,9 +72,6 @@ export function formatDocument(fileName: string, text: string, tabspace: integer
     }
   }
   let formattedFile = formattedLines.join('\n');
-  if (formatHeader) {
-    formatFileHeader(formattedFile, fileName, "sad", "dsa", author);
-  }
   return formattedFile;
 }
 
@@ -215,27 +221,76 @@ function formatSingleLineComments(line: string): string {
 
 export function formatFileHeader(content: string, fileName: string, creationDate: string, lastModifiedDate: string, author: string): string {
   const headerRegex = /^\/\*\*[\s\S]*?\*\/\n?/;
-  const lastModifiedRegex = /(Last Modified on: ).*/;
+
   if (headerRegex.test(content)) {
-    return content.replace(headerRegex, (header) => {
-      if (lastModifiedRegex.test(header)) {
-        return header.replace(lastModifiedRegex, `$1${lastModifiedDate}`);
-      } else {
-        const headerLines = header.split('\n');
-        headerLines.splice(headerLines.length - 1, 0, ` * Last Modified on: ${lastModifiedDate}`);
-        return headerLines.join('\n');
+    const header = content.match(headerRegex)![0];
+
+    /* Parse header content into lines */
+    const headerLines = header
+      .replace(/^\/\*\*\s*\n/, '')
+      .replace(/\s*\*\/\s*$/, '')
+      .split('\n')
+      .map(line => line.replace(/^\s*\*\s?/, ''))
+      .filter(line => line !== '');
+
+    /* Extract tagged values and check for their existence */
+    const hasFileTag = headerLines.some(line => line.trim().startsWith('@file'));
+    const hasAuthorTag = headerLines.some(line => line.trim().startsWith('@author'));
+    const hasDateTag = headerLines.some(line => line.trim().startsWith('@date'));
+    const hasLastModified = headerLines.some(line => line.trim().startsWith('Last Modified on:'));
+
+    /* Create the new header lines */
+    let newHeaderLines = [];
+
+    /* Add @file tag at the beginning if missing */
+    if (!hasFileTag) {
+      newHeaderLines.push(`@file ${fileName}`);
+    }
+
+    /* Add all existing lines except @author, @date, and Last Modified */
+    for (const line of headerLines) {
+      if (!line.trim().startsWith('@author') &&
+        !line.trim().startsWith('Last Modified on:') &&
+        (hasDateTag || !line.trim().startsWith('@date'))) {
+        newHeaderLines.push(line);
       }
-    });
+    }
+
+    /* Add @date if it doesn't exist */
+    if (!hasDateTag) {
+      newHeaderLines.push(`@date ${creationDate}`);
+    }
+
+    /* Add @author tag at the end if missing */
+    if (!hasAuthorTag) {
+      newHeaderLines.push(`@author ${author}`);
+    } else {
+      /* If author exists, find and move it to the end */
+      const authorLine = headerLines.find(line => line.trim().startsWith('@author'));
+      newHeaderLines.push(authorLine || `@author ${author}`);
+    }
+
+    /* Add Last Modified at the end */
+    newHeaderLines.push(`Last Modified on: ${lastModifiedDate}`);
+
+    /* Format the header with the new order */
+    const newHeader = [
+      '/**',
+      ...newHeaderLines.map(line => ` * ${line}`),
+      ' */'
+    ].join('\n') + '\n';
+
+    return content.replace(headerRegex, newHeader);
   }
+
+  /* No header exists; prepend a new header */
   const newHeader = `/**
  * @file ${fileName}
- * @author ${author}
  * @brief 
  * @date ${creationDate}
+ * @author ${author}
  * Last Modified on: ${lastModifiedDate}
  */
-
 `;
   return newHeader + content;
 }
-

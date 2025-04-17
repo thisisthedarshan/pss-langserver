@@ -227,5 +227,18 @@ function isStandalonePattern(line: string, i: number, pattern: string): boolean 
     return true;
 }
 
+function formatDate(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        timeZoneName: 'short',
+    };
+    return date.toLocaleString('en-US', options).replace(/,/, '').replace(/(\d+):(\d+) (AM|PM)/, '$1:$2 $3');
+}
+
 export default alignTextElements;
-export { isStandalonePattern };
+export { isStandalonePattern, formatDate };
