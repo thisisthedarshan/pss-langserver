@@ -143,7 +143,7 @@ connection.onInitialize((params: InitializeParams) => {
       /* Tell the client that this server supports code completion. */
       completionProvider: {
         resolveProvider: true,
-        triggerCharacters: ['.', ':', ' '],
+        triggerCharacters: ['.', ':'],
       },
       /* Our language has inter-file dependencies */
       /* For now, we will not support diagnostics */
@@ -309,11 +309,6 @@ const debouncedASTBuilder = debounce((uri: string, content: string) => {
 
 /* Event when a document is changed or first opened */
 documents.onDidChangeContent(change => {
-  /* Call async file processor */
-  // updateAST(change.document.uri.toString(), change.document.getText().toString()).then(result => {
-  //   globalAST = updateASTMeta(globalAST, result);
-  // });
-
   /* New function */
   debouncedASTBuilder(change.document.uri.toString(), change.document.getText().toString());
 });
@@ -332,8 +327,6 @@ connection.onDidChangeWatchedFiles(_change => {
 /* Completions provider */
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    // let completions = [...builtInCompletions, ...buildAutocompletionBlock(globalAST)];
-    // let completions = [...builtInCompletions, ...buildAutocompletionBlockAdvanced(pssAST)]
     let completions = [...builtInCompletions, ...autoCompletions]
     return [...new Set(completions)];
   }

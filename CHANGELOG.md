@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The formatter is fixed to ensure proper behavior.
 - Fixed a bug which wrongly calculated wrap value.
+- The auto-completions would trigger on space - it caused a bit of annoyance. So, dropped this behavior.
 
 ## [0.3.2] - 2025-04-14
 
