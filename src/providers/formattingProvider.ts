@@ -16,7 +16,7 @@
  */
 
 import { integer } from "vscode-languageserver";
-import alignTextElements, { formatDate } from "./formattingHelper";
+import alignTextElements, { formatDate, formatExpression, getBraceDepthChange, handleCommentWrapping, tokenizeLine } from "./formattingHelper";
 import { statSync } from "fs-extra";
 import * as path from 'path';
 
@@ -32,78 +32,110 @@ export function formatDocument(filePath: string, text: string, tabspace: integer
   doc = formatCommas(doc);
   doc = formatMultilineComments(doc);
   doc = addNewlinesAfterSemicolons(doc);
-  doc = alignTextElements(doc, patterns);
-  doc = doc.replace(/\b(if|for|while|repeat)(?=\()/g, '$1 ');
   let lines = doc.split('\n');
   const formattedLines: string[] = [];
   let indentLevel = 0;
+  let braceDepth = 0;
   let isInBlockComment = false;
+  const indentLevels: number[] = [];
+  const processedLines: string[] = [];
 
+  // First pass: Calculate indentation and process lines
   for (let line of lines) {
     if (line.trim() === '') {
-      formattedLines.push('');
+      processedLines.push('');
+      indentLevels.push(0);
       continue;
     }
-    line = line.trim();
-    line = formatOperators(line);
-    line = formatSingleLineComments(line);
-    if (line.startsWith('}') && !isInBlockComment && !(/\/\//.test(line))) {
+    const trimmedLine = line.trim();
+    let formattedLine = formatOperators(trimmedLine);
+    formattedLine = formatSingleLineComments(formattedLine);
+    processedLines.push(formattedLine);
+    if (formattedLine.startsWith('}') && !isInBlockComment && !(/\/\//.test(formattedLine))) {
       indentLevel = Math.max(indentLevel - tabspace, 0);
     }
-    if (line.startsWith("/*")) {
-      isInBlockComment = true;
+    if ((formattedLine.startsWith(')') || formattedLine.startsWith(']')) && !isInBlockComment) {
+      braceDepth = Math.max(braceDepth - 1, 0);
     }
-    if (line.endsWith("*/")) {
-      isInBlockComment = false;
-      if (!line.startsWith("/*")) {
-        line = line.replace(/^(?!.*\/\*).*?\*\/$/, (match) => match.replace(/(\*\/)/, ' $1'));
-      }
-    }
-    if (isInBlockComment) {
-      if (line.startsWith("*")) {
-        line = ` ${line}`;
-      }
-    }
-    const indentedLine = `${' '.repeat(indentLevel)}${line}`;
-    const wrappedLines = wrapLine(indentedLine, indentLevel, tabspace, maxColumns);
-    formattedLines.push(...wrappedLines);
-    if (line.endsWith('{') && !isInBlockComment && !(/\/\/|\/\*/.test(line))) {
+    const totalIndent = indentLevel + braceDepth * tabspace;
+    indentLevels.push(totalIndent);
+    const { depthChange, endsInBlockComment } = getBraceDepthChange(line, isInBlockComment);
+    isInBlockComment = endsInBlockComment;
+    braceDepth += depthChange;
+    braceDepth = Math.max(braceDepth, 0);
+    if (formattedLine.endsWith('{') && !isInBlockComment && !(/\/\/|\/\*/.test(formattedLine))) {
       indentLevel += tabspace;
     }
   }
-  let formattedFile = formattedLines.join('\n');
-  return formattedFile;
+
+  // Apply indentation
+  const indentedLines = processedLines.map((line, idx) => ' '.repeat(indentLevels[idx]) + line);
+
+  // Align patterns
+  alignTextElements(indentedLines, patterns);
+
+  // Wrap lines
+  for (let idx = 0; idx < indentedLines.length; idx++) {
+    const line = indentedLines[idx];
+    const currentIndent = ' '.repeat(indentLevels[idx]);
+    const wrappedLines = wrapLine(line, currentIndent, tabspace, maxColumns);
+    formattedLines.push(...wrappedLines);
+  }
+
+  return formattedLines.join('\n');
 }
 
-function wrapLine(line: string, indentLevel: number, tabspace: number, maxColumns: number): string[] {
+function wrapLine(line: string, currentIndent: string, tabspace: integer, maxColumns: integer): string[] {
   if (maxColumns === 0 || line.length <= maxColumns) {
     return [line];
   }
-  const words = line.split(' ');
+  const tokens: string[] = tokenizeLine(line);
   const wrappedLines: string[] = [];
   let currentLine = '';
-  const baseIndent = ' '.repeat(indentLevel);
-  const doubleIndent = ' '.repeat(indentLevel + tabspace);
   let isFirstLine = true;
-  for (const word of words) {
-    const separator = currentLine ? ' ' : '';
-    const indentLength = isFirstLine ? baseIndent.length : doubleIndent.length;
-    const potentialLength = indentLength + currentLine.length + separator.length + word.length;
-    if (potentialLength > maxColumns) {
-      if (currentLine) {
-        const lineIndent = isFirstLine ? baseIndent : doubleIndent;
-        wrappedLines.push(lineIndent + currentLine.trimStart());
-        isFirstLine = false;
+  let inMultiLineComment = false;
+  let hasWrappedSingleLineComment = false;
+
+  for (let j = 0; j < tokens.length; j++) {
+    const token = tokens[j];
+    const separator = currentLine && !['(', ',', ')'].includes(token) && !['(', ','].includes(currentLine.slice(-1)) ? ' ' : '';
+    const potentialLine = currentLine + separator + token;
+    const indentLength = isFirstLine ? currentIndent.length : currentIndent.length + tabspace;
+    const potentialLength = indentLength + potentialLine.length;
+
+    if (potentialLength > maxColumns && currentLine) {
+      const lineIndent = isFirstLine ? currentIndent : currentIndent + ' '.repeat(tabspace);
+      wrappedLines.push(lineIndent + currentLine.trimStart());
+      isFirstLine = false;
+      if (currentLine.includes('//')) {
+        hasWrappedSingleLineComment = true;
       }
-      currentLine = word;
+      currentLine = handleCommentWrapping(token, inMultiLineComment, hasWrappedSingleLineComment);
+      // Check if next token can fit with current token post-wrap
+      if (j + 1 < tokens.length) {
+        const nextToken = tokens[j + 1];
+        const nextPotentialLine = currentLine + (currentLine && !['(', ','].includes(currentLine.slice(-1)) ? ' ' : '') + nextToken;
+        if ((indentLength + nextPotentialLine.length) <= maxColumns) {
+          currentLine = nextPotentialLine;
+          j++; // Skip the next token since we’ve included it
+        }
+      }
     } else {
-      currentLine += separator + word;
+      currentLine = potentialLine;
+    }
+
+    if (token === '/*') {
+      inMultiLineComment = true;
+    } else if (token === '*/') {
+      inMultiLineComment = false;
     }
   }
+
   if (currentLine) {
-    const lineIndent = isFirstLine ? baseIndent : doubleIndent;
+    const lineIndent = isFirstLine ? currentIndent : currentIndent + ' '.repeat(tabspace);
     wrappedLines.push(lineIndent + currentLine.trimStart());
   }
+
   return wrappedLines;
 }
 
@@ -183,34 +215,67 @@ function formatMultilineComments(documentText: string): string {
 }
 
 function formatOperators(input: string): string {
-  const operatorRegex = /([^\s])([\+\-\*\/\%\^=<>!&|]+)([^\s])/g;
+  const multiCharOperators = ["===", "!==", "==", "!=", "<=", ">=", "=>", "+=", "-=", "*=", "/=", "&&", "||", "++", "--"];
+  const operatorRegex = new RegExp(`(${multiCharOperators.map(op => op.replace(/[-+*/%^=<>!&|]/g, '\\$&')).join('|')})|([+\\-*/%^=<>!&|])`, 'g');
+
   function formatExpression(expression: string): string {
-    return expression.replace(operatorRegex, (match, left, ops, right) => {
-      if ((left === '/' && (ops === '*' || ops === '**')) || (ops === '*' && right === '/')) {
-        return match;
+    return expression.replace(operatorRegex, (match, multiOp, singleOp) => {
+      if (multiOp) {
+        return ` ${multiOp} `;
+      } else if (singleOp) {
+        return ` ${singleOp} `;
       }
-      if (ops.length === 1) {
-        return `${left} ${ops} ${right}`;
+      return match;
+    }).replace(/\s+/g, ' ').trim();
+  }
+
+  let result = "";
+  let i = 0;
+  let bracketDepth = 0;
+  let currentSegment = "";
+
+  while (i < input.length) {
+    if (input[i] === '/' && (input[i + 1] === '/' || input[i + 1] === '*')) {
+      if (currentSegment) {
+        result += bracketDepth > 0 ? formatExpression(currentSegment) : currentSegment;
+        currentSegment = "";
+      }
+      if (input[i + 1] === '/') {
+        const commentEnd = input.indexOf('\n', i) === -1 ? input.length : input.indexOf('\n', i);
+        result += input.substring(i, commentEnd);
+        i = commentEnd;
       } else {
-        return match;
+        const commentEnd = input.indexOf('*/', i) + 2;
+        result += input.substring(i, commentEnd);
+        i = commentEnd;
       }
-    });
+    } else if (input[i] === '(') {
+      if (currentSegment) {
+        result += bracketDepth > 0 ? formatExpression(currentSegment) : currentSegment;
+        currentSegment = "";
+      }
+      bracketDepth++;
+      result += '(';
+      i++;
+    } else if (input[i] === ')') {
+      if (currentSegment) {
+        result += bracketDepth > 0 ? formatExpression(currentSegment) : currentSegment;
+        currentSegment = "";
+      }
+      bracketDepth--;
+      result += ')';
+      i++;
+    } else {
+      currentSegment += input[i];
+      i++;
+    }
   }
-  function formatNested(content: string): string {
-    let previousContent;
-    do {
-      previousContent = content;
-      content = content.replace(/\(([^()]+)\)/g, (match, innerContent) => {
-        return `(${formatExpression(innerContent)})`;
-      });
-    } while (content !== previousContent);
-    return formatExpression(content);
+
+  if (currentSegment) {
+    result += bracketDepth > 0 ? formatExpression(currentSegment) : currentSegment;
   }
-  return input.replace(/\/\*[\s\S]*?\*\//g, match => match)
-    .replace(/\/\/[^\n]*/g, match => match)
-    .replace(/['"`][^'"`]*['"`]/g, match => match)
-    .replace(/\bhttps?:\/\/[^\s)]+/g, match => match)
-    .replace(/[^\s()]+/g, formatNested);
+
+  return result;
 }
 
 function formatSingleLineComments(line: string): string {
@@ -224,8 +289,6 @@ export function formatFileHeader(content: string, fileName: string, creationDate
 
   if (headerRegex.test(content)) {
     const header = content.match(headerRegex)![0];
-
-    /* Parse header content into lines */
     const headerLines = header
       .replace(/^\/\*\*\s*\n/, '')
       .replace(/\s*\*\/\s*$/, '')
@@ -233,21 +296,15 @@ export function formatFileHeader(content: string, fileName: string, creationDate
       .map(line => line.replace(/^\s*\*\s?/, ''))
       .filter(line => line !== '');
 
-    /* Extract tagged values and check for their existence */
     const hasFileTag = headerLines.some(line => line.trim().startsWith('@file'));
     const hasAuthorTag = headerLines.some(line => line.trim().startsWith('@author'));
     const hasDateTag = headerLines.some(line => line.trim().startsWith('@date'));
     const hasLastModified = headerLines.some(line => line.trim().startsWith('Last Modified on:'));
 
-    /* Create the new header lines */
     let newHeaderLines = [];
-
-    /* Add @file tag at the beginning if missing */
     if (!hasFileTag) {
       newHeaderLines.push(`@file ${fileName}`);
     }
-
-    /* Add all existing lines except @author, @date, and Last Modified */
     for (const line of headerLines) {
       if (!line.trim().startsWith('@author') &&
         !line.trim().startsWith('Last Modified on:') &&
@@ -255,25 +312,17 @@ export function formatFileHeader(content: string, fileName: string, creationDate
         newHeaderLines.push(line);
       }
     }
-
-    /* Add @date if it doesn't exist */
     if (!hasDateTag) {
       newHeaderLines.push(`@date ${creationDate}`);
     }
-
-    /* Add @author tag at the end if missing */
     if (!hasAuthorTag) {
       newHeaderLines.push(`@author ${author}`);
     } else {
-      /* If author exists, find and move it to the end */
       const authorLine = headerLines.find(line => line.trim().startsWith('@author'));
       newHeaderLines.push(authorLine || `@author ${author}`);
     }
-
-    /* Add Last Modified at the end */
     newHeaderLines.push(`Last Modified on: ${lastModifiedDate}`);
 
-    /* Format the header with the new order */
     const newHeader = [
       '/**',
       ...newHeaderLines.map(line => ` * ${line}`),
@@ -283,7 +332,6 @@ export function formatFileHeader(content: string, fileName: string, creationDate
     return content.replace(headerRegex, newHeader);
   }
 
-  /* No header exists; prepend a new header */
   const newHeader = `/**
  * @file ${fileName}
  * @brief 

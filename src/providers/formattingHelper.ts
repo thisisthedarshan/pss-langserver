@@ -15,219 +15,180 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-function alignTextElements(input: string, patterns: string[]): string {
-    // Split the input into lines
-    const lines = input.split('\n');
-
-    // Process each formatting pattern
-    let contents = lines;
-    let isEndComment = false;
-    if (patterns.length == 0) {
-        return input; /* Assume user doesn't want any formatting */
+export function alignTextElements(lines: string[], patterns: string[]): void {
+    if (patterns.length === 0) {
+        return;
     }
     patterns.forEach(pattern => {
-        if (pattern === "//") {
-            isEndComment = true;
-        }
-        contents = findAndAlignConsecutivePatterns(contents, pattern, isEndComment);
+        findAndAlignConsecutivePatterns(lines, pattern);
     });
-    // const colonFormatted = findAndAlignConsecutivePatterns(lines, ':');
-    // const formattedEquals = findAndAlignConsecutivePatterns(colonFormatted, '=');
-    // const formatted = findAndAlignConsecutivePatterns(formattedEquals, '//', true);
-
-    // Join the formatted lines and return
-    return contents.join('\n');
 }
 
-function findAndAlignConsecutivePatterns(lines: string[], pattern: string, isEndComment: boolean = false): string[] {
-    const result = [...lines];
+function findAndAlignConsecutivePatterns(lines: string[], pattern: string): void {
     let i = 0;
     let blockStart = 0;
     let inBlock = false;
+    let isInBlockComment = false;
 
-    // Group lines by code blocks (determined by indentation)
-    while (i < result.length) {
-        // Detect blocks based on indentation or braces
-        if (!inBlock && result[i].includes('{')) {
+    while (i < lines.length) {
+        if (!inBlock && lines[i].includes('{')) {
             blockStart = i;
             inBlock = true;
         }
-
-        if (inBlock && result[i].includes('}')) {
-            // Process this block separately
-            processBlockForAlignment(result, blockStart, i + 1, pattern, isEndComment);
+        if (inBlock && lines[i].includes('}')) {
+            processBlockForAlignment(lines, blockStart, i + 1, pattern, isInBlockComment);
+            isInBlockComment = processBlockForAlignment(lines, blockStart, i + 1, pattern, isInBlockComment, true);
             inBlock = false;
         }
-
+        const { endsInBlockComment } = hasPatternOutsideBrackets(lines[i], pattern, isInBlockComment);
+        isInBlockComment = endsInBlockComment;
         i++;
     }
-
-    // Process the top level (non-block) lines
-    processBlockForAlignment(result, 0, result.length, pattern, isEndComment, true);
-
-    return result;
+    processBlockForAlignment(lines, 0, lines.length, pattern, isInBlockComment, true);
 }
 
-function processBlockForAlignment(lines: string[], start: number, end: number, pattern: string, isEndComment: boolean, isTopLevel: boolean = false): void {
-    // Find consecutive lines with the pattern at the same indent level
+function processBlockForAlignment(lines: string[], start: number, end: number, pattern: string, startInBlockComment: boolean, isTopLevel: boolean = false): boolean {
     let currentIndent = -1;
     let blockStartLine = start;
     let consecutiveCount = 0;
+    let isInBlockComment = startInBlockComment;
 
     for (let i = start; i < end; i++) {
         const line = lines[i].trim();
-
-        // Skip empty lines or block delimiters
         if (line === '' || line === '{' || line === '}') {
+            const { endsInBlockComment } = hasPatternOutsideBrackets(lines[i], pattern, isInBlockComment);
+            isInBlockComment = endsInBlockComment;
             continue;
         }
-
-        // Calculate indent level
         const indent = lines[i].length - lines[i].trimStart().length;
-
-        // If moving to a different indent level, process the previous block
         if (currentIndent !== -1 && indent !== currentIndent) {
             if (consecutiveCount >= 2) {
-                alignPatternInBlock(lines, blockStartLine, i, pattern, isEndComment);
+                alignPatternInBlock(lines, blockStartLine, i, pattern);
             }
             blockStartLine = i;
             consecutiveCount = 0;
         }
-
         currentIndent = indent;
-
-        // Check if line contains the pattern outside of brackets
-        if (hasPatternOutsideBrackets(lines[i], pattern)) {
+        const { hasPattern, endsInBlockComment } = hasPatternOutsideBrackets(lines[i], pattern, isInBlockComment);
+        isInBlockComment = endsInBlockComment;
+        if (hasPattern) {
             consecutiveCount++;
         } else {
-            // If we had consecutive lines and now found a non-matching one, process the block
             if (consecutiveCount >= 2) {
-                alignPatternInBlock(lines, blockStartLine, i, pattern, isEndComment);
+                alignPatternInBlock(lines, blockStartLine, i, pattern);
             }
             blockStartLine = i + 1;
             consecutiveCount = 0;
         }
     }
-
-    // Process the last block if needed
     if (consecutiveCount >= 2) {
-        alignPatternInBlock(lines, blockStartLine, end, pattern, isEndComment);
+        alignPatternInBlock(lines, blockStartLine, end, pattern);
     }
+    return isInBlockComment;
 }
 
-function hasPatternOutsideBrackets(line: string, pattern: string): boolean {
-    if (!line.includes(pattern)) return false;
-    let inSingleQuote = false;
-    let inDoubleQuote = false;
-    let bracketDepth = 0;
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === "'" && (i === 0 || line[i - 1] !== '\\')) {
-            inSingleQuote = !inSingleQuote;
-        } else if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
-            inDoubleQuote = !inDoubleQuote;
-        }
-        if (inSingleQuote || inDoubleQuote) continue;
-        if (char === '(' || char === '[' || char === '{') {
-            bracketDepth++;
-        } else if (char === ')' || char === ']' || char === '}') {
-            bracketDepth--;
-        }
-        if (bracketDepth === 0 && line.substring(i, i + pattern.length) === pattern && isStandalonePattern(line, i, pattern)) {
-            const beforeChar = i > 0 ? line[i - 1] : ' ';
-            const afterChar = i + pattern.length < line.length ? line[i + pattern.length] : ' ';
-            if (/[\s\w]/.test(beforeChar) && /[\s\w=;,)]/.test(afterChar)) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-function alignPatternInBlock(lines: string[], start: number, end: number, pattern: string, isEndComment: boolean): void {
-    // Find the longest prefix before the pattern (ignoring patterns inside brackets)
-    let maxPrefixLength = 0;
+function alignPatternInBlock(lines: string[], start: number, end: number, pattern: string): void {
     let linesToAlign = [];
-
-    // First, collect all valid lines and determine max prefix length
     for (let i = start; i < end; i++) {
-        const line = lines[i];
-        if (!hasPatternOutsideBrackets(line, pattern)) continue;
-
-        const { prefix } = getPatternPosition(line, pattern);
-        maxPrefixLength = Math.max(maxPrefixLength, prefix.length);
-        linesToAlign.push(i);
+        const { hasPattern } = hasPatternOutsideBrackets(lines[i], pattern, false);
+        if (hasPattern) {
+            linesToAlign.push(i);
+        }
     }
-
-    // Now align each line
-    for (const i of linesToAlign) {
-        const line = lines[i];
-        const { prefix, suffix } = getPatternPosition(line, pattern);
-
-        const padding = ' '.repeat(maxPrefixLength - prefix.length);
-
-        if (isEndComment) {
-            // For comments, add more padding
-            lines[i] = prefix + padding + ' '.repeat(4) + suffix;
-        } else {
-            // For other patterns, maintain a single space before and after
-            lines[i] = prefix + padding + ' ' + pattern + ' ' + suffix.trimStart().substring(pattern.length).trimStart();
+    if (linesToAlign.length < 2) return;
+    let maxI = 0;
+    for (const idx of linesToAlign) {
+        const line = lines[idx];
+        const i = line.indexOf(pattern);
+        if (i !== -1) {
+            maxI = Math.max(maxI, i);
+        }
+    }
+    for (const idx of linesToAlign) {
+        const line = lines[idx];
+        const i = line.indexOf(pattern);
+        if (i !== -1) {
+            const padding = ' '.repeat(maxI - i);
+            const leftPart = line.substring(0, i);
+            const rightPart = line.substring(i);
+            lines[idx] = leftPart + padding + rightPart;
         }
     }
 }
 
-function getPatternPosition(line: string, pattern: string): { prefix: string, suffix: string } {
+function hasPatternOutsideBrackets(line: string, pattern: string, startInBlockComment: boolean): { hasPattern: boolean, endsInBlockComment: boolean } {
+    if (!line.includes(pattern)) {
+        return { hasPattern: false, endsInBlockComment: startInBlockComment };
+    }
     let inSingleQuote = false;
     let inDoubleQuote = false;
+    let inSingleLineComment = false;
+    let inMultiLineComment = startInBlockComment;
     let bracketDepth = 0;
+    let foundPattern = false;
+
     for (let i = 0; i < line.length; i++) {
         const char = line[i];
-        if (char === "'" && (i === 0 || line[i - 1] !== '\\')) {
+        if (inSingleLineComment) {
+            continue;
+        }
+        if (inMultiLineComment) {
+            if (char === '*' && i + 1 < line.length && line[i + 1] === '/') {
+                inMultiLineComment = false;
+                i++;
+            }
+            continue;
+        }
+        if (char === "'" && !inDoubleQuote && (i === 0 || line[i - 1] !== '\\')) {
             inSingleQuote = !inSingleQuote;
-        } else if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
+        } else if (char === '"' && !inSingleQuote && (i === 0 || line[i - 1] !== '\\')) {
             inDoubleQuote = !inDoubleQuote;
         }
         if (inSingleQuote || inDoubleQuote) continue;
+        if (char === '/' && i + 1 < line.length) {
+            if (line[i + 1] === '/') {
+                inSingleLineComment = true;
+                i++;
+                continue;
+            } else if (line[i + 1] === '*') {
+                inMultiLineComment = true;
+                i++;
+                continue;
+            }
+        }
         if (char === '(' || char === '[' || char === '{') {
             bracketDepth++;
         } else if (char === ')' || char === ']' || char === '}') {
             bracketDepth--;
         }
-        if (bracketDepth === 0 && line.substring(i, i + pattern.length) === pattern && isStandalonePattern(line, i, pattern)) {
+        if (bracketDepth === 0 && !inSingleLineComment && !inMultiLineComment && line.substring(i, i + pattern.length) === pattern && isStandalonePattern(line, i, pattern)) {
             const beforeChar = i > 0 ? line[i - 1] : ' ';
             const afterChar = i + pattern.length < line.length ? line[i + pattern.length] : ' ';
             if (/[\s\w]/.test(beforeChar) && /[\s\w=;,)]/.test(afterChar)) {
-                const prefix = line.substring(0, i).trimEnd();
-                const suffix = line.substring(i);
-                return { prefix, suffix };
+                foundPattern = true;
             }
         }
     }
-    return { prefix: line, suffix: '' };
+    return { hasPattern: foundPattern, endsInBlockComment: inMultiLineComment };
 }
 
 function isStandalonePattern(line: string, i: number, pattern: string): boolean {
-    const multiCharOperators = ["==", "===", "!=", "!==", "=>", "<=", ">=", "+=", "-=", "*=", "/=", "&&", "||", "++", "--"];
+    const multiCharOperators = ["===", "!==", "==", "!=", "<=", ">=", "=>", "+=", "-=", "*=", "/=", "&&", "||", "++", "--"];
     for (const op of multiCharOperators) {
-        if (op.startsWith(pattern) && line.substring(i, i + op.length) === op) {
-            return false;
+        if (line.substring(i, i + op.length) === op) {
+            return pattern === op;
         }
     }
-    // Check if the pattern is not part of a longer sequence of the same character
-    if (pattern.length === 1) {
-        const char = pattern[0];
-        let j = i + 1;
-        while (j < line.length && line[j] === char) {
-            j++;
-        }
-        if (j - i > 1) {
+    if (pattern.length === 1 && i + pattern.length < line.length) {
+        const nextChar = line[i + pattern.length];
+        if (nextChar === pattern[0]) {
             return false;
         }
     }
     return true;
 }
 
-function formatDate(date: Date): string {
+export function formatDate(date: Date): string {
     const options: Intl.DateTimeFormatOptions = {
         day: '2-digit',
         month: 'short',
@@ -240,5 +201,189 @@ function formatDate(date: Date): string {
     return date.toLocaleString('en-US', options).replace(/,/, '').replace(/(\d+):(\d+) (AM|PM)/, '$1:$2 $3');
 }
 
+export function formatExpression(expression: string): string {
+    const multiCharOperators = ["===", "!==", "==", "!=", "<=", ">=", "=>", "+=", "-=", "*=", "/=", "&&", "||", "++", "--"];
+    const operatorRegex = new RegExp(`(${multiCharOperators.map(op => op.replace(/[-+*/%^=<>!&|]/g, '\\$&')).join('|')})|([+\\-*/%^=<>!&|])`, 'g');
+    return expression.replace(operatorRegex, (match, multiOp, singleOp) => {
+        if (multiOp) {
+            return ` ${multiOp} `;
+        } else if (singleOp) {
+            return ` ${singleOp} `;
+        }
+        return match;
+    }).replace(/\s+/g, ' ').trim();
+}
+
+export function getBraceDepthChange(line: string, startInBlockComment: boolean): { depthChange: number, endsInBlockComment: boolean } {
+    let depthChange = 0;
+    let inSingleQuote = false;
+    let inDoubleQuote = false;
+    let inSingleLineComment = false;
+    let inMultiLineComment = startInBlockComment;
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (inSingleLineComment) {
+            continue;
+        }
+        if (inMultiLineComment) {
+            if (char === '*' && i + 1 < line.length && line[i + 1] === '/') {
+                inMultiLineComment = false;
+                i++;
+            }
+            continue;
+        }
+        if (char === "'" && !inDoubleQuote && (i === 0 || line[i - 1] !== '\\')) {
+            inSingleQuote = !inSingleQuote;
+        } else if (char === '"' && !inSingleQuote && (i === 0 || line[i - 1] !== '\\')) {
+            inDoubleQuote = !inDoubleQuote;
+        }
+        if (inSingleQuote || inDoubleQuote) continue;
+        if (char === '/' && i + 1 < line.length) {
+            if (line[i + 1] === '/') {
+                inSingleLineComment = true;
+                i++;
+                continue;
+            } else if (line[i + 1] === '*') {
+                inMultiLineComment = true;
+                i++;
+                continue;
+            }
+        }
+        if (char === '(' || char === '[') {
+            depthChange++;
+        } else if (char === ')' || char === ']') {
+            depthChange--;
+        }
+    }
+    return { depthChange, endsInBlockComment: inMultiLineComment };
+}
+
+function formatOperators(input: string): string {
+    let result = "";
+    let i = 0;
+    let bracketDepth = 0;
+    let currentSegment = "";
+    let isInBlockComment = false;
+
+    while (i < input.length) {
+        if (input[i] === '/' && (input[i + 1] === '/' || input[i + 1] === '*')) {
+            if (currentSegment) {
+                result += bracketDepth > 0 ? formatExpression(currentSegment) : currentSegment;
+                currentSegment = "";
+            }
+            if (input[i + 1] === '/') {
+                const commentEnd = input.indexOf('\n', i) === -1 ? input.length : input.indexOf('\n', i);
+                result += input.substring(i, commentEnd);
+                i = commentEnd;
+            } else {
+                const commentEnd = input.indexOf('*/', i) + 2;
+                result += input.substring(i, commentEnd);
+                i = commentEnd;
+                isInBlockComment = false;
+            }
+        } else if (input[i] === '(') {
+            if (currentSegment) {
+                result += bracketDepth > 0 ? formatExpression(currentSegment) : currentSegment;
+                currentSegment = "";
+            }
+            bracketDepth++;
+            result += '(';
+            i++;
+        } else if (input[i] === ')') {
+            if (currentSegment) {
+                result += bracketDepth > 0 ? formatExpression(currentSegment) : currentSegment;
+                currentSegment = "";
+            }
+            bracketDepth--;
+            result += ')';
+            i++;
+        } else {
+            currentSegment += input[i];
+            i++;
+        }
+    }
+
+    if (currentSegment) {
+        result += bracketDepth > 0 ? formatExpression(currentSegment) : currentSegment;
+    }
+
+    return result;
+}
+
+function tokenizeLine(line: string): string[] {
+    const tokens: string[] = [];
+    let currentToken = '';
+    let inSingleQuote = false;
+    let inDoubleQuote = false;
+    let inComment = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (inComment) {
+            currentToken += char;
+            if (char === '\n') {
+                inComment = false;
+                tokens.push(currentToken);
+                currentToken = '';
+            }
+        } else if (inSingleQuote) {
+            currentToken += char;
+            if (char === "'" && (i === 0 || line[i - 1] !== '\\')) {
+                inSingleQuote = false;
+            }
+        } else if (inDoubleQuote) {
+            currentToken += char;
+            if (char === '"' && (i === 0 || line[i - 1] !== '\\')) {
+                inDoubleQuote = false;
+            }
+        } else if (char === '/' && i + 1 < line.length && line[i + 1] === '/') {
+            if (currentToken) {
+                tokens.push(currentToken);
+                currentToken = '';
+            }
+            inComment = true;
+            currentToken += '//';
+            i++;
+        } else if (char === '/' && i + 1 < line.length && line[i + 1] === '*') {
+            if (currentToken) {
+                tokens.push(currentToken);
+                currentToken = '';
+            }
+            tokens.push('/*');
+            i++;
+        } else if (char === '*' && i + 1 < line.length && line[i + 1] === '/') {
+            tokens.push('*/');
+            i++;
+        } else if ([' ', '(', ')', '+', '-', '*', '/', '=', '<', '>', '&', '|', ','].includes(char)) {
+            if (currentToken) {
+                tokens.push(currentToken);
+                currentToken = '';
+            }
+            if (char !== ' ') {
+                tokens.push(char);
+            }
+        } else {
+            currentToken += char;
+        }
+    }
+    if (currentToken) {
+        tokens.push(currentToken);
+    }
+    return tokens;
+}
+
+function handleCommentWrapping(token: string, inMultiLineComment: boolean, hasWrappedSingleLineComment: boolean): string {
+    if (token.startsWith('//') && hasWrappedSingleLineComment) {
+        return '// ' + token.substring(2).trim();
+    } else if (inMultiLineComment && !token.startsWith('/*') && !token.endsWith('*/')) {
+        return token.trim(); // Pull up content without ' * ' for consistency
+    } else if (inMultiLineComment) {
+        return ' * ' + token.trim();
+    }
+    return token;
+}
+
+
 export default alignTextElements;
-export { isStandalonePattern, formatDate };
+export { isStandalonePattern, formatOperators, handleCommentWrapping, tokenizeLine };
