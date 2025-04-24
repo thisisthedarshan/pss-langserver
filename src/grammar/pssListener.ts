@@ -257,7 +257,6 @@ import { Function_parameter_dirContext } from "./pss.js";
 import { Varargs_parameterContext } from "./pss.js";
 import { User_typeContext } from "./pss.js";
 import { Function_call_paramsContext } from "./pss.js";
-import { IdentifierContext } from "./pss.js";
 import { Hierarchical_id_listContext } from "./pss.js";
 import { Hierarchical_idContext } from "./pss.js";
 import { Member_path_elemContext } from "./pss.js";
@@ -291,6 +290,7 @@ import { Resource_type_identifierContext } from "./pss.js";
 import { State_type_identifierContext } from "./pss.js";
 import { Stream_type_identifierContext } from "./pss.js";
 import { Entity_type_identifierContext } from "./pss.js";
+import { IdentifierContext } from "./pss.js";
 import { NumberContext } from "./pss.js";
 import { Integer_numberContext } from "./pss.js";
 import { Based_bin_numberContext } from "./pss.js";
@@ -2840,16 +2840,6 @@ export default class pssListener extends ParseTreeListener {
 	 */
 	exitFunction_call_params?: (ctx: Function_call_paramsContext) => void;
 	/**
-	 * Enter a parse tree produced by `pss.identifier`.
-	 * @param ctx the parse tree
-	 */
-	enterIdentifier?: (ctx: IdentifierContext) => void;
-	/**
-	 * Exit a parse tree produced by `pss.identifier`.
-	 * @param ctx the parse tree
-	 */
-	exitIdentifier?: (ctx: IdentifierContext) => void;
-	/**
 	 * Enter a parse tree produced by `pss.hierarchical_id_list`.
 	 * @param ctx the parse tree
 	 */
@@ -3179,6 +3169,16 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitEntity_type_identifier?: (ctx: Entity_type_identifierContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.identifier`.
+	 * @param ctx the parse tree
+	 */
+	enterIdentifier?: (ctx: IdentifierContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.identifier`.
+	 * @param ctx the parse tree
+	 */
+	exitIdentifier?: (ctx: IdentifierContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.number`.
 	 * @param ctx the parse tree
