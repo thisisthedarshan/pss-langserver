@@ -19,9 +19,8 @@ import action_declarations,activity_statements,behavioral_coverage,component_dec
 
 constant_expression 
     : (primary expression)
-    |  primary
-    |  expression
-    | (expression primary);
+    | (expression primary)
+    |  expression;
 
 expression
     : primary
@@ -153,7 +152,8 @@ collection_expression : expression;
 cast_expression : TOKEN_FLBRACE casting_type TOKEN_FRBRACE expression;
 
 ref_path
-    : static_ref_path
+    : hierarchical_id
+    | static_ref_path
     | static_ref_path TOKEN_DOT hierarchical_id
     | static_ref_path TOKEN_DOT hierarchical_id slice
     | static_ref_path slice
