@@ -96,6 +96,10 @@ Per the Portable Stimulus Standard v3.0 LRM, enum item values are constant expre
 
 ---
 
+## Limitations
+
+1. Currently the LSP can't parse usage of all reserved keywords in place of parameters or variable names. To see the keywords, check out the [Keywords](KEYWORDS.md) page.
+
 ## Custom Requests
 
 Custom LSP requests are your ticket to a spiced-up IDE, unlocking quirky features like auto-documentation or project-specific magic. Why settle for vanilla when you can have extra flavor? Here’s what’s on the menu:
