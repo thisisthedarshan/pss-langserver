@@ -17,10 +17,6 @@ options {tokenVocab=pssLex;}
 
 import action_declarations,activity_statements,behavioral_coverage,component_declaration,conditional_compilation,constraints,coverage,data_coverage,data_types,exec_blocks,expressions,extras,foreign_procedural_interface,functions,numbers_and_literals,overrides,package_declaration,procedural_statements,struct_declaration,template_types,memory,registers;
 
-identifier :
-ID
-| ESCAPED_ID;
-
 hierarchical_id_list : hierarchical_id (TOKEN_COMMA hierarchical_id)*;
 
 hierarchical_id : member_path_elem (TOKEN_DOT member_path_elem)*;
@@ -90,3 +86,10 @@ action_type_identifier
 | component_type_identifier
 | flow_object_type
 | resource_object_type;
+
+/* This is extended to allow certain keywords - (my requirement >_<) */
+identifier :
+TOKEN_ADDR
+| TOKEN_SIZE
+| ID
+| ESCAPED_ID;
