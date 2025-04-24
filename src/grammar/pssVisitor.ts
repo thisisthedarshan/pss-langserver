@@ -335,6 +335,8 @@ import { Procedural_return_stmtContext } from "./pss.js";
 import { Procedural_repeat_stmtContext } from "./pss.js";
 import { Procedural_foreach_stmtContext } from "./pss.js";
 import { Procedural_if_else_stmtContext } from "./pss.js";
+import { Procedural_if_stmtContext } from "./pss.js";
+import { Procedural_else_stmtContext } from "./pss.js";
 import { Procedural_match_stmtContext } from "./pss.js";
 import { Procedural_match_choiceContext } from "./pss.js";
 import { Procedural_break_stmtContext } from "./pss.js";
@@ -2356,6 +2358,18 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitProcedural_if_else_stmt?: (ctx: Procedural_if_else_stmtContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.procedural_if_stmt`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitProcedural_if_stmt?: (ctx: Procedural_if_stmtContext) => Result;
+	/**
+	 * Visit a parse tree produced by `pss.procedural_else_stmt`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitProcedural_else_stmt?: (ctx: Procedural_else_stmtContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.procedural_match_stmt`.
 	 * @param ctx the parse tree

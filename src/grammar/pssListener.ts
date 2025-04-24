@@ -335,6 +335,8 @@ import { Procedural_return_stmtContext } from "./pss.js";
 import { Procedural_repeat_stmtContext } from "./pss.js";
 import { Procedural_foreach_stmtContext } from "./pss.js";
 import { Procedural_if_else_stmtContext } from "./pss.js";
+import { Procedural_if_stmtContext } from "./pss.js";
+import { Procedural_else_stmtContext } from "./pss.js";
 import { Procedural_match_stmtContext } from "./pss.js";
 import { Procedural_match_choiceContext } from "./pss.js";
 import { Procedural_break_stmtContext } from "./pss.js";
@@ -3617,6 +3619,26 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitProcedural_if_else_stmt?: (ctx: Procedural_if_else_stmtContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.procedural_if_stmt`.
+	 * @param ctx the parse tree
+	 */
+	enterProcedural_if_stmt?: (ctx: Procedural_if_stmtContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.procedural_if_stmt`.
+	 * @param ctx the parse tree
+	 */
+	exitProcedural_if_stmt?: (ctx: Procedural_if_stmtContext) => void;
+	/**
+	 * Enter a parse tree produced by `pss.procedural_else_stmt`.
+	 * @param ctx the parse tree
+	 */
+	enterProcedural_else_stmt?: (ctx: Procedural_else_stmtContext) => void;
+	/**
+	 * Exit a parse tree produced by `pss.procedural_else_stmt`.
+	 * @param ctx the parse tree
+	 */
+	exitProcedural_else_stmt?: (ctx: Procedural_else_stmtContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.procedural_match_stmt`.
 	 * @param ctx the parse tree

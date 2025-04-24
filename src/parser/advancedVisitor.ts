@@ -1121,8 +1121,14 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       const funcCall = d.function_call();
       if (refPath) {
         node.name = refPath.getText();
+        const splitName = node.name.split('.');
+        if (splitName.length > 1) {
+          node.name = splitName[0];
+          node.dataType = "struct->" + splitName.slice(1).join('->');
+        } else {
+          node.dataType = "ref";
+        }
         node.value = d.expression().getText();
-        node.dataType = "ref";
       } else if (identifier && expression) {
         node.name = d.constant_expression().getText();
         node.value = d.expression().getText();

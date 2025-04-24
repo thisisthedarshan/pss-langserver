@@ -73,19 +73,23 @@ procedural_return_stmt
 
 procedural_repeat_stmt:
 	(TOKEN_REPEAT TOKEN_FLBRACE (index_identifier TOKEN_COLON)? expression TOKEN_FRBRACE
-		procedural_stmt)
-	| (TOKEN_REPEAT procedural_stmt TOKEN_WHILE (expression) TOKEN_SEMICOLON)
-	| (TOKEN_WHILE TOKEN_FLBRACE expression TOKEN_FRBRACE procedural_stmt);
+		TOKEN_CLBRACE procedural_stmt+ TOKEN_CRBRACE)
+	| (TOKEN_REPEAT TOKEN_CLBRACE procedural_stmt+ TOKEN_CRBRACE TOKEN_WHILE TOKEN_FLBRACE expression TOKEN_FRBRACE TOKEN_SEMICOLON)
+	| (TOKEN_WHILE TOKEN_FLBRACE expression TOKEN_FRBRACE TOKEN_CLBRACE procedural_stmt+ TOKEN_CRBRACE);
 
 procedural_foreach_stmt:
 	TOKEN_FOREACH TOKEN_FLBRACE (iterator_identifier TOKEN_COLON)? expression (
 		TOKEN_SLBRACE index_identifier TOKEN_SRBRACE
-	)? TOKEN_FRBRACE procedural_stmt;
+	)? TOKEN_FRBRACE TOKEN_CLBRACE procedural_stmt+ TOKEN_CRBRACE;
 
 procedural_if_else_stmt:
-	TOKEN_IF TOKEN_FLBRACE expression TOKEN_FRBRACE procedural_stmt (
-		TOKEN_ELSE procedural_stmt
-	)?;
+	procedural_if_stmt (TOKEN_ELSE procedural_if_stmt)* (procedural_else_stmt)?;
+
+procedural_if_stmt:
+	TOKEN_IF TOKEN_FLBRACE expression TOKEN_FRBRACE TOKEN_CLBRACE procedural_stmt* TOKEN_CRBRACE;
+
+procedural_else_stmt:
+	TOKEN_ELSE TOKEN_CLBRACE procedural_stmt* TOKEN_CRBRACE;
 
 procedural_match_stmt:
 	TOKEN_MATCH TOKEN_FLBRACE match_expression TOKEN_FRBRACE TOKEN_CLBRACE procedural_match_choice
