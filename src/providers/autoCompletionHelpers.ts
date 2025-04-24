@@ -279,12 +279,14 @@ function getCompletionsWithinStruct(remainingChain: string[], currentStruct: PSS
     return completions;
   }
 
-  const memberType = member.name; // Assuming 'type' is the name of a struct
+  const memberTypeNode = member as InstanceNode;
+  const memberType = memberTypeNode.instanceType;
   if (!memberType) {
     return completions;
   }
 
-  const memberStruct = getNodeFromNameArray(ast, memberType);
+  const memberStruct = getNodeFromNameArray(ast, memberType, objType.ASSIGNMENT);
+  console.warn("memberStruct", memberStruct);
   if (!memberStruct) {
     return completions;
   }
@@ -305,7 +307,7 @@ function getCompletionsForChain(chain: string[], ast: PSSLangObjects[]): Complet
   }
   const parentNode = parent as InstanceNode;
   const structName = parentNode.instanceType;
-  const superParent = getNodeFromNameArray(ast, structName);
+  const superParent = getNodeFromNameArray(ast, structName, objType.ASSIGNMENT);
   if (!superParent) {
     return completions;
   }
