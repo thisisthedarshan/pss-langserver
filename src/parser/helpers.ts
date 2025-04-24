@@ -277,10 +277,8 @@ export async function updateASTNew(fileURI: string, documentText: string): Promi
 export async function scanDirectory(dirPath: string, files: string[]): Promise<void> {
   try {
     const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-
     for (const entry of entries) {
       const fullPath = path.join(dirPath, entry.name);
-
       if (entry.isDirectory()) {
         await scanDirectory(fullPath, files);
       } else if (entry.isFile() && entry.name.endsWith('.pss')) {
@@ -502,6 +500,39 @@ export function collectAllPSSNodes(
       }
 
       /* Add all children to stack for processing */
+      for (const child of current.children) {
+        stack.push(child);
+      }
+    }
+  }
+
+  return results;
+}
+
+// Type guard to check if a node is an InstanceNode
+function isInstanceNode(node: PSSLangObjects): node is InstanceNode {
+  return node.type === objType.INSTANCE;
+}
+export function collectAllInstanceNodes(
+  objects: PSSLangObjects[],
+  instanceType: string
+): InstanceNode[] {
+  const results: InstanceNode[] = [];
+
+  // Process each root object
+  for (const object of objects) {
+    // Use iterative DFS with a stack
+    const stack: PSSLangObjects[] = [object];
+
+    while (stack.length > 0) {
+      const current = stack.pop()!;
+
+      // Check if the current node is an InstanceNode with matching instanceType
+      if (isInstanceNode(current) && current.instanceType === instanceType) {
+        results.push(current);
+      }
+
+      // Add all children to the stack for further processing
       for (const child of current.children) {
         stack.push(child);
       }

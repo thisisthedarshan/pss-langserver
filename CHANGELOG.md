@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- New autocompletion engine to provide more smarter auto-completions.
+
 ### Fixed
 
 - The formatter is fixed to ensure proper behavior.

@@ -187,9 +187,9 @@ function formatMultilineComments(documentText: string): string {
             if (trimmedLine === '' || trimmedLine === '*') {
               return null;
             } else if (trimmedLine.startsWith('*')) {
-              return `* ${trimmedLine.slice(1).trim()}`;
+              return ` * ${trimmedLine.slice(1).trim()}`;
             } else {
-              return `* ${trimmedLine}`;
+              return ` * ${trimmedLine}`;
             }
           }).filter((line: string | null) => line !== null);
           formattedComment += '\n' + formattedLines.join('\n');

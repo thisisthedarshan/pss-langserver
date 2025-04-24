@@ -63,6 +63,8 @@ import { FunctionNode, PSSLangObjects } from './definitions/dataStructures';
 import debounce from 'lodash.debounce';
 import { keywords } from './definitions/keywords';
 import { createCommentsFromNode } from './providers/objectCommentsProvider';
+import { Worker } from 'cluster';
+import { getSmartAutocompletions } from './providers/autoCompletionEngine';
 
 /* To make the process act like an actual executable */
 const args = process.argv.slice(2);
@@ -101,26 +103,6 @@ connection.onInitialize((params: InitializeParams) => {
   const capabilities = params.capabilities;
   const workspaceFolders = params.workspaceFolders || [];
   const pssFiles: string[] = [];
-
-  for (const folder of workspaceFolders) {
-    let dir = decodeURIComponent(folder.uri.replace('file://', ''));
-    scanDirectory(dir, pssFiles);
-  }
-
-  /* Process found files */
-  fileWiseAST = buildASTForFiles(pssFiles);
-  pssAST = [];
-  Object.entries(fileWiseAST).forEach(([uri, ast]) => {
-    pssAST = [...pssAST, ...ast];
-  });
-
-
-  if (pssAST.length > 0) {
-    isFirst = false;
-    autoCompletions = buildAutocompletions(pssAST);
-    hoverCache = buildHoverItems(pssAST);
-    semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
-  }
 
   /* Does the client support the `workspace/configuration` request? */
   /* If not, we fall back using global settings. */
@@ -266,24 +248,24 @@ connection.onDidOpenTextDocument((params) => {
     try {
       const filePath = fileURLToPath(file);
       const folderPath = path.dirname(filePath);
-      notify(connection, `Scanning local folder (${folderPath}) for pss files`)
+      notify(connection, `Scanning local folder (${folderPath}) for pss files`);
 
-      scanDirectory(folderPath, pssFiles);
-      fileWiseAST = buildASTForFiles(pssFiles);
-      pssAST = [];
-      Object.entries(fileWiseAST).forEach(([uri, ast]) => {
-        pssAST = [...pssAST, ...ast];
+      scanDirectory(folderPath, pssFiles).then(() => {
+        fileWiseAST = buildASTForFiles(pssFiles);
+        pssAST = [];
+        Object.entries(fileWiseAST).forEach(([uri, ast]) => {
+          pssAST = [...pssAST, ...ast];
+        });
+        autoCompletions = buildAutocompletions(pssAST);
+        hoverCache = buildHoverItems(pssAST);
+        semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
+        isFirst = false;
+      }).catch((error) => {
+        console.error(`Error during initialization: ${error}`);
       });
-      autoCompletions = buildAutocompletions(pssAST);
-      hoverCache = buildHoverItems(pssAST);
-      semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
-      isFirst = false;
-
-      // Continue with the rest of your handler...
     } catch (e) {
       console.error(`Error parsing URI ${file}: ${e}`);
     }
-
   }
 });
 
@@ -292,6 +274,7 @@ const debouncedASTBuilder = debounce((uri: string, content: string) => {
   if (content.length === 0) {
     return;
   }
+
   updateASTNew(uri, content).then(result => {
     // pssAST = updateASTNewMeta(pssAST, result);
     if (result.length > 0) {
@@ -327,7 +310,8 @@ connection.onDidChangeWatchedFiles(_change => {
 /* Completions provider */
 connection.onCompletion(
   (_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-    let completions = [...builtInCompletions, ...autoCompletions]
+    const contents = documents.get(_textDocumentPosition.textDocument.uri)?.getText() || "";
+    let completions = getSmartAutocompletions(_textDocumentPosition, contents, pssAST, autoCompletions, builtInCompletions);
     return [...new Set(completions)];
   }
 );
