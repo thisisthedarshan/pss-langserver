@@ -16,7 +16,7 @@
  */
 import { CompletionItem, CompletionItemKind, Position } from "vscode-languageserver/node";
 import { objType } from "../definitions/dataTypes";
-import { FunctionNode, InstanceNode, PSSLangObjects, StructKindNode } from "../definitions/dataStructures";
+import { AddressNode, FunctionNode, InstanceNode, PSSLangObjects, StructKindNode } from "../definitions/dataStructures";
 import { collectAllInstanceNodes, collectAllPSSNodes, getNodeFromNameArray } from "../parser/helpers";
 
 function getCompletionKind(type: objType): CompletionItemKind {
@@ -305,6 +305,54 @@ function getCompletionsForChain(chain: string[], ast: PSSLangObjects[]): Complet
   if (!parent) {
     return completions;
   }
+  /* Test if its address space or address region - as they require different auto-completions */
+  if (parent.type === objType.ADDRESS_SPACE || parent.type === objType.ADDRESS_REGION || parent.type === objType.ADDRESS_CLAIM) {
+    /* We can return proper auto-completions as required - and they don't typically have 2nd or 3rd chain item, unless its trait */
+    if (chain.length === 1) {
+      switch (parent.type) {
+        case objType.ADDRESS_SPACE:
+          completions.push({
+            label: "add_nonallocatable_region",
+            kind: CompletionItemKind.Function
+          });
+          completions.push({
+            label: "add_region",
+            kind: CompletionItemKind.Function
+          });
+          break;
+        case objType.ADDRESS_REGION:
+          completions.push({
+            label: "size",
+            kind: CompletionItemKind.Property
+          });
+          completions.push({
+            label: "addr",
+            kind: CompletionItemKind.Property
+          });
+          completions.push({
+            label: "trait",
+            kind: CompletionItemKind.Property
+          });
+          break;
+      }
+      return completions;
+    } else if (chain[1] === 'trait') {
+      const node = parent as AddressNode;
+      const traitsStruct = node.traitsStruct;
+      const traitNode = getNodeFromNameArray(ast, traitsStruct);
+      if (traitNode) {
+        traitNode.children.forEach(child => {
+          completions.push({
+            label: child.name,
+            kind: CompletionItemKind.Property
+          });
+        });
+      }
+      return completions;
+    }
+    return completions;
+  }
+
   const parentNode = parent as InstanceNode;
   const structName = parentNode.instanceType;
   const superParent = getNodeFromNameArray(ast, structName, objType.ASSIGNMENT);
