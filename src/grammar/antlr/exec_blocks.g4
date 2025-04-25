@@ -39,11 +39,11 @@ TOKEN_PRESOLVE
 | TOKEN_INIT;
 
 exec_stmt 
-  : procedural_stmt 
+  : mem_ops
+  | procedural_stmt 
   | exec_super_stmt 
   | function_call 
   | addr_region_def 
-  | mem_ops 
   ;
 
 exec_super_stmt : TOKEN_SUPER TOKEN_SEMICOLON;

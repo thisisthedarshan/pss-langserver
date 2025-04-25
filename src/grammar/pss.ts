@@ -9836,35 +9836,35 @@ export default class pss extends Parser {
 				this.enterOuterAlt(localctx, 1);
 				{
 				this.state = 2467;
-				this.procedural_stmt();
+				this.mem_ops();
 				}
 				break;
 			case 2:
 				this.enterOuterAlt(localctx, 2);
 				{
 				this.state = 2468;
-				this.exec_super_stmt();
+				this.procedural_stmt();
 				}
 				break;
 			case 3:
 				this.enterOuterAlt(localctx, 3);
 				{
 				this.state = 2469;
-				this.function_call();
+				this.exec_super_stmt();
 				}
 				break;
 			case 4:
 				this.enterOuterAlt(localctx, 4);
 				{
 				this.state = 2470;
-				this.addr_region_def();
+				this.function_call();
 				}
 				break;
 			case 5:
 				this.enterOuterAlt(localctx, 5);
 				{
 				this.state = 2471;
-				this.mem_ops();
+				this.addr_region_def();
 				}
 				break;
 			}
@@ -23311,8 +23311,8 @@ export default class pss extends Parser {
 	0,2456,2460,5,44,0,0,2457,2459,3,332,166,0,2458,2457,1,0,0,0,2459,2462,
 	1,0,0,0,2460,2458,1,0,0,0,2460,2461,1,0,0,0,2461,2463,1,0,0,0,2462,2460,
 	1,0,0,0,2463,2464,5,45,0,0,2464,329,1,0,0,0,2465,2466,7,6,0,0,2466,331,
-	1,0,0,0,2467,2473,3,612,306,0,2468,2473,3,334,167,0,2469,2473,3,420,210,
-	0,2470,2473,3,732,366,0,2471,2473,3,728,364,0,2472,2467,1,0,0,0,2472,2468,
+	1,0,0,0,2467,2473,3,728,364,0,2468,2473,3,612,306,0,2469,2473,3,334,167,
+	0,2470,2473,3,420,210,0,2471,2473,3,732,366,0,2472,2467,1,0,0,0,2472,2468,
 	1,0,0,0,2472,2469,1,0,0,0,2472,2470,1,0,0,0,2472,2471,1,0,0,0,2473,333,
 	1,0,0,0,2474,2475,5,82,0,0,2475,2476,5,2,0,0,2476,335,1,0,0,0,2477,2478,
 	5,70,0,0,2478,2479,3,330,165,0,2479,2480,3,506,253,0,2480,2481,5,6,0,0,
@@ -31641,6 +31641,9 @@ export class Exec_stmtContext extends ParserRuleContext {
 		super(parent, invokingState);
     	this.parser = parser;
 	}
+	public mem_ops(): Mem_opsContext {
+		return this.getTypedRuleContext(Mem_opsContext, 0) as Mem_opsContext;
+	}
 	public procedural_stmt(): Procedural_stmtContext {
 		return this.getTypedRuleContext(Procedural_stmtContext, 0) as Procedural_stmtContext;
 	}
@@ -31652,9 +31655,6 @@ export class Exec_stmtContext extends ParserRuleContext {
 	}
 	public addr_region_def(): Addr_region_defContext {
 		return this.getTypedRuleContext(Addr_region_defContext, 0) as Addr_region_defContext;
-	}
-	public mem_ops(): Mem_opsContext {
-		return this.getTypedRuleContext(Mem_opsContext, 0) as Mem_opsContext;
 	}
     public get ruleIndex(): number {
     	return pss.RULE_exec_stmt;
