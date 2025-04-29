@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { AssignmentNode, CompNode, FunctionNode, InstanceNode, PSSLangObjects, RegisterCompNode, RegisterDefNode, RegisterGroupNode } from "../definitions/dataStructures";
-import { params } from "../definitions/dataTypes";
+import { AssignmentNode, CompNode, FunctionCallNode, FunctionNode, InstanceNode, PSSLangObjects, RegisterCompNode, RegisterDefNode, RegisterGroupNode } from "../definitions/dataStructures";
+import { objType, params } from "../definitions/dataTypes";
 
 /**
  * Generates a Doxygen-style comment for a component node.
@@ -337,6 +337,36 @@ function generateFunctionCommentMarkdown(node: FunctionNode): string {
   return markdown;
 }
 
+
+/**
+ * Generates a Markdown-style comment for a function call node.
+ * @param node The function all node
+ * @returns The formatted Markdown comment string
+ */
+function generateFunctionCallCommentMarkdown(node: FunctionCallNode, depth: number = 0): string {
+  let markdown: string = (depth === 0) ? '### ' : '';
+  markdown += ' '.repeat(depth * 2) + 'Function Call: ' + node.name + '\n\n';
+  if (node.super) {
+    markdown += ' '.repeat(depth * 2) + `- **Called using super**: Yes\n`;
+  }
+  if (node.refPath && node.refPath !== node.name) {
+    markdown += ' '.repeat(depth * 2) + `- **Ref-path**: ${node.refPath}\n`;
+  }
+  if (node.children.length > 0) {
+    markdown += ' '.repeat(depth * 2) + `Parameters:\n`
+    node.children.forEach(child => {
+      if (child.type === objType.FUNCTION_CALL) {
+        markdown += generateFunctionCallCommentMarkdown(child as FunctionCallNode, depth + 1);
+      } else {
+        const childItem = child as AssignmentNode;
+        markdown += ' '.repeat(depth * 2) + `   * ${childItem.value}\n`;
+      }
+    });
+  }
+
+  return markdown;
+}
+
 /**
  * Generates a default Markdown-style comment for unhandled node types.
  * @param node The PSS node
@@ -362,5 +392,6 @@ export {
   generateRegisterGroupCommentMarkdown,
   generateRegisterDefCommentMarkdown,
   generateFunctionCommentMarkdown,
-  generateDefaultCommentMarkdown
+  generateDefaultCommentMarkdown,
+  generateFunctionCallCommentMarkdown
 };

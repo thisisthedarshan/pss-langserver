@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { AssignmentNode, CompNode, FunctionNode, InstanceNode, PSSLangObjects, RegisterCompNode, RegisterDefNode, RegisterGroupNode } from "../definitions/dataStructures";
+import { AssignmentNode, CompNode, FunctionCallNode, FunctionNode, InstanceNode, PSSLangObjects, RegisterCompNode, RegisterDefNode, RegisterGroupNode } from "../definitions/dataStructures";
 import { objType } from "../definitions/dataTypes";
-import { generateComponentComment, generateInstanceComment, generateAssignmentComment, generateRegisterCompComment, generateRegisterGroupComment, generateRegisterDefComment, generateFunctionComment, generateDefaultComment, generateAssignmentCommentMarkdown, generateComponentCommentMarkdown, generateDefaultCommentMarkdown, generateFunctionCommentMarkdown, generateInstanceCommentMarkdown, generateRegisterCompCommentMarkdown, generateRegisterDefCommentMarkdown, generateRegisterGroupCommentMarkdown } from "./objectCommentsHelper";
+import { generateComponentComment, generateInstanceComment, generateAssignmentComment, generateRegisterCompComment, generateRegisterGroupComment, generateRegisterDefComment, generateFunctionComment, generateDefaultComment, generateAssignmentCommentMarkdown, generateComponentCommentMarkdown, generateDefaultCommentMarkdown, generateFunctionCommentMarkdown, generateInstanceCommentMarkdown, generateRegisterCompCommentMarkdown, generateRegisterDefCommentMarkdown, generateRegisterGroupCommentMarkdown, generateFunctionCallCommentMarkdown } from "./objectCommentsHelper";
 
 export function createCommentsFromNode(node: PSSLangObjects): string {
   switch (node.type) {
@@ -55,6 +55,8 @@ export function createCommentsFromNodeMarkdown(node: PSSLangObjects): string {
       return generateRegisterDefCommentMarkdown(node as RegisterDefNode);
     case objType.FUNCTION:
       return generateFunctionCommentMarkdown(node as FunctionNode);
+    case objType.FUNCTION_CALL:
+      return generateFunctionCallCommentMarkdown(node as FunctionCallNode);
     default:
       return generateDefaultCommentMarkdown(node);
   }
