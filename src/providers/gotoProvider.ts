@@ -17,7 +17,7 @@
 
 import { Location, Position, Range } from "vscode-languageserver/node";
 import { metaData, objType } from "../definitions/dataTypes";
-import { PSSLangObjects } from "../definitions/dataStructures";
+import { EnumNode, PSSLangObjects } from "../definitions/dataStructures";
 import { collectAllPSSNodes, getNodeFromNameArray } from "../parser/helpers";
 
 export function getGoToDefinition(document: string, pos: number, ast: metaData[]): Location | null {
@@ -64,6 +64,22 @@ export function getGoToDefinitionAdvanced(document: string, pos: number, ast: PS
         node.definedOn.file,
         Range.create(start_range, end_range)
       );
+    }
+  } else {
+    const enumNodes = collectAllPSSNodes(ast, { type: objType.ENUM });
+    if (enumNodes) {
+      for (const enumNode of enumNodes as EnumNode[]) {
+        if (enumNode.enumItems.some(item => keyword === item.name)) {
+          /* For now, this leads to the parent enum, and not the keyword itself. Maybe in the future? */
+          let start_range = Position.create(enumNode.definedOn.lineNumber - 1, enumNode.definedOn.columnNumber)
+          let end_range = Position.create(enumNode.definedOn.lineNumber - 1, enumNode.definedOn.columnNumber + keyword.length)
+          location = Location.create(
+            enumNode.definedOn.file,
+            Range.create(start_range, end_range)
+          );
+          return location;
+        }
+      }
     }
   }
 
