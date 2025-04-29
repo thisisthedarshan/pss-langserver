@@ -20,7 +20,7 @@
  */
 
 import { CompletionItem, TextDocumentPositionParams } from "vscode-languageserver";
-import { isInsideMultilineComment, getDotNotationChain, getFunctionContext, getCommentCompletions, getCompletionsForChain, getCompletionsForFunction } from "./autoCompletionHelpers";
+import { isInsideMultilineComment, getDotNotationChain, getFunctionContext, getCommentCompletions, getCompletionsForChain, getCompletionsForFunction, getScopeNotationChain, getCompletionsForScopedItems } from "./autoCompletionHelpers";
 import { PSSLangObjects } from "../definitions/dataStructures";
 
 function getSmartAutocompletions(params: TextDocumentPositionParams, content: string, ast: PSSLangObjects[], autoCompletions: CompletionItem[], builtInCompletions: CompletionItem[]): CompletionItem[] {
@@ -48,6 +48,12 @@ function getSmartAutocompletions(params: TextDocumentPositionParams, content: st
         return [...builtInCompletions, ...autoCompletions];
       }
       return completions;
+    }
+
+    // 5. Scoped notation
+    const scopedItems = getScopeNotationChain(text, position)
+    if (scopedItems) {
+      return getCompletionsForScopedItems(scopedItems, ast);
     }
   }
 

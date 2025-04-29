@@ -16,7 +16,7 @@
  */
 import { CompletionItem, CompletionItemKind, Position } from "vscode-languageserver/node";
 import { objType } from "../definitions/dataTypes";
-import { AddressNode, FunctionNode, InstanceNode, PSSLangObjects, StructKindNode } from "../definitions/dataStructures";
+import { AddressNode, EnumNode, FunctionNode, InstanceNode, PSSLangObjects, StructKindNode } from "../definitions/dataStructures";
 import { collectAllInstanceNodes, collectAllPSSNodes, getNodeFromNameArray } from "../parser/helpers";
 
 function getCompletionKind(type: objType): CompletionItemKind {
@@ -158,6 +158,40 @@ function isInsideMultilineComment(text: string, position: Position): boolean {
   const commentEnds = (textUpToCursor.match(/\*\//g) || []).length;
   return commentStarts > commentEnds;
 }
+
+// Extract double-colon (scope) notation chain (e.g., ['abc'] for 'abc::', ['abc', 'def'] for 'abc::Def::')
+function getScopeNotationChain(text: string, position: Position): string[] | null {
+  const offset = getOffsetFromPosition(text, position);
+  // Ensure the last two characters before the cursor are "::"
+  if (offset < 2 || text.slice(offset - 2, offset) !== '::') {
+    return null;
+  }
+
+  let chain: string[] = [];
+  let current = '';
+  let i = offset - 3; // Start before the last '::'
+
+  while (i >= 0) {
+    const char = text[i];
+    if (/[a-zA-Z0-9_]/.test(char)) {
+      current = char + current;
+    } else if (text.slice(i - 1, i + 1) === '::' && current !== '') {
+      chain.unshift(current.toLowerCase());
+      current = '';
+      i -= 1; // Skip the previous ':'
+    } else {
+      break;
+    }
+    i--;
+  }
+
+  if (current !== '') {
+    chain.unshift(current.toLowerCase());
+  }
+
+  return chain.length > 0 ? chain : null;
+}
+
 
 // Extract dot notation chain (e.g., ['abc'] for 'abc.', ['abc', 'def'] for 'abc.def.')
 function getDotNotationChain(text: string, position: Position): string[] | null {
@@ -395,4 +429,41 @@ function getCompletionsForFunction(name: string, index: number, ast: PSSLangObje
   return completions;
 }
 
-export { getCompletionKind, getFunctionContext, isInsideMultilineComment, getDotNotationChain, getCommentCompletions, getCompletionsForChain, getCompletionsForFunction }
+function getCompletionsForScopedItems(name: string[], ast: PSSLangObjects[]): CompletionItem[] {
+  const node = getNodeFromNameArray(ast, name[name.length - 1]);
+  let completions: CompletionItem[] = [];
+  if (node) {
+    switch (node.type) {
+      case objType.ENUM:
+        const enumNode = node as EnumNode;
+        enumNode.enumItems.forEach(item => {
+          completions.push({
+            label: item.name,
+            kind: CompletionItemKind.EnumMember
+          });
+        });
+        break;
+      default:
+        node.children.forEach(child => {
+          completions.push({
+            label: child.name,
+            kind: CompletionItemKind.TypeParameter
+          });
+        });
+        break;
+    }
+  }
+  return completions;
+}
+
+export {
+  getCompletionKind,
+  getFunctionContext,
+  isInsideMultilineComment,
+  getDotNotationChain,
+  getCommentCompletions,
+  getCompletionsForChain,
+  getCompletionsForFunction,
+  getScopeNotationChain,
+  getCompletionsForScopedItems
+}
