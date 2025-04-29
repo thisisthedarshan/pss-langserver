@@ -57,7 +57,7 @@ import { buildASTForFiles, notify } from './helpers';
 import { buildMarkdownComment, fullRange, getNodeFromNameArray, scanDirectory, updateAST, updateASTMeta, updateASTNew, updateASTNewMeta } from './parser/helpers';
 import { buildAutocompletions, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
 import { createSemanticTokensFor, generateSemanticTokensAdvanced } from './providers/semanticTokenProvider';
-import { getGoToDeclarationsAdvanced, getGoToDefinitionAdvanced, getReferencesAdvanced } from './providers/gotoProvider';
+import { getGoToDefinitionAdvanced, getReferencesAdvanced } from './providers/gotoProvider';
 import { buildHoverItems, createBuiltinHoverCache, getHoverFor } from './providers/hoverProvider';
 import { FunctionNode, PSSLangObjects } from './definitions/dataStructures';
 import debounce from 'lodash.debounce';
@@ -460,13 +460,13 @@ connection.onDefinition((params: DefinitionParams): Definition | null => {
 );
 
 /* Provide go-to declarations functionality */
-connection.onDeclaration((params: DeclarationParams): Declaration | null => {
+connection.onDeclaration((params: DeclarationParams): Declaration | null | undefined => {
   const { textDocument, position } = params;
   const doc = documents.get(textDocument.uri);
   if (!doc) { return null }
   const content = doc.getText()
   const offset = doc.offsetAt(position);
-  const loc = getGoToDeclarationsAdvanced(content, offset, pssAST);
+  const loc = getReferencesAdvanced(content, offset, pssAST);
   return loc;
 });
 

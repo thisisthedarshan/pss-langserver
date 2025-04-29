@@ -55,7 +55,7 @@ export function getGoToDefinitionAdvanced(document: string, pos: number, ast: PS
     return null;
   }
 
-  const node = getNodeFromNameArray(ast, keyword, objType.ASSIGNMENT);
+  const node = getNodeFromNameArray(ast, keyword, { ignoreList: [objType.ASSIGNMENT, objType.FUNCTION_CALL] });
   if (node) {
     if (node.definedOn) {
       let start_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber)
@@ -68,26 +68,6 @@ export function getGoToDefinitionAdvanced(document: string, pos: number, ast: PS
   }
 
   return location;
-}
-
-export function getGoToDeclarationsAdvanced(document: string, pos: number, ast: PSSLangObjects[]): Location[] | null {
-  let definitions: Location[] = [];
-  const keyword = wordAt(document, pos);
-
-  if (keyword === null) {
-    return null;
-  }
-
-  const items = collectAllPSSNodes(ast, { name: keyword });
-  items.forEach(node => {
-    let start_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber)
-    let end_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber + keyword.length)
-    definitions.push(Location.create(
-      node.definedOn.file,
-      Range.create(start_range, end_range)
-    ));
-  });
-  return definitions.length > 0 ? definitions : null;
 }
 
 export function getReferencesAdvanced(document: string, pos: number, ast: PSSLangObjects[]): Location[] | null | undefined {
