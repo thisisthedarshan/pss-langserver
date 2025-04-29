@@ -301,7 +301,7 @@ function getCompletionsForChain(chain: string[], ast: PSSLangObjects[]): Complet
     return completions;
   }
   const baseName = chain[0];
-  const parent = getNodeFromNameArray(ast, baseName);
+  const parent = getNodeFromNameArray(ast, baseName, objType.ASSIGNMENT);
   if (!parent) {
     return completions;
   }
@@ -339,7 +339,7 @@ function getCompletionsForChain(chain: string[], ast: PSSLangObjects[]): Complet
     } else if (chain[1] === 'trait') {
       const node = parent as AddressNode;
       const traitsStruct = node.traitsStruct;
-      const traitNode = getNodeFromNameArray(ast, traitsStruct);
+      const traitNode = getNodeFromNameArray(ast, traitsStruct, objType.ASSIGNMENT);
       if (traitNode) {
         traitNode.children.forEach(child => {
           completions.push({
@@ -375,7 +375,7 @@ function getCompletionsForChain(chain: string[], ast: PSSLangObjects[]): Complet
 // This function provides auto-completions for function parameters
 function getCompletionsForFunction(name: string, index: number, ast: PSSLangObjects[]): CompletionItem[] {
   let completions: CompletionItem[] = [];
-  let node = getNodeFromNameArray(ast, name);
+  let node = getNodeFromNameArray(ast, name, objType.FUNCTION_CALL);
   if (!node) {
     return completions;
   }
