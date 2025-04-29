@@ -49,7 +49,7 @@ import {
 } from 'vscode-languageserver-textdocument';
 import { formatDocument } from './providers/formattingProvider';
 import { builtInSignatures } from './definitions/builtinFunctions';
-import { DoxygenGenerationRequest, DoxygenGenerationResponse, PSS_Config, RequestDoxygenGeneration, semanticTokensLegend } from './definitions/dataTypes';
+import { DoxygenGenerationRequest, DoxygenGenerationResponse, objType, PSS_Config, RequestDoxygenGeneration, semanticTokensLegend } from './definitions/dataTypes';
 import { version } from './version';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
@@ -125,7 +125,7 @@ connection.onInitialize((params: InitializeParams) => {
       /* Tell the client that this server supports code completion. */
       completionProvider: {
         resolveProvider: true,
-        triggerCharacters: ['.', ':'],
+        triggerCharacters: ['.', ':', '(', ','],
       },
       /* Our language has inter-file dependencies */
       /* For now, we will not support diagnostics */
@@ -345,7 +345,7 @@ connection.onSignatureHelp(
     // Count commas to determine active parameter
     var activeParameter = (match[2].match(/,/g) || []).length;
 
-    const refNode = getNodeFromNameArray(pssAST, funcName);
+    const refNode = getNodeFromNameArray(pssAST, funcName, objType.FUNCTION_CALL);
     if (refNode) {
       const functionInfo: FunctionNode = refNode as FunctionNode;
 
