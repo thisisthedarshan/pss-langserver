@@ -69,7 +69,9 @@ bool_type : TOKEN_BOOL;
 enum_declaration :
 TOKEN_ENUM enum_identifier ( TOKEN_COLON data_type )? TOKEN_CLBRACE (enum_item (TOKEN_COMMA enum_item)* )? TOKEN_CRBRACE;
 
-enum_item : identifier (TOKEN_EQUALS integer_number)?;
+enum_item : 
+  comments |
+  (identifier (TOKEN_EQUALS integer_number)?);
 
 enum_type : enum_type_identifier (TOKEN_IN TOKEN_SLBRACE domain_open_range_list TOKEN_SRBRACE )?;
 

@@ -353,7 +353,7 @@ function generateFunctionCallCommentMarkdown(node: FunctionCallNode, depth: numb
     markdown += ' '.repeat(depth * 2) + `- **Ref-path**: ${node.refPath}\n`;
   }
   if (node.children.length > 0) {
-    markdown += ' '.repeat(depth * 2) + `Parameters:\n`
+    markdown += ' '.repeat(depth * 2) + 'Parameters: \n'
     node.children.forEach(child => {
       if (child.type === objType.FUNCTION_CALL) {
         markdown += generateFunctionCallCommentMarkdown(child as FunctionCallNode, depth + 1);
