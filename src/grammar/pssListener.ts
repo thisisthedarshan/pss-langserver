@@ -234,7 +234,7 @@ import { Function_ref_pathContext } from "./pss.js";
 import { Function_paramsContext } from "./pss.js";
 import { Symbol_callContext } from "./pss.js";
 import { Function_parameter_listContext } from "./pss.js";
-import { Expression_listContext } from "./pss.js";
+import { Function_call_paramsContext } from "./pss.js";
 import { String_literalContext } from "./pss.js";
 import { Filename_stringContext } from "./pss.js";
 import { Action_extensionContext } from "./pss.js";
@@ -256,7 +256,6 @@ import { Function_parameterContext } from "./pss.js";
 import { Function_parameter_dirContext } from "./pss.js";
 import { Varargs_parameterContext } from "./pss.js";
 import { User_typeContext } from "./pss.js";
-import { Function_call_paramsContext } from "./pss.js";
 import { Hierarchical_id_listContext } from "./pss.js";
 import { Hierarchical_idContext } from "./pss.js";
 import { Member_path_elemContext } from "./pss.js";
@@ -2610,15 +2609,15 @@ export default class pssListener extends ParseTreeListener {
 	 */
 	exitFunction_parameter_list?: (ctx: Function_parameter_listContext) => void;
 	/**
-	 * Enter a parse tree produced by `pss.expression_list`.
+	 * Enter a parse tree produced by `pss.function_call_params`.
 	 * @param ctx the parse tree
 	 */
-	enterExpression_list?: (ctx: Expression_listContext) => void;
+	enterFunction_call_params?: (ctx: Function_call_paramsContext) => void;
 	/**
-	 * Exit a parse tree produced by `pss.expression_list`.
+	 * Exit a parse tree produced by `pss.function_call_params`.
 	 * @param ctx the parse tree
 	 */
-	exitExpression_list?: (ctx: Expression_listContext) => void;
+	exitFunction_call_params?: (ctx: Function_call_paramsContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.string_literal`.
 	 * @param ctx the parse tree
@@ -2829,16 +2828,6 @@ export default class pssListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitUser_type?: (ctx: User_typeContext) => void;
-	/**
-	 * Enter a parse tree produced by `pss.function_call_params`.
-	 * @param ctx the parse tree
-	 */
-	enterFunction_call_params?: (ctx: Function_call_paramsContext) => void;
-	/**
-	 * Exit a parse tree produced by `pss.function_call_params`.
-	 * @param ctx the parse tree
-	 */
-	exitFunction_call_params?: (ctx: Function_call_paramsContext) => void;
 	/**
 	 * Enter a parse tree produced by `pss.hierarchical_id_list`.
 	 * @param ctx the parse tree

@@ -176,7 +176,7 @@ string_slice
 function_call
     : (TOKEN_SUPER TOKEN_DOT function_ref_path)
     | ((TOKEN_SCOPE)? (type_identifier_elem TOKEN_SCOPE)* function_ref_path)
-    | (TOKEN_COMP TOKEN_DOT function_identifier TOKEN_FLBRACE function_params? (TOKEN_COMMA function_params)* TOKEN_FRBRACE TOKEN_SEMICOLON)
+    | (TOKEN_COMP TOKEN_DOT function_identifier function_parameter_list TOKEN_SEMICOLON)
     ;
 
 function_ref_path : (member_path_elem TOKEN_DOT)? identifier function_parameter_list;
@@ -187,9 +187,9 @@ symbol_call : symbol_identifier function_parameter_list TOKEN_SEMICOLON;
 
 function_parameter_list
     : (TOKEN_FLBRACE TOKEN_FRBRACE)
-    | (TOKEN_FLBRACE expression_list TOKEN_FRBRACE)
+    | (TOKEN_FLBRACE function_call_params TOKEN_FRBRACE)
     ;
 
-expression_list
-    : expression (TOKEN_COMMA expression)*
-    ;
+function_call_params
+  : (function_call | identifier | constant_expression) 
+    (TOKEN_COMMA function_call_params)* ;

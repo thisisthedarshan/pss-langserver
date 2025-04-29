@@ -48,7 +48,6 @@ labeled_activity_stmt
     | activity_repeat_stmt
     | activity_foreach_stmt
     | activity_select_stmt
-    
     | activity_if_else_stmt
     | activity_match_stmt
     | activity_replicate_stmt

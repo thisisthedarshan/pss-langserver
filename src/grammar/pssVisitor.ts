@@ -234,7 +234,7 @@ import { Function_ref_pathContext } from "./pss.js";
 import { Function_paramsContext } from "./pss.js";
 import { Symbol_callContext } from "./pss.js";
 import { Function_parameter_listContext } from "./pss.js";
-import { Expression_listContext } from "./pss.js";
+import { Function_call_paramsContext } from "./pss.js";
 import { String_literalContext } from "./pss.js";
 import { Filename_stringContext } from "./pss.js";
 import { Action_extensionContext } from "./pss.js";
@@ -256,7 +256,6 @@ import { Function_parameterContext } from "./pss.js";
 import { Function_parameter_dirContext } from "./pss.js";
 import { Varargs_parameterContext } from "./pss.js";
 import { User_typeContext } from "./pss.js";
-import { Function_call_paramsContext } from "./pss.js";
 import { Hierarchical_id_listContext } from "./pss.js";
 import { Hierarchical_idContext } from "./pss.js";
 import { Member_path_elemContext } from "./pss.js";
@@ -1753,11 +1752,11 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 */
 	visitFunction_parameter_list?: (ctx: Function_parameter_listContext) => Result;
 	/**
-	 * Visit a parse tree produced by `pss.expression_list`.
+	 * Visit a parse tree produced by `pss.function_call_params`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitExpression_list?: (ctx: Expression_listContext) => Result;
+	visitFunction_call_params?: (ctx: Function_call_paramsContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.string_literal`.
 	 * @param ctx the parse tree
@@ -1884,12 +1883,6 @@ export default class pssVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitUser_type?: (ctx: User_typeContext) => Result;
-	/**
-	 * Visit a parse tree produced by `pss.function_call_params`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitFunction_call_params?: (ctx: Function_call_paramsContext) => Result;
 	/**
 	 * Visit a parse tree produced by `pss.hierarchical_id_list`.
 	 * @param ctx the parse tree
