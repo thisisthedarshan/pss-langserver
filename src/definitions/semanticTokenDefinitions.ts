@@ -613,5 +613,7 @@ export const semanticTokenTypes: Record<keyof typeof objType, KeywordInfo> = {
   EXEC_FILE: { tokenType: SemanticTokenTypes.method, tokenModifiers: [] },
   CALL_SUPER: { tokenType: SemanticTokenTypes.event, tokenModifiers: [SemanticTokenModifiers.defaultLibrary] },
   IMPORT: { tokenType: SemanticTokenTypes.macro, tokenModifiers: [] },
-  ASSIGNMENT: { tokenType: SemanticTokenTypes.variable, tokenModifiers: [] }
+  ASSIGNMENT: { tokenType: SemanticTokenTypes.variable, tokenModifiers: [] },
+  FUNCTION_CALL: { tokenType: SemanticTokenTypes.function, tokenModifiers: [SemanticTokenModifiers.definition] },
+  PARAMETER: { tokenType: SemanticTokenTypes.parameter, tokenModifiers: [] }
 };
