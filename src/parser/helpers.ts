@@ -407,14 +407,14 @@ export function getPackedStructSize(obj: PSSLangObjects[] | PSSLangObjects, pack
 }
 
 /** This function goes through a PSS Lang Objects data type and finds the object with given name and returns it */
-export function getNodeFromName(object: PSSLangObjects, name: string, ignore: objType | { ignoreList: objType[] } = objType.UNKNOWN): PSSLangObjects | undefined {
+export function getNodeFromName(object: PSSLangObjects, name: string, ignore: objType | objType[] = objType.UNKNOWN): PSSLangObjects | undefined {
   const stack: PSSLangObjects[] = [object];
   /* This logic uses an iterative Depth First Search algorithm to find the child */
   while (stack.length > 0) {
     const current = stack.pop()!;
     if (current.name === name) {
-      if (typeof ignore === 'object' && 'ignoreList' in ignore) {
-        if (!ignore.ignoreList.some(ignored => current.type === ignored)) {
+      if (Array.isArray(ignore)) {
+        if (!ignore.some(ignored => current.type === ignored)) {
           return current;
         }
       } else {
@@ -431,7 +431,7 @@ export function getNodeFromName(object: PSSLangObjects, name: string, ignore: ob
 }
 
 /** This function just iterates through objects and returns the result from getNodeFromName function */
-export function getNodeFromNameArray(objects: PSSLangObjects[], name: string, ignore: objType | { ignoreList: objType[] } = objType.UNKNOWN): PSSLangObjects | undefined {
+export function getNodeFromNameArray(objects: PSSLangObjects[], name: string, ignore: objType | objType[] = objType.UNKNOWN): PSSLangObjects | undefined {
   for (const obj of objects) {
     const node = getNodeFromName(obj, name, ignore);
     if (typeof (node) !== 'undefined') {

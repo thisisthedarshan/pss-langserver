@@ -55,7 +55,7 @@ export function getGoToDefinitionAdvanced(document: string, pos: number, ast: PS
     return null;
   }
 
-  const node = getNodeFromNameArray(ast, keyword, { ignoreList: [objType.ASSIGNMENT, objType.FUNCTION_CALL] });
+  const node = getNodeFromNameArray(ast, keyword, [objType.ASSIGNMENT, objType.FUNCTION_CALL]);
   if (node) {
     if (node.definedOn) {
       let start_range = Position.create(node.definedOn.lineNumber - 1, node.definedOn.columnNumber)
