@@ -1353,7 +1353,6 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
 
     this.visitFunction_call = (ctd: Function_callContext): void => {
       const name = ctd.function_identifier()?.getText() ?? ctd.function_ref_path()?.identifier()?.getText() ?? "unknown function name @" + ctd.start.line.toString();
-      const identifier = ctd.function_identifier ?? ctd.function_ref_path().identifier;
       const isSuper = Boolean(ctd.TOKEN_SUPER());
       let visitPath = ctd.function_parameter_list() ?? ctd.function_ref_path().function_parameter_list();
       let refPath = "";
@@ -1368,6 +1367,14 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         }
         refPath += ctd.function_ref_path().identifier().getText();
       }
+      let line: number = 0, column: number = 0;
+      if (ctd.function_identifier()) {
+        line = ctd.function_identifier().start.line;
+        column = ctd.function_identifier().start.column;
+      } else if (ctd.function_ref_path().identifier()) {
+        line = ctd.function_ref_path().identifier().start.line;
+        column = ctd.function_ref_path().identifier().start.column;
+      }
       /* Create a function call node */
       const node: FunctionCallNode = {
         type: objType.FUNCTION_CALL,
@@ -1376,8 +1383,8 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         name: name,
         definedOn: {
           file: fileURI,
-          lineNumber: identifier()?.start.line ?? 0,
-          columnNumber: identifier()?.start.column ?? 0
+          lineNumber: line,
+          columnNumber: column
         },
         comments: "",
         children: []
