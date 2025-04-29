@@ -28,7 +28,9 @@ constraint_body_item
 constraint_block : TOKEN_CLBRACE constraint_body_item* TOKEN_CRBRACE;
 
 constraint_body_item :
-expression_constraint_item
+  comments
+| (TOKEN_FLBRACE+ constraint_body_item TOKEN_FRBRACE)
+| expression_constraint_item
 | foreach_constraint_item
 | forall_constraint_item
 | if_constraint_item

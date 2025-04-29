@@ -48,17 +48,14 @@ integer_atom_type
 
 integer_atom_type 
   : TOKEN_INT
-  | (TOKEN_BIT 
-    TOKEN_SLBRACE 
-    ((constant_expression TOKEN_COLON constant_expression) 
-    | constant_expression) 
-    TOKEN_SRBRACE);
+  | TOKEN_BIT;
 
 domain_open_range_list :
-domain_open_range_value (TOKEN_COMMA domain_open_range_value)?;
+domain_open_range_value (TOKEN_COMMA domain_open_range_value)*;
 
 domain_open_range_value :
-(constant_expression ( TOKEN_DDOT constant_expression )?)
+  number
+| (constant_expression ( TOKEN_DDOT constant_expression )?)
 | (constant_expression TOKEN_DDOT)
 | (TOKEN_DDOT constant_expression);
 
@@ -67,11 +64,9 @@ string_type : TOKEN_STRING (TOKEN_IN TOKEN_SLBRACE string_literal ( TOKEN_COMMA 
 bool_type : TOKEN_BOOL;
 
 enum_declaration :
-TOKEN_ENUM enum_identifier ( TOKEN_COLON data_type )? TOKEN_CLBRACE (enum_item (TOKEN_COMMA enum_item)* )? TOKEN_CRBRACE;
+TOKEN_ENUM enum_identifier ( TOKEN_COLON data_type )? TOKEN_CLBRACE ((comments| enum_item) (comments | (TOKEN_COMMA enum_item))* )? TOKEN_CRBRACE;
 
-enum_item : 
-  comments |
-  (identifier (TOKEN_EQUALS integer_number)?);
+enum_item : identifier (TOKEN_EQUALS integer_number)?;
 
 enum_type : enum_type_identifier (TOKEN_IN TOKEN_SLBRACE domain_open_range_list TOKEN_SRBRACE )?;
 
