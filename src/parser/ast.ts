@@ -52,9 +52,9 @@ export function buildASTNew(fileURI: string, fileContents: string): PSSLangObjec
   try {
     parser.pss_entry().accept(myVisitor);
   } catch (e) {
-    /* console.warn("Parsing failed for file: ", fileURI.substring(fileURI.lastIndexOf("/") + 1)); */
-    /* const msg = e as Error; */
-    /* console.warn(msg.message); */
+    // console.warn("Parsing failed for file: ", fileURI.substring(fileURI.lastIndexOf("/") + 1));
+    // const msg = e as Error;
+    // console.warn(msg.message);
     return [];
   }
   const res = myVisitor.getAstObjects();
