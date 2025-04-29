@@ -20,8 +20,8 @@ import pssVisitor from "../grammar/pssVisitor";
 import pss_lexer from "../grammar/pssLex";
 import { getExecType, getFlowObjType, getNodeFromName, getNodeFromNameArray, getObjType, getPackedStructSize, getStructKind } from "./helpers";
 import { accessMap, commentDocs, definedOn, enumItems, metaData, objType, params, PSSNode } from "../definitions/dataTypes";
-import { ActionNode, AddressNode, AssignmentNode, CompNode, EnumNode, ExecNode, FlowReferenceFieldNode, FunctionNode, ImportsNode, InstanceNode, PackageNode, PSSLangObjects, RegisterBodyNode, RegisterCompNode, RegisterDefNode, RegisterGroupNode, ResourceReferenceFieldNode, StructNode, TypedefDeclNode } from "../definitions/dataStructures";
-import { Abstract_action_declarationContext, Access_typeContext, Action_declarationContext, Action_extensionContext, Action_handle_declarationContext, Activity_declarationContext, Add_addr_region_nonallocatableContext, Add_addr_regionContext, Addr_claimContext, Addr_region_settingContext, Attr_fieldContext, Component_data_declarationContext, Component_declarationContext, Component_pool_declarationContext, Contiguous_addr_space_defContext, Data_declarationContext, Enum_declarationContext, Enum_itemContext, Exec_block_stmtContext, Exec_blockContext, Extend_stmtContext, Flow_ref_field_declarationContext, Function_declContext, Function_parameter_list_prototypeContext, Function_parameterContext, Function_prototypeContext, Import_class_declContext, Import_class_function_declContext, Import_functionContext, Import_stmtContext, Package_declarationContext, Procedural_assignment_stmtContext, Procedural_data_declarationContext, Procedural_functionContext, Pss_entryContext, Register_body_definitionContext, Register_comp_definitionContext, Register_comp_instanceContext, Register_definitionContext, Register_group_definitionContext, Resource_ref_field_declarationContext, Struct_body_itemContext, Struct_declarationContext, Template_param_decl_listContext, Transparent_addr_claimContext, Transparent_addr_region_defContext, Transparent_addr_space_defContext, Typedef_declarationContext } from "../grammar/pss";
+import { ActionNode, AddressNode, AssignmentNode, CompNode, EnumNode, ExecNode, FlowReferenceFieldNode, FunctionCallNode, FunctionNode, ImportsNode, InstanceNode, PackageNode, PSSLangObjects, RegisterBodyNode, RegisterCompNode, RegisterDefNode, RegisterGroupNode, ResourceReferenceFieldNode, StructNode, TypedefDeclNode } from "../definitions/dataStructures";
+import { Abstract_action_declarationContext, Access_typeContext, Action_declarationContext, Action_extensionContext, Action_handle_declarationContext, Activity_declarationContext, Add_addr_region_nonallocatableContext, Add_addr_regionContext, Addr_claimContext, Addr_region_settingContext, Attr_fieldContext, Component_data_declarationContext, Component_declarationContext, Component_pool_declarationContext, Contiguous_addr_space_defContext, Data_declarationContext, Enum_declarationContext, Enum_itemContext, Exec_block_stmtContext, Exec_blockContext, Extend_stmtContext, Flow_ref_field_declarationContext, Function_call_paramsContext, Function_callContext, Function_declContext, Function_parameter_list_prototypeContext, Function_parameter_listContext, Function_parameterContext, Function_prototypeContext, Import_class_declContext, Import_class_function_declContext, Import_functionContext, Import_stmtContext, Package_declarationContext, Procedural_assignment_stmtContext, Procedural_data_declarationContext, Procedural_functionContext, Pss_entryContext, Register_body_definitionContext, Register_comp_definitionContext, Register_comp_instanceContext, Register_definitionContext, Register_group_definitionContext, Resource_ref_field_declarationContext, Struct_body_itemContext, Struct_declarationContext, Template_param_decl_listContext, Transparent_addr_claimContext, Transparent_addr_region_defContext, Transparent_addr_space_defContext, Typedef_declarationContext } from "../grammar/pss";
 import doxygenLexer from "../grammar/doxygenLexer";
 import doxygenParser from "../grammar/doxygenParser";
 import { doxygen_visitor } from "./visitors";
@@ -1351,6 +1351,94 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       throw new Error(`Error encountered at line ${e.symbol.line}:${e.symbol.column} for ${name}.\n${e.getText()}`);
     };
 
+    this.visitFunction_call = (ctd: Function_callContext): void => {
+      const name = ctd.function_identifier()?.getText() ?? ctd.function_ref_path()?.identifier()?.getText() ?? "unknown function name @" + ctd.start.line.toString();
+      const identifier = ctd.function_identifier ?? ctd.function_ref_path().identifier;
+      const isSuper = Boolean(ctd.TOKEN_SUPER());
+      let visitPath = ctd.function_parameter_list() ?? ctd.function_ref_path().function_parameter_list();
+      let refPath = "";
+      if (ctd.type_identifier_elem_list() || ctd.type_identifier_elem(0)) {
+        ctd.type_identifier_elem_list().forEach(typeIdentifier => {
+          refPath += typeIdentifier.getText() + ':';
+        });
+      }
+      if (ctd.function_ref_path()) {
+        if (ctd.function_ref_path().member_path_elem()) {
+          refPath += ctd.function_ref_path().member_path_elem().getText() + ".";
+        }
+        refPath += ctd.function_ref_path().identifier().getText();
+      }
+      /* Create a function call node */
+      const node: FunctionCallNode = {
+        type: objType.FUNCTION_CALL,
+        super: isSuper,
+        refPath: refPath,
+        name: name,
+        definedOn: {
+          file: fileURI,
+          lineNumber: identifier()?.start.line ?? 0,
+          columnNumber: identifier()?.start.column ?? 0
+        },
+        comments: "",
+        children: []
+      }
+      addNodeToParent(node);
+      /* Function call is simply a reference but it will also encompass parameters as children */
+      /* This is because a function call can contain a function call as well */
+
+      if (visitPath) {
+        this.currentASTHierarchy.push(node);
+        this.visit(visitPath);
+        this.currentASTHierarchy.pop();
+      }
+    };
+
+    this.visitFunction_parameter_list = (ctd: Function_parameter_listContext): void => {
+      if (ctd.function_call_params()) {
+        this.visit(ctd.function_call_params())
+      }
+    };
+
+    this.visitFunction_call_params = (ctd: Function_call_paramsContext): void => {
+      /* These are a kind of assignments as well - but without any value */
+      if (ctd.identifier()) {
+        const node: AssignmentNode = {
+          type: objType.ASSIGNMENT,
+          name: "parameter",
+          definedOn: {
+            file: fileURI,
+            lineNumber: ctd.identifier().start.line,
+            columnNumber: ctd.identifier().start.column
+          },
+          comments: "",
+          children: [],
+          operation: "identifier",
+          value: ctd.identifier().getText(),
+          dataType: "parameter"
+        }
+        addNodeToParent(node);
+
+      } else if (ctd.constant_expression()) {
+        const node: AssignmentNode = {
+          type: objType.ASSIGNMENT,
+          name: "parameter",
+          definedOn: {
+            file: fileURI,
+            lineNumber: ctd.constant_expression().start.line,
+            columnNumber: ctd.constant_expression().start.column
+          },
+          comments: "",
+          children: [],
+          operation: "expression",
+          value: ctd.constant_expression().getText(),
+          dataType: "parameter"
+        }
+        addNodeToParent(node);
+
+      } else {
+        this.visitChildren(ctd);
+      }
+    };
 
   } /** End Super */
 

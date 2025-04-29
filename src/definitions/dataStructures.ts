@@ -165,13 +165,8 @@ interface FunctionCallNode extends PSSNode {
   type: objType.FUNCTION_CALL;
   super: boolean;
   refPath: string;
-  isStatic: boolean;
-}
-interface FunctionCallParam extends PSSNode {
-  type: objType.PARAMETER;
-  val: string; /* value, i.e. identifier or expression */
 }
 
-type PSSLangObjects = PSSNode | CompNode | ActionNode | InstanceNode | MemorySpaceNode | MemoryRegionNode | RegisterCompNode | RegisterGroupNode | RegisterBodyNode | RegisterDefNode | ActivityNode | EnumNode | StructNode | FunctionNode | FlowReferenceFieldNode | ResourceReferenceFieldNode | AddressNode | ExecNode | PackageNode | StructKindNode | TypedefDeclNode | ImportsNode | AssignmentNode;
+type PSSLangObjects = PSSNode | CompNode | ActionNode | InstanceNode | MemorySpaceNode | MemoryRegionNode | RegisterCompNode | RegisterGroupNode | RegisterBodyNode | RegisterDefNode | ActivityNode | EnumNode | StructNode | FunctionNode | FlowReferenceFieldNode | ResourceReferenceFieldNode | AddressNode | ExecNode | PackageNode | StructKindNode | TypedefDeclNode | ImportsNode | AssignmentNode | FunctionCallNode;
 
-export { PSSLangObjects, CompNode, ActionNode, InstanceNode, MemorySpaceNode, MemoryRegionNode, RegisterCompNode, RegisterGroupNode, RegisterBodyNode, RegisterDefNode, ActivityNode, EnumNode, StructNode, FunctionNode, FlowReferenceFieldNode, ResourceReferenceFieldNode, AddressNode, ExecNode, PackageNode, StructKindNode, TypedefDeclNode, ImportsNode, AssignmentNode };
+export { PSSLangObjects, CompNode, ActionNode, InstanceNode, MemorySpaceNode, MemoryRegionNode, RegisterCompNode, RegisterGroupNode, RegisterBodyNode, RegisterDefNode, ActivityNode, EnumNode, StructNode, FunctionNode, FlowReferenceFieldNode, ResourceReferenceFieldNode, AddressNode, ExecNode, PackageNode, StructKindNode, TypedefDeclNode, ImportsNode, AssignmentNode, FunctionCallNode };
