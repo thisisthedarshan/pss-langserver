@@ -69,12 +69,12 @@ export function getGoToDefinitionAdvanced(document: string, pos: number, ast: PS
     const enumNodes = collectAllPSSNodes(ast, { type: objType.ENUM });
     if (enumNodes) {
       for (const enumNode of enumNodes as EnumNode[]) {
-        if (enumNode.enumItems.some(item => keyword === item.name)) {
-          /* For now, this leads to the parent enum, and not the keyword itself. Maybe in the future? */
-          let start_range = Position.create(enumNode.definedOn.lineNumber - 1, enumNode.definedOn.columnNumber)
-          let end_range = Position.create(enumNode.definedOn.lineNumber - 1, enumNode.definedOn.columnNumber + keyword.length)
+        const enumItem = enumNode.enumItems.find(item => keyword === item.name);
+        if (enumItem) {
+          let start_range = Position.create(enumItem.definedOn.lineNumber - 1, enumItem.definedOn.columnNumber)
+          let end_range = Position.create(enumItem.definedOn.lineNumber - 1, enumItem.definedOn.columnNumber + keyword.length)
           location = Location.create(
-            enumNode.definedOn.file,
+            enumItem.definedOn.file,
             Range.create(start_range, end_range)
           );
           return location;
