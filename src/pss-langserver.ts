@@ -279,13 +279,19 @@ const callbackForWorker = (results: { result: PSSLangObjects[]; uri: string; }):
   }
 }
 
-/* Handle updating AST using debounce */
+/* Handle updating AST using debounce logic - for on Change */
 const debouncedASTBuilder = debounce((uri: string, content: string) => {
   if (content.length === 0) {
     return;
   }
+}, 3600);
+
+const saveDebouncer = debounce((uri: string, content: string): void => {
+  if (content.length === 0) {
+    return;
+  }
   spawnProcessor(content, uri, callbackForWorker);
-}, 1800);
+}, 9000); /* Once every 9 seconds */
 
 /* Event when a document is changed or first opened */
 documents.onDidChangeContent(change => {
@@ -296,7 +302,7 @@ documents.onDidChangeContent(change => {
 /* Refresh semantic tokens on document saves */
 connection.onDidSaveTextDocument(save => {
   connection.languages.semanticTokens.refresh();
-  debouncedASTBuilder(save.textDocument.uri, save.text || "");
+  saveDebouncer(save.textDocument.uri, save.text || "");
 });
 
 /* See if monitored files have changed */
