@@ -16,10 +16,28 @@
  */
 
 // This is a worker thread that runs in the background and updates the data in LSP
-import { parentPort } from 'worker_threads';
+import { parentPort, workerData } from 'worker_threads';
 import { updateASTNew } from './helpers';
+import { PSSLangObjects } from '../definitions/dataStructures';
 
-parentPort?.on('message', async (uri: string, code: string) => {
-  const updatedResults = updateASTNew(uri, code);
-  parentPort?.postMessage(updatedResults);
-});
+
+async function processor(content: string, uri: string): Promise<{
+  result: PSSLangObjects[];
+  uri: string;
+}> {
+  const result = await updateASTNew(uri, content);
+  return {
+    result: result,
+    uri: uri
+  };
+}
+
+(async () => {
+  if (!parentPort) {
+    console.error("No Parent Port!!");
+    return;
+  } else {
+    const result = await processor(workerData.content, workerData.uri);
+    parentPort.postMessage(result);
+  }
+})();

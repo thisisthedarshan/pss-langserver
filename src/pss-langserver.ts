@@ -53,7 +53,7 @@ import { DoxygenGenerationRequest, DoxygenGenerationResponse, objType, PSS_Confi
 import { version } from './version';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { buildASTForFiles, notify } from './helpers';
+import { buildASTForFiles, notify, spawnProcessor } from './helpers';
 import { buildMarkdownComment, fullRange, getNodeFromNameArray, scanDirectory, updateAST, updateASTMeta, updateASTNew, updateASTNewMeta } from './parser/helpers';
 import { buildAutocompletions, buildAutocompletionBuiltinsBlock } from './providers/autoCompletionProvider';
 import { createSemanticTokensFor, generateSemanticTokensAdvanced } from './providers/semanticTokenProvider';
@@ -63,8 +63,9 @@ import { FunctionNode, PSSLangObjects } from './definitions/dataStructures';
 import debounce from 'lodash.debounce';
 import { keywords } from './definitions/keywords';
 import { createCommentsFromNode } from './providers/objectCommentsProvider';
-import { Worker } from 'cluster';
 import { getSmartAutocompletions } from './providers/autoCompletionEngine';
+import { url } from 'inspector';
+const fs = require('fs-extra')
 
 /* To make the process act like an actual executable */
 const args = process.argv.slice(2);
@@ -249,45 +250,41 @@ connection.onDidOpenTextDocument((params) => {
       const filePath = fileURLToPath(file);
       const folderPath = path.dirname(filePath);
       notify(connection, `Scanning local folder (${folderPath}) for pss files`);
-
-      scanDirectory(folderPath, pssFiles).then(() => {
-        fileWiseAST = buildASTForFiles(pssFiles);
-        pssAST = [];
-        Object.entries(fileWiseAST).forEach(([uri, ast]) => {
-          pssAST = [...pssAST, ...ast];
-        });
-        autoCompletions = buildAutocompletions(pssAST);
-        hoverCache = buildHoverItems(pssAST);
-        semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
-        isFirst = false;
-      }).catch((error) => {
-        console.error(`Error during initialization: ${error}`);
+      scanDirectory(folderPath, pssFiles);
+      pssFiles.forEach(file => {
+        const content: string = fs.readFileSync(file, 'utf8');
+        const fileURI: string = encodeURI("file://" + file);
+        spawnProcessor(content, fileURI, callbackForWorker);
       });
-    } catch (e) {
+      isFirst = false;
+    }
+    catch (e) {
       console.error(`Error parsing URI ${file}: ${e}`);
     }
   }
 });
+
+const callbackForWorker = (results: { result: PSSLangObjects[]; uri: string; }): void => {
+  var result = results.result;
+  var uri = results.uri;
+  if (result.length > 0) {
+    fileWiseAST[uri] = result;
+    pssAST = [];
+    Object.entries(fileWiseAST).forEach(([uri, ast]) => {
+      pssAST = [...pssAST, ...ast];
+    });
+    autoCompletions = buildAutocompletions(pssAST);
+    hoverCache = buildHoverItems(pssAST);
+    semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
+  }
+}
 
 /* Handle updating AST using debounce */
 const debouncedASTBuilder = debounce((uri: string, content: string) => {
   if (content.length === 0) {
     return;
   }
-
-  updateASTNew(uri, content).then(result => {
-    // pssAST = updateASTNewMeta(pssAST, result);
-    if (result.length > 0) {
-      fileWiseAST[uri] = result;
-      pssAST = [];
-      Object.entries(fileWiseAST).forEach(([uri, ast]) => {
-        pssAST = [...pssAST, ...ast];
-      });
-      autoCompletions = buildAutocompletions(pssAST);
-      hoverCache = buildHoverItems(pssAST);
-      semanticTokenCache = generateSemanticTokensAdvanced(pssAST);
-    }
-  });
+  spawnProcessor(content, uri, callbackForWorker);
 }, 1800);
 
 /* Event when a document is changed or first opened */

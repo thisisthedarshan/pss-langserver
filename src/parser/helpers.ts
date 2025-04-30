@@ -23,6 +23,10 @@ import { InstanceNode, PSSLangObjects, StructNode } from "../definitions/dataStr
 const fs = require('fs-extra')
 const path = require('path')
 
+export function generateUniqueId() {
+  return `d-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+}
+
 export function isWithinCommentBlock(document: { lineAt: (arg0: any) => { (): any; new(): any; text: string; }; }, lineNumber: any) {
   for (let i = lineNumber; i >= 0; i--) {
     const lineText = document.lineAt(i).text.trim();
@@ -274,13 +278,13 @@ export async function updateASTNew(fileURI: string, documentText: string): Promi
   return items;
 }
 
-export async function scanDirectory(dirPath: string, files: string[]): Promise<void> {
+export function scanDirectory(dirPath: string, files: string[], ignore: string[] = []): void {
   try {
     const entries = fs.readdirSync(dirPath, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(dirPath, entry.name);
-      if (entry.isDirectory()) {
-        await scanDirectory(fullPath, files);
+      if (entry.isDirectory() && !ignore.some(folderName => folderName === entry.name)) {
+        scanDirectory(fullPath, files);
       } else if (entry.isFile() && entry.name.endsWith('.pss')) {
         files.push(fullPath);
       }

@@ -19,6 +19,7 @@ import { _Connection } from "vscode-languageserver/node";
 import { PSSLangObjects } from "./definitions/dataStructures";
 import { updateASTNew, updateASTNewMeta } from "./parser/helpers";
 import fs from 'fs-extra';
+import { Worker } from 'worker_threads';
 
 export function notify(conn: _Connection, message: string, err: boolean = false) {
   if (err) {
@@ -28,6 +29,7 @@ export function notify(conn: _Connection, message: string, err: boolean = false)
   }
 }
 
+/**@deprecated */
 export function buildASTForFiles(files: string[]): { [fileURI: string]: PSSLangObjects[] } {
   let pssAST: { [fileURI: string]: PSSLangObjects[] } = {};
   for (const file of files) {
@@ -41,4 +43,22 @@ export function buildASTForFiles(files: string[]): { [fileURI: string]: PSSLangO
     });
   }
   return pssAST;
+}
+
+export function spawnProcessor(content: string, uri: string, callback: (result: { result: PSSLangObjects[]; uri: string; }) => void): void {
+  const worker = new Worker('./parser/worker.js', {
+    workerData: { content: content, uri: uri }
+  });
+
+  worker.on('message', (result) => {
+    callback(result);
+  });
+  worker.on('error', (err) => {
+    console.error('Worker Error - ', err);
+  });
+  worker.on('exit', (code) => {
+    if (code != 0) {
+      console.error(`Worker stopped with exit code ${code}`);
+    }
+  });
 }
