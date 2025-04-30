@@ -241,15 +241,15 @@ documents.onDidClose(e => {
   documentSettings.delete(e.document.uri);
 });
 
-connection.onDidOpenTextDocument((params) => {
+documents.onDidOpen((params) => {
   if (isFirst) {
-    const file = params.textDocument.uri;
+    const file = params.document.uri;
     const pssFiles: string[] = [];
 
     try {
       const filePath = fileURLToPath(file);
       const folderPath = path.dirname(filePath);
-      notify(connection, `Scanning local folder (${folderPath}) for pss files`);
+      notify(connection, `Scanning local folder for pss files`);
       scanDirectory(folderPath, pssFiles);
       pssFiles.forEach(file => {
         const content: string = fs.readFileSync(file, 'utf8');
@@ -300,9 +300,9 @@ documents.onDidChangeContent(change => {
 });
 
 /* Refresh semantic tokens on document saves */
-connection.onDidSaveTextDocument(save => {
+documents.onDidSave(save => {
   connection.languages.semanticTokens.refresh();
-  saveDebouncer(save.textDocument.uri, save.text || "");
+  saveDebouncer(save.document.uri, save.document.getText() || "");
 });
 
 /* See if monitored files have changed */
