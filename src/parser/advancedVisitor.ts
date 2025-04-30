@@ -1347,12 +1347,6 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
       }
     };
 
-    /* This node is visited when our visitor encounters an error */
-    this.visitErrorNode = (e: ErrorNode) => {
-      const name = e.parentCtx.getText();
-      throw new Error(`Error encountered at line ${e.symbol.line}:${e.symbol.column} for ${name}.\n${e.getText()}`);
-    };
-
     this.visitFunction_call = (ctd: Function_callContext): void => {
       const name = ctd.function_identifier()?.getText() ?? ctd.function_ref_path()?.identifier()?.getText() ?? "unknown function name @" + ctd.start.line.toString();
       const isSuper = Boolean(ctd.TOKEN_SUPER());
@@ -1448,6 +1442,13 @@ export class advancedVisitor extends pssVisitor<PSSLangObjects | void> {
         this.visitChildren(ctd);
       }
     };
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    /* This node is visited when our visitor encounters an error */
+    this.visitErrorNode = (e: ErrorNode) => {
+      throw new Error(`Error encountered at line ${e.symbol.line}:${e.symbol.column}.\n${e.getText()}`);
+    };
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
 
   } /** End Super */
 
