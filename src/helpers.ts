@@ -17,7 +17,7 @@
 
 import { _Connection } from "vscode-languageserver/node";
 import { PSSLangObjects } from "./definitions/dataStructures";
-import { updateASTNew, updateASTNewMeta } from "./parser/helpers";
+import { generateUniqueId, updateASTNew, updateASTNewMeta } from "./parser/helpers";
 import fs from 'fs-extra';
 import { Worker } from 'worker_threads';
 
@@ -45,20 +45,34 @@ export function buildASTForFiles(files: string[]): { [fileURI: string]: PSSLangO
   return pssAST;
 }
 
+/* This is the timeout for the worker */
+const MINS = 5; // 5 minutes
+const WORKER_TIMEOUT_MS = MINS * 60 * 1000;
+
 export function spawnProcessor(content: string, uri: string, callback: (result: { result: PSSLangObjects[]; uri: string; }) => void): void {
-  const worker = new Worker('./parser/worker.js', {
-    workerData: { content: content, uri: uri }
+  let id = generateUniqueId();
+  const worker = new Worker(__dirname + '/parser/worker.js', {
+    workerData: { content: content, uri: uri, id: id }
   });
 
+  let timeout = setTimeout(() => {
+    console.warn(`Worker Timed-out. De-spawning thread with id ${id}`);
+    worker.terminate();
+  }, WORKER_TIMEOUT_MS);
+
   worker.on('message', (result) => {
+    clearTimeout(timeout);
     callback(result);
   });
+
   worker.on('error', (err) => {
     console.error('Worker Error - ', err);
   });
+
   worker.on('exit', (code) => {
     if (code != 0) {
       console.error(`Worker stopped with exit code ${code}`);
     }
   });
+
 }
