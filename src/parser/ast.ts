@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { CharStream, CommonTokenStream } from "antlr4";
+import { BailErrorStrategy, CharStream, CommonTokenStream, ErrorStrategy, PredictionMode } from "antlr4";
 import pss, { Enum_identifierContext, IdentifierContext, Stream_type_identifierContext } from "../grammar/pss";
 import pss_lexer from "../grammar/pssLex";
 import { visitor } from "./visitors";
@@ -48,14 +48,26 @@ export function buildASTNew(fileURI: string, fileContents: string): PSSLangObjec
 
   parser.removeErrorListeners(); /* No need for error listener for now */
   /*parser.addErrorListener(new PSSErrorListener())*/
-
+  let errStrategy: ErrorStrategy = new BailErrorStrategy();
   try {
+    parser._interp.predictionMode = PredictionMode.SLL;
+    errStrategy = parser._errHandler;
+    parser._errHandler = new BailErrorStrategy();
     parser.pss_entry().accept(myVisitor);
   } catch (e) {
+    try {
+      parser._interp.predictionMode = PredictionMode.LL;
+      parser._errHandler = errStrategy;
+      parser.pss_entry().accept(myVisitor);
+    } catch (e) {
+      // console.warn("Parsing failed for file: ", fileURI.substring(fileURI.lastIndexOf("/") + 1));
+      // const msg = e as Error;
+      // console.warn(msg.message);
+      return [];
+    }
     // console.warn("Parsing failed for file: ", fileURI.substring(fileURI.lastIndexOf("/") + 1));
     // const msg = e as Error;
     // console.warn(msg.message);
-    return [];
   }
   const res = myVisitor.getAstObjects();
   // writeFileSync(fileURLToPath(fileURI) + '-lsp.json', JSON.stringify(res, null, 4), 'utf-8');
