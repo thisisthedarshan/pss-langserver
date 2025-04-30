@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New autocompletion engine to provide more smarter auto-completions.
+- New background processor for AST building. This significantly improves performance.
 
 ### Fixed
 
