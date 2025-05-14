@@ -47,7 +47,7 @@ export function getObjType(str: string): objType {
       return objType.COMPONENT;
     case "ACTION":
       return objType.ACTION;
-    case "ACTION":
+    case "ACTIVITY":
       return objType.ACTIVITY;
     case "FUNCTION":
       return objType.FUNCTION;
