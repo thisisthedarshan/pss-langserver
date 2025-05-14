@@ -209,10 +209,16 @@ function formatCurlyBraces(input: string): string {
   /* Ensure newline after opening brace */
   input = input.replace(/{(?!\s*\n)/g, '{\n');
 
-  /* Add newline before closing brace if there isn't one already */
-  input = input.replace(/([^\n])(\s*})(?!\n)/g, (match, p1, p2) => {
-    return /\n/.test(match) ? match : p1 + '\n' + p2;
-  });
+  /* Process closing braces, preserving those in comments, and add newline only if no newlines at all precede */
+  input = input.replace(
+    /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|([^\s\n])(\s*})(?!\n)/g,
+    (match, comment, p1, p2) => {
+      if (comment) return comment; // Preserve comment unchanged
+      // Check if there's already a newline in the whitespace before the closing brace
+      if (p2.includes('\n')) return p1 + p2;
+      return p1 + '\n' + p2; // Add newline before closing brace only if directly after code
+    }
+  );
 
   /* Add newline after } unless followed by newline, semicolon, or comment */
   input = input.replace(/}(?!\s*(?:\n|;|\/\/))/g, '}\n');
