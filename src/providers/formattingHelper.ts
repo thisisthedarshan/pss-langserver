@@ -258,8 +258,11 @@ function formatDate(date: Date): string {
 }
 
 function formatExpression(expression: string): string {
-    const multiCharOperators = ["===", "!==", "==", "!=", "<=", ">=", "=>", "+=", "-=", "*=", "/=", "&&", "||", "++", "--", ">>", "<<", ">>>", "?.", "**", "**=", "??", "??=", "...", "::"];
-    const operatorRegex = new RegExp(`(${multiCharOperators.map(op => op.replace(/[-+*/%^=<>!&|]/g, '\\$&')).join('|')})|([+\\-*/%^=<>!&|])`, 'g');
+    const multiCharOperators = multiCharTokens;
+    const operatorRegex = new RegExp(
+        `(${multiCharOperators.map(op => op.replace(/[-+*/%^=<>!&|]/g, '\\$&')).join('|')})|([+\\-*/%^=<>!&|])`,
+        'g'
+    );
     return expression.replace(operatorRegex, (match, multiOp, singleOp) => {
         if (multiOp) {
             return ` ${multiOp} `;
@@ -367,6 +370,40 @@ function formatOperators(input: string): string {
     return result;
 }
 
+function wrapCommentText(commentText: string, indent: string, maxColumns: number, isSingleLine: boolean): string[] {
+    const wrappedLines: string[] = [];
+    /* Use exact comment markers, not separated by spaces */
+    const prefix = isSingleLine ? '//' : '* ';
+
+    /* Extract comment content without prefix */
+    let content = commentText.trim();
+    if (isSingleLine && content.startsWith('//')) {
+        content = content.substring(2).trim();
+    } else if (!isSingleLine && content.startsWith('*')) {
+        content = content.substring(1).trim();
+    }
+
+    const words = content.split(/\s+/);
+    let currentLine = prefix;
+
+    for (const word of words) {
+        const potentialLine = currentLine + (currentLine !== prefix ? ' ' : '') + word;
+        if (potentialLine.length + indent.length > maxColumns && currentLine !== prefix) {
+            wrappedLines.push(indent + currentLine);
+            currentLine = prefix + word;
+        } else {
+            currentLine = potentialLine;
+        }
+    }
+
+    if (currentLine) {
+        wrappedLines.push(indent + currentLine);
+    }
+
+    return wrappedLines;
+}
+
+
 function tokenizeLine(line: string): string[] {
     const tokens: string[] = [];
     let i = 0;
@@ -377,49 +414,12 @@ function tokenizeLine(line: string): string[] {
             i++;
             continue;
         }
-        // Check for multi-character tokens
-        let matched = false;
-        for (const token of multiCharTokens) {
-            if (line.substring(i, i + token.length) === token) {
-                tokens.push(token);
-                i += token.length;
-                matched = true;
-                break;
-            }
-        }
-        if (matched) {
-            continue;
-        }
-        // Check for single-character tokens
-        if (['(', ')', '+', '-', '*', '/', '=', '<', '>', '&', '|', ','].includes(line[i])) {
-            tokens.push(line[i]);
-            i++;
-            continue;
-        }
-        // Handle strings
-        if (line[i] === "'" || line[i] === '"') {
-            const quote = line[i];
-            let j = i + 1;
-            while (j < line.length && line[j] !== quote) {
-                if (line[j] === '\\') {
-                    j++;
-                }
-                j++;
-            }
-            if (j < line.length) {
-                tokens.push(line.substring(i, j + 1));
-                i = j + 1;
-            } else {
-                tokens.push(line.substring(i));
-                i = line.length;
-            }
-            continue;
-        }
-        // Handle comments
+
+        // Check for comments first
         if (line[i] === '/' && i + 1 < line.length) {
             if (line[i + 1] === '/') {
                 tokens.push(line.substring(i));
-                break;
+                break; // Entire single-line comment captured
             } else if (line[i + 1] === '*') {
                 const commentEnd = line.indexOf('*/', i + 2);
                 if (commentEnd !== -1) {
@@ -432,9 +432,47 @@ function tokenizeLine(line: string): string[] {
                 continue;
             }
         }
+
+        // Check for multi-character tokens (e.g., ==, !=)
+        let matched = false;
+        for (const token of multiCharTokens) {
+            if (line.substring(i, i + token.length) === token) {
+                tokens.push(token);
+                i += token.length;
+                matched = true;
+                break;
+            }
+        }
+        if (matched) { continue; }
+
+        // Check for single-character tokens
+        if (['(', ')', '+', '-', '*', '/', '=', '<', '>', '&', '|', ','].includes(line[i])) {
+            tokens.push(line[i]);
+            i++;
+            continue;
+        }
+
+        // Handle strings
+        if (line[i] === "'" || line[i] === '"') {
+            const quote = line[i];
+            let j = i + 1;
+            while (j < line.length && line[j] !== quote) {
+                if (line[j] === '\\') { j++; }
+                j++;
+            }
+            if (j < line.length) {
+                tokens.push(line.substring(i, j + 1));
+                i = j + 1;
+            } else {
+                tokens.push(line.substring(i));
+                i = line.length;
+            }
+            continue;
+        }
+
         // Handle identifiers and keywords
         let j = i;
-        while (j < line.length && ![' ', '\t', '(', ')', '+', '-', '*', '/', '=', '<', '>', '&', '|', ','].includes(line[j]) && !(line[j] === '/' && j + 1 < line.length && (line[j + 1] === '/' || line[j + 1] === '*'))) {
+        while (j < line.length && ![' ', '\t', '(', ')', '+', '-', '*', '/', '=', '<', '>', '&', '|', ','].includes(line[j])) {
             j++;
         }
         tokens.push(line.substring(i, j));
@@ -444,12 +482,10 @@ function tokenizeLine(line: string): string[] {
 }
 
 function handleCommentWrapping(token: string, inMultiLineComment: boolean, hasWrappedSingleLineComment: boolean): string {
-    if (token.startsWith('//') && hasWrappedSingleLineComment) {
-        return '// ' + token.substring(2).trim();
-    } else if (inMultiLineComment && !token.startsWith('/*') && !token.endsWith('*/')) {
-        return token.trim();
-    } else if (inMultiLineComment) {
-        return ' * ' + token.trim();
+    if (inMultiLineComment) {
+        return token; // Preserve token as is within multi-line comments
+    } else if (hasWrappedSingleLineComment && !token.startsWith('//')) {
+        return '// ' + token; // Prepend '// ' to continue a wrapped single-line comment
     }
     return token;
 }
@@ -463,5 +499,6 @@ export {
     getBraceDepthChange,
     formatExpression,
     formatDate,
-    alignTextElements
+    alignTextElements,
+    wrapCommentText
 };

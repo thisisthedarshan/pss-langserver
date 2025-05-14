@@ -16,7 +16,7 @@
  */
 
 import { integer } from "vscode-languageserver";
-import alignTextElements, { formatDate, formatExpression, getBraceDepthChange, handleCommentWrapping, tokenizeLine } from "./formattingHelper";
+import alignTextElements, { formatDate, formatExpression, getBraceDepthChange, handleCommentWrapping, tokenizeLine, wrapCommentText } from "./formattingHelper";
 import { statSync } from "fs-extra";
 import * as path from 'path';
 
@@ -50,6 +50,9 @@ export function formatDocument(filePath: string, text: string, tabspace: integer
     const trimmedLine = line.trim();
     let formattedLine = formatOperators(trimmedLine);
     formattedLine = formatSingleLineComments(formattedLine);
+    if (formattedLine.startsWith("*")){
+      formattedLine = ` ${formattedLine}`;
+    }
     processedLines.push(formattedLine);
     if (formattedLine.startsWith('}') && !isInBlockComment && !(/\/\//.test(formattedLine))) {
       indentLevel = Math.max(indentLevel - tabspace, 0);
@@ -85,7 +88,7 @@ export function formatDocument(filePath: string, text: string, tabspace: integer
   return formattedLines.join('\n');
 }
 
-function wrapLine(line: string, currentIndent: string, tabspace: integer, maxColumns: integer): string[] {
+function wrapLine(line: string, currentIndent: string, tabspace: number, maxColumns: number): string[] {
   if (maxColumns === 0 || line.length <= maxColumns) {
     return [line];
   }
@@ -103,7 +106,67 @@ function wrapLine(line: string, currentIndent: string, tabspace: integer, maxCol
     const indentLength = isFirstLine ? currentIndent.length : currentIndent.length + tabspace;
     const potentialLength = indentLength + potentialLine.length;
 
-    if (potentialLength > maxColumns && currentLine) {
+    // Handle long single-line comment tokens
+    if (token.startsWith('//') && potentialLength > maxColumns) {
+      const commentText = token.substring(2).trimStart();
+      const words = commentText.split(' ');
+      let commentLines: string[] = [];
+      let currentCommentLine = '';
+      for (const word of words) {
+        const testLine = currentCommentLine ? currentCommentLine + ' ' + word : word;
+        if (indentLength + testLine.length + 3 > maxColumns) { // 3 for "// "
+          commentLines.push('// ' + currentCommentLine.trim());
+          currentCommentLine = word;
+        } else {
+          currentCommentLine = testLine;
+        }
+      }
+      if (currentCommentLine) {
+        commentLines.push('// ' + currentCommentLine.trim());
+      }
+      if (currentLine) {
+        wrappedLines.push((isFirstLine ? currentIndent : currentIndent + ' '.repeat(tabspace)) + currentLine.trimStart());
+      }
+      if (isFirstLine) {
+        wrappedLines.push(currentIndent + commentLines[0]);
+        for (let k = 1; k < commentLines.length; k++) {
+          wrappedLines.push(currentIndent + ' '.repeat(tabspace) + commentLines[k]);
+        }
+      } else {
+        commentLines.forEach(cl => wrappedLines.push(currentIndent + ' '.repeat(tabspace) + cl));
+      }
+      isFirstLine = false;
+      hasWrappedSingleLineComment = true;
+      currentLine = '';
+    }
+    // Handle long multi-line comment tokens
+    else if (token.startsWith('/*') && token.endsWith('*/') && potentialLength > maxColumns) {
+      const commentText = token.substring(2, token.length - 2).trim();
+      const words = commentText.split(' ');
+      let commentLines: string[] = [];
+      let currentCommentLine = '';
+      for (const word of words) {
+        const testLine = currentCommentLine ? currentCommentLine + ' ' + word : word;
+        if (indentLength + testLine.length + 4 > maxColumns) { // 4 for "* "
+          commentLines.push('* ' + currentCommentLine.trim());
+          currentCommentLine = word;
+        } else {
+          currentCommentLine = testLine;
+        }
+      }
+      if (currentCommentLine) {
+        commentLines.push('* ' + currentCommentLine.trim());
+      }
+      if (currentLine) {
+        wrappedLines.push((isFirstLine ? currentIndent : currentIndent + ' '.repeat(tabspace)) + currentLine.trimStart());
+      }
+      wrappedLines.push((isFirstLine ? currentIndent : currentIndent + ' '.repeat(tabspace)) + '/*');
+      commentLines.forEach(cl => wrappedLines.push(currentIndent + ' '.repeat(tabspace) + cl));
+      wrappedLines.push(currentIndent + ' '.repeat(tabspace) + '*/');
+      isFirstLine = false;
+      currentLine = '';
+    }
+    else if (potentialLength > maxColumns && currentLine) {
       const lineIndent = isFirstLine ? currentIndent : currentIndent + ' '.repeat(tabspace);
       wrappedLines.push(lineIndent + currentLine.trimStart());
       isFirstLine = false;
@@ -111,15 +174,6 @@ function wrapLine(line: string, currentIndent: string, tabspace: integer, maxCol
         hasWrappedSingleLineComment = true;
       }
       currentLine = handleCommentWrapping(token, inMultiLineComment, hasWrappedSingleLineComment);
-      // Check if next token can fit with current token post-wrap
-      if (j + 1 < tokens.length) {
-        const nextToken = tokens[j + 1];
-        const nextPotentialLine = currentLine + (currentLine && !['(', ','].includes(currentLine.slice(-1)) ? ' ' : '') + nextToken;
-        if ((indentLength + nextPotentialLine.length) <= maxColumns) {
-          currentLine = nextPotentialLine;
-          j++; // Skip the next token since we’ve included it
-        }
-      }
     } else {
       currentLine = potentialLine;
     }
@@ -140,19 +194,63 @@ function wrapLine(line: string, currentIndent: string, tabspace: integer, maxCol
 }
 
 function formatCurlyBraces(input: string): string {
-  input = input.replace(/\n\s*{/g, ' {');
+  /* 
+   * Check for comments on the same line before opening brace
+   * If a comment exists, place the brace before the comment
+   */
+  input = input.replace(/(\s*)([^\/]*?)(\s*)(\/\/.*|\/\*.*?\*\/)(\s*\n\s*{)/g, '$1$2 {$3$4$5');
+
+  /* Remove newlines before opening braces to bring them up */
+  input = input.replace(/\n\s*{/g, '');
+
+  /* Ensure space before opening brace */
   input = input.replace(/\s*{/g, ' {');
-  input = input.replace(/({)(?!\n)/g, '$1\n');
+
+  /* Ensure newline after opening brace */
+  input = input.replace(/{(?!\s*\n)/g, '{\n');
+
+  /* Add newline before closing brace if there isn't one already */
   input = input.replace(/([^\n])(\s*})(?!\n)/g, (match, p1, p2) => {
     return /\n/.test(match) ? match : p1 + '\n' + p2;
   });
-  input = input.replace(/}(?!\n)(?!\s*\n)(?!;)/g, '}\n');
+
+  /* Add newline after } unless followed by newline, semicolon, or comment */
+  input = input.replace(/}(?!\s*(?:\n|;|\/\/))/g, '}\n');
+
+  /* Add newline after } followed by a multiline comment if newline is missing */
+  input = input.replace(/}(\s*\/\*[\s\S]*?\*\/)(?!\n)/g, '}$1\n');
+
   return input;
 }
 
 function addNewlinesAfterSemicolons(input: string): string {
-  input = input.replace(/;(?!\s*(?:\n|\/\/|\/\*[^*]*\*\/))(?=\s*(?!\n))(?=\s*(?![^*]*\*\/)[^]*\n)/g, ';\n');
-  return input;
+  return input.replace(
+    /(\/\/.*|\/\*[\s\S]*?\*\/|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)|;/g,
+    (match, commentOrString, offset, string) => {
+      if (commentOrString) {
+        // If it's a comment or string literal, return it unchanged
+        return commentOrString;
+      } else {
+        // It's a semicolon; determine if a newline should be added
+        let next = offset + 1;
+        // Skip horizontal whitespace (tabs and spaces) after the semicolon
+        while (next < string.length && /[\t ]/.test(string[next])) {
+          next++;
+        }
+        // Check what follows the semicolon
+        if (next >= string.length || string[next] === '\n') {
+          // Semicolon is at end of string or followed by a newline; no extra newline needed
+          return ';';
+        } else if (string.startsWith('//', next) || string.startsWith('/*', next)) {
+          // Semicolon is followed by a comment; do not add newline
+          return ';';
+        } else {
+          // Semicolon is followed by code; add a newline
+          return ';\n';
+        }
+      }
+    }
+  );
 }
 
 function formatCommas(input: string): string {
@@ -215,8 +313,18 @@ function formatMultilineComments(documentText: string): string {
 }
 
 function formatOperators(input: string): string {
-  const multiCharOperators = ["===", "!==", "==", "!=", "<=", ">=", "=>", "+=", "-=", "*=", "/=", "&&", "||", "++", "--"];
-  const operatorRegex = new RegExp(`(${multiCharOperators.map(op => op.replace(/[-+*/%^=<>!&|]/g, '\\$&')).join('|')})|([+\\-*/%^=<>!&|])`, 'g');
+  const multiCharOperators = [
+    "===", "!==", "==", "!=", "<=", ">=", "=>", 
+    "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<=", ">>=", ">>>=",
+    "&&", "||", "++", "--", "<<", ">>", ">>>", "**"
+  ];
+  
+  multiCharOperators.sort((a, b) => b.length - a.length);
+  
+  const operatorRegex = new RegExp(
+    `(${multiCharOperators.map(op => op.replace(/[-+*/%^=<>!&|]/g, '\\$&')).join('|')})|([+\\-*/%^=<>!&|])`, 
+    'g'
+  );
 
   function formatExpression(expression: string): string {
     return expression.replace(operatorRegex, (match, multiOp, singleOp) => {

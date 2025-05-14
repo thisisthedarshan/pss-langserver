@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2025-05-14
+
+### Fixed
+
+- Single-line comment wrapping issue: Corrected tokenizeLine to prioritize // comment detection before single-character token checks, ensuring // is not split into / /. This fixed improper formatting of single-line comments where // was not preserved on wrapped lines.
+- Expression formatter issue - fixed wrong formatting of shift operators.
+
+### Added
+
+- Multi-line comment wrapping: Added logic in wrapLine to handle long multi-line comments `(/* ... */)` by splitting content into multiple lines, each prefixed with * , and maintaining proper indentation with `/*` and `*/` delimiters.
+
+
 ## [0.4.1] - 2025-05-12
 
 ### Fixed
