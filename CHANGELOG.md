@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Single-line comment wrapping issue: Corrected tokenizeLine to prioritize // comment detection before single-character token checks, ensuring // is not split into / /. This fixed improper formatting of single-line comments where // was not preserved on wrapped lines.
 - Expression formatter issue - fixed wrong formatting of shift operators.
+- Wrong indent level detection when encountering a closing brace with a comment in the sentence.
 
 ### Added
 

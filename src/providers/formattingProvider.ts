@@ -20,7 +20,7 @@ import alignTextElements, { formatDate, formatExpression, getBraceDepthChange, h
 import { statSync } from "fs-extra";
 import * as path from 'path';
 
-export function formatDocument(filePath: string, text: string, tabspace: integer, author: string, patterns: string[], formatHeader: boolean, maxColumns: integer): string {
+export function formatDocument(filePath: string, text: string, tabspace: number, author: string, patterns: string[], formatHeader: boolean, maxColumns: number): string {
   const fileName = path.basename(filePath);
   let doc: string = text;
   if (formatHeader) {
@@ -50,11 +50,11 @@ export function formatDocument(filePath: string, text: string, tabspace: integer
     const trimmedLine = line.trim();
     let formattedLine = formatOperators(trimmedLine);
     formattedLine = formatSingleLineComments(formattedLine);
-    if (formattedLine.startsWith("*")){
+    if (formattedLine.startsWith("*")) {
       formattedLine = ` ${formattedLine}`;
     }
     processedLines.push(formattedLine);
-    if (formattedLine.startsWith('}') && !isInBlockComment && !(/\/\//.test(formattedLine))) {
+    if (trimmedLine[0] === '}' && !isInBlockComment) {
       indentLevel = Math.max(indentLevel - tabspace, 0);
     }
     if ((formattedLine.startsWith(')') || formattedLine.startsWith(']')) && !isInBlockComment) {
