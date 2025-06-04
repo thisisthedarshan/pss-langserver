@@ -3,7 +3,6 @@
 This guide is aimed to help you setup the PSS Language server for your favourite IDE.
 
 > [!NOTE]
-
 > Before integrating with any IDE (Other than VS Code), please ensure you have installed the language server globally by running:
 >
 >```bash
